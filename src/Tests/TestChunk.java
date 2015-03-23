@@ -1,12 +1,25 @@
 package Tests;
 
 import static org.junit.Assert.*;
-import Main.Chunk;
 
+import java.sql.SQLException;
+
+import Main.Chunk;
+import Main.Database;
+
+import org.junit.Before;
 import org.junit.Test;
 
 public class TestChunk {
+	
+	static final String testOutputFile = "testFiles/chunkTestFileOutput.chunk";
 
+	@Before
+	public void setupDB(){
+		
+		Database.databaseToUse = DatabaseTests.testDBFile;
+	}
+	
 	@Test
 	public void testSaveChunkToFileAndRetrive() {
 	
@@ -14,12 +27,23 @@ public class TestChunk {
 		
 		
 		try {
-			Chunk c = new Chunk("id",0,s.getBytes());
 			
-			assertTrue(s.equals(new String(c.getContent())));
+			Database d = new Database(true);//we have to clear the db first
+			
+			
+			Chunk c = new Chunk("id",0,s.getBytes());
+			assertTrue(s.equals(new String(c.getContent())));//
+			
+			c.saveToFile(testOutputFile);
+			
+			String contentComingFromFile = new String(c.getContent());
+			
+			assertEquals(contentComingFromFile,s);
+			
+			
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			fail("unable to create chunk and save it");
 			e.printStackTrace();
 		}
 		
@@ -27,6 +51,30 @@ public class TestChunk {
 		
 		
 	}
-	
+
+	@Test
+	public void testSaveChunkToFileAndRetrive2() throws Exception{
+		
+		String s = "ola bom dia";
+		
+		Database d = new Database(true);//we have to clear the db first
+		
+		
+		Chunk c = new Chunk("id",0,s.getBytes(),testOutputFile);
+		
+		assertTrue(s.equals(new String(c.getContent())));//
+		
+		c.saveToFile(testOutputFile);
+		
+		String contentComingFromFile = new String(c.getContent());
+		
+		assertEquals(contentComingFromFile,s);
+		
+		
+		Chunk retrivalChunk = new Chunk("id",0);
+		
+		assertEquals(new String(retrivalChunk.getContent()),new String(c.getContent()));
+		
+	}
 
 }

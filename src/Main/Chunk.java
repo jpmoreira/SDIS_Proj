@@ -8,8 +8,8 @@ import java.io.IOException;
 
 public class Chunk {
 	
-	private int nr;
-	private String fileID = null;
+	public int nr;
+	public String fileID = null;
 	private File f = null;
 	private byte[] content = null;
 	
@@ -39,8 +39,13 @@ public class Chunk {
 			
 		}
 		
+		Database d = new Database();
+		
 		nr = number;
 		this.fileID = fileID;
+		d.addChunk(this, path);
+		
+
 		
 		
 	}
@@ -55,7 +60,7 @@ public class Chunk {
 	 * @param contentBytes the content of the chunk
 	 * @throws Exception an exception is thrown if the chunk could not be created
 	 */
-	public Chunk(String fileID,int number, byte[] contentBytes) throws Exception {
+	public Chunk(String fileID,int number, byte[] contentBytes) {
 		
 		
 		this.content = contentBytes;
@@ -74,11 +79,19 @@ public class Chunk {
 	 * If the chunk doesn't exist then an exception will be raised.
 	 * 
 	 * @param number the number of the chunk
-	 * @param fileID the fileID to wich the chunck belongs
-	 * @param path the path were the chunck is stored
+	 * @param fileID the fileID to which the chunck belongs
 	 * @throws Exception an exception that means the file doesn't exist
 	 */
-	public Chunk(String fileID,int number, String path) throws Exception {
+	public Chunk(String fileID,int number) throws Exception {
+		
+		nr = number;
+		this.fileID = fileID;
+		
+		Database d = new Database();
+		
+		String path = d.getPathForChunk(this);
+		
+		if(path == null) throw new Exception("Could not locate file");
 		
 		f = new File(path);
 		
@@ -89,8 +102,7 @@ public class Chunk {
 			
 		}
 		
-		nr = number;
-		this.fileID = fileID;
+
 		
 		
 	}
@@ -129,10 +141,15 @@ public class Chunk {
 		
 	}
 	
-	
-	
+	/**
+	 * Save a chunk to the disk and registers it. If the chunk already has an attributed file to hold it, this call is silently ignored.
+	 * @param path the path to the file where the chunk is to be saved.
+	 * @throws Exception
+	 */
 	public void saveToFile(String path) throws Exception{
 		
+		
+		if(f!=null) return;
 		
 		FileOutputStream fos = new FileOutputStream(path);
 		fos.write(content);
@@ -146,10 +163,11 @@ public class Chunk {
 			
 		}
 		
+		Database d = new Database();
+		d.addChunk(this, path);
 		content = null;//immediatly free the content if possible
 		
 		
 	}
 	
-
 }

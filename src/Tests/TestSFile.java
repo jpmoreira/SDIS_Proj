@@ -2,7 +2,6 @@ package Tests;
 
 import static org.junit.Assert.*;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -17,7 +16,7 @@ public class TestSFile {
 	public void testCreateFileThatExists() {
 		
 		try {
-			S_File file = new S_File("testFiles/oneChunkFile");
+			new S_File("testFiles/oneChunkFile");
 		} catch (Exception e) {
 			fail("coudn't open file that acctually exists");
 			e.printStackTrace();

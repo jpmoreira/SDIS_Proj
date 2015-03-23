@@ -45,11 +45,10 @@ public class S_File {
 	
 	public Chunk getChunk(int nr) throws Exception{
 		
-		int nrChunks = (int) (file.length()/64000.0);//get integer parts
-		nrChunks++;
 		
 		
-		if( nr >= nrChunks) return null;
+		
+		if( nr >= this.getNrChunks()) return null;
 		
 		byte[] b = new byte[64000];
 		RandomAccessFile raf = new RandomAccessFile(file, "r");
@@ -68,7 +67,16 @@ public class S_File {
 		return new Chunk("",nr,b);
 		
 	}
+
 	
+	public int getNrChunks(){
+		
+		int nrChunks = (int) (file.length()/64000.0);//get integer parts
+		nrChunks++;
+		
+		return nrChunks;
+		
+	}
 	
 
 }

@@ -2,9 +2,7 @@ package Tests;
 
 import static org.junit.Assert.*;
 
-import java.sql.SQLException;
-
-import Main.Chunk;
+import Chunk.FileChunk;
 import Main.Database;
 
 import org.junit.Before;
@@ -28,10 +26,12 @@ public class TestChunk {
 		
 		try {
 			
-			Database d = new Database(true);//we have to clear the db first
+			new Database(true);//we have to clear the db first
+			
+			FileChunk c  = new FileChunk("id",0,s.getBytes(),false);
 			
 			
-			Chunk c = new Chunk("id",0,s.getBytes());
+			
 			assertTrue(s.equals(new String(c.getContent())));//
 			
 			c.saveToFile(testOutputFile);
@@ -57,10 +57,20 @@ public class TestChunk {
 		
 		String s = "ola bom dia";
 		
-		Database d = new Database(true);//we have to clear the db first
+		
+		try{
+			new Database(true);//we have to clear the db first
+			
+		}
+		catch (Exception e){
+		
+			e.printStackTrace();
+			
+		}
+	
 		
 		
-		Chunk c = new Chunk("id",0,s.getBytes(),testOutputFile);
+		FileChunk c = new FileChunk("id",0,s.getBytes(),testOutputFile,false);
 		
 		assertTrue(s.equals(new String(c.getContent())));//
 		
@@ -71,10 +81,31 @@ public class TestChunk {
 		assertEquals(contentComingFromFile,s);
 		
 		
-		Chunk retrivalChunk = new Chunk("id",0);
+		FileChunk retrivalChunk = new FileChunk("id",0);
 		
 		assertEquals(new String(retrivalChunk.getContent()),new String(c.getContent()));
 		
 	}
 
+	@Test
+	public void testLoadOfChunkRestoreFlag() throws Exception{
+		
+		
+		String s = "ola bom dia";
+		
+		new Database(true);//we have to clear the db first
+		
+		
+		FileChunk c = new FileChunk("id",0,s.getBytes(),"testFiles/testChunk14.chunk",false);
+		FileChunk c2 = new FileChunk("id2",27,s.getBytes(),"testFiles/testChunk15.chunk",true);
+		
+		FileChunk c3 = new FileChunk("id",0);
+		FileChunk c4 = new FileChunk("id2",27);
+		
+		
+		assertEquals(c.restore,c3.restore);
+		assertEquals(c2.restore,c4.restore);
+		
+		
+	}
 }

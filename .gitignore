@@ -1,3 +1,6 @@
 .settings/*
 bin/*
-/bin
+
+testFiles/RIGPChunks
+RIGP_Recovery.pdf
+testFiles/testChunk*

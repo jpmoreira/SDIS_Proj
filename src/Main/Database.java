@@ -1,6 +1,13 @@
 package Main;
 
+import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
+
+import Chunk.Chunk;
+import Chunk.RecieveChunk;
+import Files.FileToBackup;
+import Files.FileToRestore;
 
 public class Database {
 	
@@ -46,22 +53,87 @@ public class Database {
 		
 	}
 	
+
 	/**
 	 * 
 	 * Puts a chunk into the database
 	 * @param chunk the chunk to be placed in the db
-	 * @param path the path to the chunk file in the file system
-	 * @throws SQLException and exception is thrown if an error occurs while inserting the file in the db.
+	 * @param a flag to state whether this is a restore chunk or not 
+	 * @throws Exception An exception is thrown if anything goes wrong
 	 */
-	public void addChunk(Chunk chunk,String path) throws SQLException{
+	public void addChunk(Chunk chunk) throws SQLException{
+		
+		
+		
 		
 		
 		Statement stmt = con.createStatement();
 		
-		String sql = "INSERT INTO Chunk (path,fileID,nr) VALUES('"+path+"','"+chunk.fileID+"',"+chunk.nr+");";
-	    stmt.executeUpdate(sql);
+		String path = chunk.getPath();
+		String sql = null;
+		
+		if(path == null){
+			
+			sql = "INSERT INTO Chunk (fileID,nr,isOwn) VALUES('"+chunk.fileID+"',"+chunk.nr+",'"+Boolean.toString(chunk.isOwn()).toUpperCase()+"');";
+			
+		}
+		else{
+			sql = "INSERT INTO Chunk (path,fileID,nr,isOwn) VALUES('"+path+"','"+chunk.fileID+"',"+chunk.nr+",'"+Boolean.toString(chunk.isOwn()).toUpperCase()+"');";
+			
+		}
+		
+		
+		stmt.execute(sql);
 	    stmt.close();
 		
+		
+	}
+
+	
+	public void setPathForChunk(RecieveChunk chunk){
+		
+		
+		try{
+			Statement stmt = con.createStatement();
+			
+			String sql = "UPDATE Chunk SET path = '"+ chunk.getPath()+"';";
+			
+			stmt.execute(sql);
+			
+			stmt.close();
+			
+		}
+		catch(Exception e){}
+		
+		
+
+		
+	}
+
+	
+	
+	public boolean chunkExists(Chunk c){
+		
+		
+		try {
+			
+			Statement stmt = con.createStatement();
+			
+			String sql = "SELECT * FROM Chunk WHERE fileID = '"+c.fileID+"' AND nr = "+c.nr+";";
+			
+			ResultSet set = stmt.executeQuery(sql);
+			
+			boolean result =false;
+			
+			if(set.next()) result = true;
+			
+			stmt.close();
+			
+			return result;
+			
+		} catch (Exception e) {
+		}
+		return false;
 		
 	}
 	
@@ -97,7 +169,34 @@ public class Database {
 	
 		
 	}
-
+	
+	/**
+	 * 
+	 * Gets the restore flag for a given chunk
+	 * @param chunk the chunk whose flag is to be returned
+	 * @return the flag value for the chunk
+	 * @throws SQLException an exception is thrown if the chunk doesn't exist
+	 */
+	public boolean getRestoreFlagForChunk(Chunk chunk) throws SQLException{
+		
+		Statement stmt = con.createStatement();
+		
+		String sql = "SELECT isOwn from Chunk WHERE fileID='"+chunk.fileID+"' AND nr = "+chunk.nr+";";
+		
+		ResultSet resultSet = stmt.executeQuery(sql);
+		
+		boolean value = false;
+		
+		while(resultSet.next()){
+			
+			if(resultSet.getString(1).toUpperCase().equals("TRUE")) value = true;
+			break;
+			
+		}
+		stmt.close();
+		return value;
+		
+	}
 	/**
 	 * 
 	 * A method that removes a chunk from the db.
@@ -160,9 +259,135 @@ public class Database {
 		
 		String sql = "DELETE from Chunk WHERE 1=1;";
 		stmt.execute(sql);
+		stmt.execute("DELETE from BackedFiles WHERE 1=1;");
 		stmt.close();
+		
+		
 		
 	}
 
+	/**
+	 * 
+	 * Returns all the chunks of a given file in an orderly fashion
+	 * @param fileID the id of the file whose chucks are to be retrieved
+	 * @param restoreChunks a boolean saying whether the restore or backup chunks are to be returned
+	 * @return an array with the found chunks, ordered in ascending order of chunk number
+	 * @throws Exception an exception thrown if anything goes wrong
+	 */
+	public RecieveChunk[] chunksForFile(String fileID,boolean ownChunks) throws Exception{
+	
+		Statement stmt = con.createStatement();
+		
+		String sql = "SELECT nr,path from Chunk where isOwn = '"+Boolean.toString(ownChunks).toUpperCase()+"' AND fileID='"+fileID+"' ORDER BY nr ASC;";
+		
+		ResultSet set = stmt.executeQuery(sql);
+		
+		//TODO: maybe discover the size before and then allocate the whole array before. More efficient
+		ArrayList<RecieveChunk> chunkList = new ArrayList<RecieveChunk>();
+		
+		while(set.next()){
+			
+			chunkList.add(new RecieveChunk(fileID,set.getInt("nr"),set.getString("path"),ownChunks));
+		}
+		
+		RecieveChunk[] array = new RecieveChunk[chunkList.size()];
+		chunkList.toArray(array);
+		
+		return array;
+		
+		
+		
+		
+	}
+
+	public void addReplicaCountToChunk(String fileID,int nr) throws SQLException{
+		
+		Statement stmt = con.createStatement();
+		
+		String sql = "UPDATE Chunk SET replicas = replicas+1 WHERE fileID = '"+fileID+"' AND nr = "+nr+";";
+		
+		stmt.execute(sql);
+		stmt.close();
+		
+		
+	}
+	
+	public int replicaCountOfChunk(String fileID,int nr) throws SQLException{
+		
+		Statement stmt = con.createStatement();
+		
+		String sql = "SELECT replicas from Chunk WHERE fileID ='"+fileID+"' AND nr = "+nr+";";
+		
+		ResultSet r = stmt.executeQuery(sql);
+		int count = -1;
+		while(r.next()){
+			
+			count = r.getInt(1);//0 is rowid
+			
+		}
+		stmt.close();
+		return count;
+		
+		
+	}
+
+	
+	public void addBackedUpFile(FileToBackup f) throws IOException, SQLException{
+		
+		Statement stmt = con.createStatement();
+		
+		String sql = "INSERT INTO BackedFiles (path,nrChunks,fileID) VALUES('"+f.file.getCanonicalPath()+"',"+f.getNrChunks()+",'"+f.getFileID()+"');";
+		
+		stmt.execute(sql);
+		
+		stmt.close();
+		
+	}
+	
+	public int getNrChunks(FileToRestore f) throws SQLException, IOException{
+		
+		
+		Statement stmt = con.createStatement();
+		
+		String sql = "SELECT nrChunks from BackedFiles WHERE fileID = '"+f.fileID+"' ;";
+		
+		
+		ResultSet resultSet = stmt.executeQuery(sql);
+		int nr = -1;
+		
+		if(resultSet.next()){
+			
+			nr = resultSet.getInt("nrChunks");
+			
+		}
+		
+		
+		stmt.close();
+		return nr;
+		
+	}
+
+	public String getPathForRestoreFile(FileToRestore f) throws SQLException{
+		
+		
+		Statement stmt = con.createStatement();
+		
+		String sql = "SELECT path from BackedFiles WHERE fileID = '"+f.fileID+"';";
+		
+		ResultSet set = stmt.executeQuery(sql);
+		
+		String result = null;
+		if(set.next()){
+			
+			result = set.getString("path");
+		}
+		
+		stmt.close();
+		
+		return result;
+		
+		
+	}
+	
 }
 

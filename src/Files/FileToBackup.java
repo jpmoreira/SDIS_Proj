@@ -1,17 +1,21 @@
 package Files;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 import java.util.Arrays;
 
-import Chunk.OwnChunk;
+import Chunk.SendChunk;
+import Main.Database;
 
-public class FileToBackup extends S_File {
+public class FileToBackup implements S_File {
 
-	private File file;
+	public File file;
 	
 	final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
 	
@@ -47,11 +51,17 @@ public class FileToBackup extends S_File {
 		
 	}
 	
-	public String getFileID() throws NoSuchAlgorithmException, UnsupportedEncodingException{
+	public String getFileID() {
 		
 		
-		return bytesToHex(this.sha256());
-
+		try{
+			return bytesToHex(this.sha256());
+		}
+		
+		catch(Exception e){
+			
+			return null;
+		}
 		
 	}
 
@@ -72,10 +82,19 @@ public class FileToBackup extends S_File {
 		
 	}
 
-	public OwnChunk getChunk(int nr) throws Exception{
+	public SendChunk getChunk(int nr) throws Exception{
 		
 		
 		
+		
+		if( nr >= this.getNrChunks()) return null;
+		
+		return new SendChunk(nr,this);
+		
+	}
+	
+	
+	public byte[] contentForChunk(int nr) throws IOException{
 		
 		if( nr >= this.getNrChunks()) return null;
 		
@@ -90,11 +109,11 @@ public class FileToBackup extends S_File {
 		if(readSize == -1)readSize=0;//if didn't read any char, meaning last chunk is empty
 		
 		if(readSize<64000){//if we don't have 64K to read shorten array before creating chunk
-			return new OwnChunk("", nr, Arrays.copyOfRange(b, 0, readSize));	
+			return Arrays.copyOfRange(b, 0, readSize);	
 			//TODO change the id here
 		}
 		
-		return new OwnChunk("",nr,b);
+		return b;
 		
 	}
 	
@@ -105,6 +124,33 @@ public class FileToBackup extends S_File {
 		nrChunks++;
 		
 		return nrChunks;
+		
+	}
+
+
+	public String getFilePath() {
+		
+		if(file == null) return null;
+		try{
+			return file.getCanonicalPath();
+		}catch(Exception e){
+			return null;
+		}
+		
+	}
+	public void addToBackupRegistry() throws SQLException, IOException{
+		
+		
+		try{
+			Database d = new Database();
+			
+			d.addBackedUpFile(this);
+			
+		}catch(Exception e){
+			
+			System.out.println("Unable to register file to backup");
+		}
+
 		
 	}
 }

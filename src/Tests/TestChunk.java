@@ -2,7 +2,7 @@ package Tests;
 
 import static org.junit.Assert.*;
 
-import Chunk.FileChunk;
+import Chunk.RecieveChunk;
 import Main.Database;
 
 import org.junit.Before;
@@ -28,7 +28,7 @@ public class TestChunk {
 			
 			new Database(true);//we have to clear the db first
 			
-			FileChunk c  = new FileChunk("id",0,s.getBytes(),false);
+			RecieveChunk c  = new RecieveChunk("id",0,s.getBytes(),false);
 			
 			
 			
@@ -70,7 +70,7 @@ public class TestChunk {
 	
 		
 		
-		FileChunk c = new FileChunk("id",0,s.getBytes(),testOutputFile,false);
+		RecieveChunk c = new RecieveChunk("id",0,s.getBytes(),testOutputFile,false);
 		
 		assertTrue(s.equals(new String(c.getContent())));//
 		
@@ -81,7 +81,7 @@ public class TestChunk {
 		assertEquals(contentComingFromFile,s);
 		
 		
-		FileChunk retrivalChunk = new FileChunk("id",0);
+		RecieveChunk retrivalChunk = new RecieveChunk("id",0,true);
 		
 		assertEquals(new String(retrivalChunk.getContent()),new String(c.getContent()));
 		
@@ -96,15 +96,15 @@ public class TestChunk {
 		new Database(true);//we have to clear the db first
 		
 		
-		FileChunk c = new FileChunk("id",0,s.getBytes(),"testFiles/testChunk14.chunk",false);
-		FileChunk c2 = new FileChunk("id2",27,s.getBytes(),"testFiles/testChunk15.chunk",true);
+		RecieveChunk c = new RecieveChunk("id",0,s.getBytes(),"testFiles/testChunk14.chunk",false);
+		RecieveChunk c2 = new RecieveChunk("id2",27,s.getBytes(),"testFiles/testChunk15.chunk",true);
 		
-		FileChunk c3 = new FileChunk("id",0);
-		FileChunk c4 = new FileChunk("id2",27);
+		RecieveChunk c3 = new RecieveChunk("id",0,true);
+		RecieveChunk c4 = new RecieveChunk("id2",27,true);
 		
 		
-		assertEquals(c.restore,c3.restore);
-		assertEquals(c2.restore,c4.restore);
+		assertEquals(c.isOwn(),c3.isOwn());
+		assertEquals(c2.isOwn(),c4.isOwn());
 		
 		
 	}

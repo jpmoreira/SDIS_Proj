@@ -1,10 +1,13 @@
 package Main;
 
+import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 
 import Chunk.Chunk;
-import Chunk.FileChunk;
+import Chunk.RecieveChunk;
+import Files.FileToBackup;
+import Files.FileToRestore;
 
 public class Database {
 	
@@ -50,43 +53,7 @@ public class Database {
 		
 	}
 	
-	/**
-	 * 
-	 * Adds a path to a chunk in a database. This should be used only for testing
-	 * @param chunk the chunk to be placed in the db
-	 * @param path the path to the chunk file in the file system
-	 * @throws Exception An exception is thrown if anything goes wrong
-	 */
-	public void addPathToChunk(FileChunk chunk,String path) throws SQLException{
-		
-		Statement stmt = con.createStatement();
-		String sql = null;
-		if(path==null){
-			
-			sql = "UPDATE Chunk set path = NULL WHERE fileID='"+chunk.fileID+"' AND nr = "+chunk.nr+";";
-			
-		}
-		else{
-		
-			sql = "UPDATE Chunk set path = '"+path+"' WHERE fileID='"+chunk.fileID+"' AND nr = "+chunk.nr+";";
-			
-			
-		}
-		
-		
-		
-		
-		
-		//String sql = "INSERT INTO Chunk (path,fileID,nr) VALUES('"+path+"','"+chunk.fileID+"',"+chunk.nr+");";
-	    stmt.executeUpdate(sql);
-	    stmt.close();
-		
-		
-	}
-	
 
-	
-	
 	/**
 	 * 
 	 * Puts a chunk into the database
@@ -94,22 +61,25 @@ public class Database {
 	 * @param a flag to state whether this is a restore chunk or not 
 	 * @throws Exception An exception is thrown if anything goes wrong
 	 */
-	public void addChunk(FileChunk chunk,boolean isRestore) throws SQLException{
+	public void addChunk(Chunk chunk) throws SQLException{
+		
+		
+		
+		
 		
 		Statement stmt = con.createStatement();
 		
 		String path = chunk.getPath();
 		String sql = null;
 		
-		
-		
 		if(path == null){
 			
-			sql = "INSERT INTO Chunk (fileID,nr,isRestore) VALUES('"+chunk.fileID+"',"+chunk.nr+",'"+Boolean.toString(chunk.restore).toUpperCase()+"');";
+			sql = "INSERT INTO Chunk (fileID,nr,isOwn) VALUES('"+chunk.fileID+"',"+chunk.nr+",'"+Boolean.toString(chunk.isOwn()).toUpperCase()+"');";
 			
 		}
 		else{
-			sql = "INSERT INTO Chunk (path,fileID,nr,isRestore) VALUES('"+path+"','"+chunk.fileID+"',"+chunk.nr+",'"+Boolean.toString(chunk.restore).toUpperCase()+"');";
+			sql = "INSERT INTO Chunk (path,fileID,nr,isOwn) VALUES('"+path+"','"+chunk.fileID+"',"+chunk.nr+",'"+Boolean.toString(chunk.isOwn()).toUpperCase()+"');";
+			
 		}
 		
 		
@@ -118,9 +88,54 @@ public class Database {
 		
 		
 	}
+
+	
+	public void setPathForChunk(RecieveChunk chunk){
+		
+		
+		try{
+			Statement stmt = con.createStatement();
+			
+			String sql = "UPDATE Chunk SET path = '"+ chunk.getPath()+"';";
+			
+			stmt.execute(sql);
+			
+			stmt.close();
+			
+		}
+		catch(Exception e){}
+		
+		
+
+		
+	}
+
 	
 	
-	
+	public boolean chunkExists(Chunk c){
+		
+		
+		try {
+			
+			Statement stmt = con.createStatement();
+			
+			String sql = "SELECT * FROM Chunk WHERE fileID = '"+c.fileID+"' AND nr = "+c.nr+";";
+			
+			ResultSet set = stmt.executeQuery(sql);
+			
+			boolean result =false;
+			
+			if(set.next()) result = true;
+			
+			stmt.close();
+			
+			return result;
+			
+		} catch (Exception e) {
+		}
+		return false;
+		
+	}
 	
 	/**
 	 * 
@@ -166,7 +181,7 @@ public class Database {
 		
 		Statement stmt = con.createStatement();
 		
-		String sql = "SELECT isRestore from Chunk WHERE fileID='"+chunk.fileID+"' AND nr = "+chunk.nr+";";
+		String sql = "SELECT isOwn from Chunk WHERE fileID='"+chunk.fileID+"' AND nr = "+chunk.nr+";";
 		
 		ResultSet resultSet = stmt.executeQuery(sql);
 		
@@ -201,8 +216,6 @@ public class Database {
 		
 	}
 
-	
-	
 	/**
 	 * 
 	 * 
@@ -246,7 +259,10 @@ public class Database {
 		
 		String sql = "DELETE from Chunk WHERE 1=1;";
 		stmt.execute(sql);
+		stmt.execute("DELETE from BackedFiles WHERE 1=1;");
 		stmt.close();
+		
+		
 		
 	}
 
@@ -258,23 +274,23 @@ public class Database {
 	 * @return an array with the found chunks, ordered in ascending order of chunk number
 	 * @throws Exception an exception thrown if anything goes wrong
 	 */
-	public FileChunk[] chunksForFile(String fileID,boolean restoreChunks) throws Exception{
+	public RecieveChunk[] chunksForFile(String fileID,boolean ownChunks) throws Exception{
 	
 		Statement stmt = con.createStatement();
 		
-		String sql = "SELECT nr,path from Chunk where isRestore = '"+Boolean.toString(restoreChunks).toUpperCase()+"' AND fileID='"+fileID+"' ORDER BY nr ASC;";
+		String sql = "SELECT nr,path from Chunk where isOwn = '"+Boolean.toString(ownChunks).toUpperCase()+"' AND fileID='"+fileID+"' ORDER BY nr ASC;";
 		
 		ResultSet set = stmt.executeQuery(sql);
 		
 		//TODO: maybe discover the size before and then allocate the whole array before. More efficient
-		ArrayList<FileChunk> chunkList = new ArrayList<FileChunk>();
+		ArrayList<RecieveChunk> chunkList = new ArrayList<RecieveChunk>();
 		
 		while(set.next()){
 			
-			chunkList.add(new FileChunk(fileID,set.getInt("nr"),set.getString("path"),restoreChunks));
+			chunkList.add(new RecieveChunk(fileID,set.getInt("nr"),set.getString("path"),ownChunks));
 		}
 		
-		FileChunk[] array = new FileChunk[chunkList.size()];
+		RecieveChunk[] array = new RecieveChunk[chunkList.size()];
 		chunkList.toArray(array);
 		
 		return array;
@@ -284,7 +300,6 @@ public class Database {
 		
 	}
 
-	
 	public void addReplicaCountToChunk(String fileID,int nr) throws SQLException{
 		
 		Statement stmt = con.createStatement();
@@ -316,5 +331,63 @@ public class Database {
 		
 	}
 
+	
+	public void addBackedUpFile(FileToBackup f) throws IOException, SQLException{
+		
+		Statement stmt = con.createStatement();
+		
+		String sql = "INSERT INTO BackedFiles (path,nrChunks,fileID) VALUES('"+f.file.getCanonicalPath()+"',"+f.getNrChunks()+",'"+f.getFileID()+"');";
+		
+		stmt.execute(sql);
+		
+		stmt.close();
+		
+	}
+	
+	public int getNrChunks(FileToRestore f) throws SQLException, IOException{
+		
+		
+		Statement stmt = con.createStatement();
+		
+		String sql = "SELECT nrChunks from BackedFiles WHERE fileID = '"+f.fileID+"' ;";
+		
+		
+		ResultSet resultSet = stmt.executeQuery(sql);
+		int nr = -1;
+		
+		if(resultSet.next()){
+			
+			nr = resultSet.getInt("nrChunks");
+			
+		}
+		
+		
+		stmt.close();
+		return nr;
+		
+	}
+
+	public String getPathForRestoreFile(FileToRestore f) throws SQLException{
+		
+		
+		Statement stmt = con.createStatement();
+		
+		String sql = "SELECT path from BackedFiles WHERE fileID = '"+f.fileID+"';";
+		
+		ResultSet set = stmt.executeQuery(sql);
+		
+		String result = null;
+		if(set.next()){
+			
+			result = set.getString("path");
+		}
+		
+		stmt.close();
+		
+		return result;
+		
+		
+	}
+	
 }
 

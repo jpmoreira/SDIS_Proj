@@ -3,19 +3,23 @@ package Files;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import Chunk.Chunk;
-import Chunk.FileChunk;
+import Chunk.RecieveChunk;
+import Main.Database;
 
-public class FileToRestore extends S_File{
+public class FileToRestore implements S_File{
 
 	
 	static String pathToRecoveryFolder = null;
 	
 
-	ArrayList<FileChunk> chunks = new ArrayList<FileChunk>();
+	ArrayList<RecieveChunk> chunks = new ArrayList<RecieveChunk>();
 	
-	String fileID = null;
+	public String fileID = null;
+	String filePath = null;
+	int nrChunks = -1;
 	
 	
 	/**
@@ -26,26 +30,115 @@ public class FileToRestore extends S_File{
 	 * @param chunks the chunks that constitute the file
 	 * @throws Exception 
 	 */
-	public FileToRestore(String filePath, FileChunk[] chunks) throws Exception{
+	public FileToRestore(String fileID, RecieveChunk[] chunks) throws Exception{
 		
-		Arrays.sort(chunks);
 		
-		String presumedFileID = chunks[0].fileID;
+		this(fileID);
 		
-		int lastNr = chunks[0].nr;
+		if(chunks != null){
+			Arrays.sort(chunks);
+			Collections.addAll(this.chunks, chunks);
+		}
+		
+		if(this.chunks.size() == this.nrChunks) this.resconstructFile();
+		
+		
+		
+		
+		
+
+		
+		
+	}
+	public FileToRestore(String fileID) throws Exception{
+		
+		
+		this.fileID = fileID;
+		
+		Database d = new Database();
+		
+		this.nrChunks = d.getNrChunks(this);
+		this.filePath = d.getPathForRestoreFile(this);
+		
+		
+		
+		
+		
+
+		
+		
+	}
+	
+	public int getNrChunks(){
+		return nrChunks;
+
+	}
+	
+	public String getFileID(){
+		
+		return fileID;
+	}
+
+	public String getFilePath(){
+	
+		return filePath;
+		
+	}
+	
+
+	public void addChunk(RecieveChunk chunk){
+		
+		if(chunk.fileID != fileID) return;
+		
+		fastInsert(chunk);
+		
+		if(chunk.inMemory()){//try to save it
+			try{
+				chunk.saveToFile(pathToRecoveryFolder+fileID+"_"+chunk.nr);
+			}
+			catch(Exception e){}
+		}
+		
+		
+		
+		if(nrChunks == chunks.size()){
+			
+			
+			
+		}
+	
+		
+		//TODO implement it
+		
+		
+	}
+
+
+	public void fastInsert(RecieveChunk c) {
+	    int pos = Collections.binarySearch(chunks, c);
+	    
+	    if(chunks.get(pos).nr == c.nr)return;//don't insert if it's already there
+	    if (pos < 0) {
+	        chunks.add(-pos-1, c);
+	    }
+	}
+
+	public void resconstructFile() throws Exception{
+		
+		
+		int lastNr = chunks.get(0).nr;
 		
 		if(lastNr!=0) throw new Exception("Missing first chunk");
 		
 		lastNr = -1; 
 		
-		for (FileChunk chunk : chunks) {
-			
-			if(!chunk.fileID.equals(presumedFileID))throw new Exception("Chunks with multiple file ids provided");
+		for (RecieveChunk chunk : chunks) {
+			if(!chunk.fileID.equals(this.fileID))throw new Exception("found chunk with non suitable chunkID");
 			lastNr++;
 			if(lastNr!=chunk.nr)throw new Exception("Missing chunk nr "+lastNr);
 		}
 		
-		if(chunks[chunks.length-1].getContent().length == 64000 )throw new Exception("Last provided chunk is not the last chunk");
+		if(chunks.get(chunks.size()-1).getContent().length == 64000 )throw new Exception("Last provided chunk is not the last chunk");
 		
 		
 		FileOutputStream fos = new FileOutputStream(filePath);
@@ -58,45 +151,6 @@ public class FileToRestore extends S_File{
 		}
 		
 		fos.close();
-		
-		
-		
-
-		
-		
-	}
-	
-	public int getNrChunks(){
-		
-		//TODO implement it
-		
-		
-		return -1;
-	}
-	
-	public String getFileID(){
-		
-		return fileID;
-	}
-
-
-	public void addChunk(FileChunk chunk){
-		
-		if(fileID == null)fileID = chunk.fileID;//if we don't have a fileID set it
-		
-		chunks.add(chunk);
-		
-		if(chunk.inMemory()){//try to save it
-			try{
-				chunk.saveToFile(pathToRecoveryFolder+fileID+"_"+chunk.nr);
-			}
-			catch(Exception e){}
-		}
-		
-		
-		
-		//TODO implement it
-		
 		
 	}
 }

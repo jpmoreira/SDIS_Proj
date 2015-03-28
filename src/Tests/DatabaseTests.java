@@ -8,7 +8,9 @@ import java.sql.SQLException;
 import org.junit.Before;
 import org.junit.Test;
 
-import Chunk.FileChunk;
+import Chunk.RecieveChunk;
+import Files.FileToBackup;
+import Files.FileToRestore;
 import Main.Database;
 
 public class DatabaseTests {
@@ -17,7 +19,8 @@ public class DatabaseTests {
 	
 	public final static String testDBFile = "testFiles/testDB.db";
 
-	 @Before public void initialize() {
+	 @Before 
+	 public void initialize() {
 	      Database.databaseToUse = testDBFile; 
 	}
 	@Test
@@ -54,7 +57,7 @@ public class DatabaseTests {
 			
 			
 			
-			FileChunk c = new FileChunk("bla",10,new String("ola bom dia").getBytes(),false);
+			RecieveChunk c = new RecieveChunk("bla",10,new String("ola bom dia").getBytes(),false);
 			c.saveToFile(originalPath);
 			
 			String path = d.getPathForChunk(c);
@@ -78,7 +81,7 @@ public class DatabaseTests {
 		Database d = new Database(true);
 		assertEquals(d.nrChunksStored(),0);
 		
-		FileChunk c = new FileChunk("asdsad",1,new String("asdasdasdsa").getBytes(),false);
+		RecieveChunk c = new RecieveChunk("asdsad",1,new String("asdasdasdsa").getBytes(),false);
 		
 		c.saveToFile("testFiles/testChunk2.chunk");
 		assertEquals(d.nrChunksStored(),1);
@@ -95,8 +98,8 @@ public class DatabaseTests {
 		String path = "testFiles/testChunk3.chunk";
 		String content = "a fantastic content";
 		
-		FileChunk c = new FileChunk("dadsad",1,content.getBytes(),false);
-		FileChunk c2 = new FileChunk("dadsad",1,content.getBytes(),true);//true or false doesn't matter here
+		RecieveChunk c = new RecieveChunk("dadsad",1,content.getBytes(),false);
+		RecieveChunk c2 = new RecieveChunk("dadsad",1,content.getBytes(),true);//true or false doesn't matter here
 		
 		c.saveToFile(path);
 		
@@ -126,8 +129,8 @@ public class DatabaseTests {
 		String path1 = "testFiles/testChunk4.chunk";
 		String path2 = "testFiles/testChunk5.chunk";
 		String content = "a fantastic content";
-		FileChunk c1 = new FileChunk("dadsad",1,content.getBytes(),false);
-		FileChunk c2 = new FileChunk("anotherFileID",1,content.getBytes(),false);
+		RecieveChunk c1 = new RecieveChunk("dadsad",1,content.getBytes(),false);
+		RecieveChunk c2 = new RecieveChunk("anotherFileID",1,content.getBytes(),false);
 		
 
 		assertEquals(d.nrChunksStored(),0);
@@ -164,8 +167,8 @@ public class DatabaseTests {
 		Database d = new Database(true);
 		String path1 = "testFiles/testChunk4.chunk";
 		String content = "a fantastic content";
-		FileChunk c1 = new FileChunk("dadsad",1,content.getBytes(),false);
-		FileChunk c2 = new FileChunk("anotherFileID",1,content.getBytes(),false);
+		RecieveChunk c1 = new RecieveChunk("dadsad",1,content.getBytes(),false);
+		RecieveChunk c2 = new RecieveChunk("anotherFileID",1,content.getBytes(),false);
 		
 
 		assertEquals(d.nrChunksStored(),0);
@@ -202,7 +205,7 @@ public class DatabaseTests {
 		
 		
 		
-		FileChunk c = new FileChunk("fileID",10,new String("contentHere").getBytes(),false);
+		RecieveChunk c = new RecieveChunk("fileID",10,new String("contentHere").getBytes(),false);
 		c.saveToFile("testFiles/testChunk6.chunk");
 		
 		
@@ -223,8 +226,8 @@ public class DatabaseTests {
 		
 		Database d = new Database(true);
 		
-		FileChunk c = new FileChunk("fileID",10,new String("contentHere").getBytes(),"testFiles/testChunk7.chunk",false);
-		FileChunk c2 = new FileChunk("anotherFileID",10,new String("anotherContent").getBytes(),false);
+		RecieveChunk c = new RecieveChunk("fileID",10,new String("contentHere").getBytes(),"testFiles/testChunk7.chunk",false);
+		RecieveChunk c2 = new RecieveChunk("anotherFileID",10,new String("anotherContent").getBytes(),false);
 		
 		
 		
@@ -254,19 +257,19 @@ public class DatabaseTests {
 		
 		assertEquals(d.nrChunksStored(), 0);
 		
-		new FileChunk("id1", 0, new String("ola").getBytes(),"testFiles/testChunk8.chunk",false);
+		new RecieveChunk("id1", 0, new String("ola").getBytes(),"testFiles/testChunk8.chunk",false);
 		
-		new FileChunk("id1",1,new String("adeus ").getBytes(),"testFiles/testChunk9.chunk",false);
+		new RecieveChunk("id1",1,new String("adeus ").getBytes(),"testFiles/testChunk9.chunk",false);
 		
-		new FileChunk("id2",0,new String("bla bla bla").getBytes(),"testFiles/testChunk10.chunk",false);
+		new RecieveChunk("id2",0,new String("bla bla bla").getBytes(),"testFiles/testChunk10.chunk",false);
 		
-		new FileChunk("id1",27,new String(" end").getBytes(),"testFiles/testChunk11.chunk",false);
+		new RecieveChunk("id1",27,new String(" end").getBytes(),"testFiles/testChunk11.chunk",false);
 		
 
 		assertEquals(d.nrChunksStored(),4);
 		
 		try{
-			FileChunk[] chunks = d.chunksForFile("id1", false);
+			RecieveChunk[] chunks = d.chunksForFile("id1", false);
 			
 			assertEquals(chunks.length,3);
 			
@@ -303,13 +306,13 @@ public class DatabaseTests {
 		
 		assertEquals(d.nrChunksStored(), 0);
 		
-		new FileChunk("id1", 0, new String("ola").getBytes(),"testFiles/testChunk10.chunk",true);
+		new RecieveChunk("id1", 0, new String("ola").getBytes(),"testFiles/testChunk10.chunk",true);
 		
-		new FileChunk("id1",1,new String("adeus ").getBytes(),"testFiles/testChunk11.chunk",true);
+		new RecieveChunk("id1",1,new String("adeus ").getBytes(),"testFiles/testChunk11.chunk",true);
 		
-		new FileChunk("id2",0,new String("bla bla bla").getBytes(),"testFiles/testChunk12.chunk",false);
+		new RecieveChunk("id2",0,new String("bla bla bla").getBytes(),"testFiles/testChunk12.chunk",false);
 		
-		new FileChunk("id1",27,new String(" end").getBytes(),"testFiles/testChunk13.chunk",false);
+		new RecieveChunk("id1",27,new String(" end").getBytes(),"testFiles/testChunk13.chunk",false);
 		
 		
 
@@ -318,7 +321,7 @@ public class DatabaseTests {
 		assertEquals(d.nrChunksStored(),4);
 		
 		
-		FileChunk[] chunks = d.chunksForFile("id1", true);
+		RecieveChunk[] chunks = d.chunksForFile("id1", true);
 		
 		assertEquals(chunks.length,2);
 		
@@ -332,7 +335,7 @@ public class DatabaseTests {
 		
 		Database d = new Database(true);
 		
-		new FileChunk("blabla",0,new String("content").getBytes(),"testFiles/replicaTest.chunk",false);
+		new RecieveChunk("blabla",0,new String("content").getBytes(),"testFiles/replicaTest.chunk",false);
 		
 		assertEquals(d.replicaCountOfChunk("blabla", 0),0);
 		
@@ -342,5 +345,25 @@ public class DatabaseTests {
 		
 		
 	}
+
+
+	@Test
+	public void addFileToBackupRecord() throws Exception{
+		
+		
+		new Database(true);
+		
+		
+		FileToBackup f = new FileToBackup("testFiles/twoChunkFileWithLastChunkEmpty");
+		f.addToBackupRegistry();
+		
+		FileToRestore r = new FileToRestore(f.getFileID(), null);
+		
+		assertEquals(f.getFileID(),r.getFileID());
+		assertEquals(f.getFilePath(),r.getFilePath());
+		assertEquals(f.getNrChunks(),f.getNrChunks());
+		
+	}
+	
 }
 

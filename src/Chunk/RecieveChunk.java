@@ -8,10 +8,12 @@ import java.sql.SQLException;
 
 import Main.Database;
 
-public class FileChunk extends Chunk {
+public class RecieveChunk extends Chunk {
 
 	protected File f = null;
-	public boolean restore = false;
+
+	
+	boolean own = false;
 	
 	/**
 	 * 
@@ -21,20 +23,18 @@ public class FileChunk extends Chunk {
 	 * @param restore
 	 * @throws Exception
 	 */
-	public FileChunk(String fileID, int nr) throws Exception {
-		super(fileID, nr);
+	public RecieveChunk(String fileID, int nr,boolean own) throws Exception {
+		super(fileID, nr,own);
 		
 		Database d = new Database();
+
 		
+		//Check if stored path exists
 		String path = d.getPathForChunk(this);
-		
-		this.restore = d.getRestoreFlagForChunk(this);
-		
 		if(path == null) throw new Exception("Could not locate file");
 		
 		f = new File(path);
-		
-		
+
 		if (!f.isFile() || !f.exists()){
 			
 			throw new Exception();
@@ -53,18 +53,15 @@ public class FileChunk extends Chunk {
 	 * @param restore
 	 * @throws SQLException
 	 */
-	public FileChunk(String fileID, int nr , byte[] content,boolean restore) throws SQLException{
-		super(fileID,nr,content);
-		this.restore = restore;
-		
-		/*Database d = new Database();
-		d.addChunk(this,restore);*/
+	public RecieveChunk(String fileID, int nr , byte[] content,boolean own) throws SQLException{
+		super(fileID,nr,content,own);
+
 		
 	}
 	
 	/**
 	 * 
-	 * Creates a FileChunk with the specified parameters. If the chunk already exists an exception is thrown
+	 * Creates a FileChunk but stores it on disk. If the chunk already exists an exception is thrown
 	 * @param fileID
 	 * @param number
 	 * @param contentBytes
@@ -72,10 +69,9 @@ public class FileChunk extends Chunk {
 	 * @param restore
 	 * @throws Exception
 	 */
-	public FileChunk(String fileID,int number, byte[] contentBytes, String path,boolean restore) throws Exception{
+	public RecieveChunk(String fileID,int number, byte[] contentBytes, String path,boolean own) throws Exception{
 		
-		super(fileID,number,contentBytes);
-		this.restore = restore;
+		super(fileID,number,contentBytes,own);
 		
 		FileOutputStream fos = new FileOutputStream(path);
 		fos.write(content);
@@ -90,23 +86,26 @@ public class FileChunk extends Chunk {
 		}
 		
 		Database d = new Database();
-		d.addChunk(this,restore);
+		
+		if(d.chunkExists(this))d.setPathForChunk(this);
+		else d.addChunk(this);
+		
+	
 	}
 	
 	/**
 	 * 
-	 * Creates a FileChunk that is already stored on disk . If the referred file doesn't exist, an exception is thrown.
+	 * Loads a FileChunk that is already stored on disk . If the referred file doesn't exist, an exception is thrown.
 	 * @param fileID
 	 * @param number
 	 * @param path
 	 * @param restore
 	 * @throws Exception
 	 */
-	public FileChunk(String fileID,int number, String path,boolean restore) throws Exception{
+	public RecieveChunk(String fileID,int number, String path,boolean own) throws Exception{
 		
-		super(fileID,number);
-		this.restore = restore;
-
+		super(fileID,number,own);
+	
 		f = new File(path);
 		
 		if (!f.isFile() || !f.exists()){
@@ -157,7 +156,7 @@ public class FileChunk extends Chunk {
 		}
 		
 		Database d = new Database();
-		d.addChunk(this, restore);
+		d.addChunk(this);
 
 		content = null;//immediatly free the content if possible
 		
@@ -234,4 +233,9 @@ public class FileChunk extends Chunk {
 		
 	}
 
+	
+	public boolean isOwn(){
+		
+		return false;
+	}
 }

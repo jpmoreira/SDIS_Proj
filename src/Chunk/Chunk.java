@@ -2,27 +2,29 @@ package Chunk;
 import java.io.IOException;
 
 
-public class Chunk implements Comparable<Chunk>{
+public abstract class Chunk implements Comparable<Chunk>{
 	
 	public int nr;
 	public String fileID = null;
 
 	protected byte[] content = null;
 	
+	boolean own = false;
 	
 	
-	
-	Chunk(String fileID,int nr){
+	Chunk(String fileID,int nr,boolean own){
 		
 		this.fileID = fileID;
 		this.nr = nr;
 		
+		this.own = own;
+		
 		
 	}
 	
-	Chunk(String fileID,int nr, byte[] content){
+	Chunk(String fileID,int nr, byte[] content,boolean own){
 		
-		this(fileID,nr);
+		this(fileID,nr,own);
 		this.content = content;
 		
 	}
@@ -41,6 +43,15 @@ public class Chunk implements Comparable<Chunk>{
 	}
 
 
+	public boolean isOwn(){
+		
+		return own;
+		
+	}
+	
+	public String getPath(){
+		return null;
+	}
 	
 	public final int compareTo(Chunk c){
 		

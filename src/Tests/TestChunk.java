@@ -2,7 +2,11 @@ package Tests;
 
 import static org.junit.Assert.*;
 
+import java.sql.SQLException;
+
 import Chunk.RecieveChunk;
+import Chunk.SendChunk;
+import Files.FileToBackup;
 import Main.Database;
 
 import org.junit.Before;
@@ -87,25 +91,30 @@ public class TestChunk {
 		
 	}
 
+
 	@Test
-	public void testLoadOfChunkRestoreFlag() throws Exception{
+	public void testIncrementAndResetOfReplicaCount() throws Exception{
 		
 		
-		String s = "ola bom dia";
+		new Database(true);
 		
-		new Database(true);//we have to clear the db first
+		FileToBackup b = new FileToBackup("testFiles/RIGP.pdf");
 		
+		SendChunk c = b.getChunk(7);
 		
-		RecieveChunk c = new RecieveChunk("id",0,s.getBytes(),"testFiles/testChunk14.chunk",false);
-		RecieveChunk c2 = new RecieveChunk("id2",27,s.getBytes(),"testFiles/testChunk15.chunk",true);
+		assertEquals(c.getReplicaCount(),0);
 		
-		RecieveChunk c3 = new RecieveChunk("id",0,true);
-		RecieveChunk c4 = new RecieveChunk("id2",27,true);
+		c.incrementReplicationCount();
 		
+		assertEquals(c.getReplicaCount(), 1);
 		
-		assertEquals(c.isOwn(),c3.isOwn());
-		assertEquals(c2.isOwn(),c4.isOwn());
+		c.incrementReplicationCount();
 		
+		assertEquals(c.getReplicaCount(),2);
+		
+		c.resetReplicationCount();
+		
+		assertEquals(c.getReplicaCount(), 0);
 		
 	}
 }

@@ -14,6 +14,16 @@ public class SendChunk extends Chunk{
 	
 	public SendChunk(String fileID,int number,boolean own) throws Exception{
 		super(fileID,number,own);
+		
+		try{
+			Database d = new Database();
+			d.chunkExists(this);
+		}
+		catch(Exception e){
+			
+			throw new Exception("Attempt to load inexisting SendChunk");
+		}
+
 	
 		
 	}
@@ -40,12 +50,6 @@ public class SendChunk extends Chunk{
 		
 		
 		
-	}
-	
-
-	@Override
-	public boolean isOwn() {
-		return true;
 	}
 	
 	

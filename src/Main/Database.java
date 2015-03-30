@@ -39,7 +39,6 @@ public class Database {
 		
 	}
 
-	
 	/**
 	 * 
 	 * Allows the creation of a Database object along with the possibility of deleting all the db data. Interesting for testing purposes.
@@ -53,7 +52,6 @@ public class Database {
 		
 	}
 	
-
 	/**
 	 * 
 	 * Puts a chunk into the database
@@ -78,6 +76,7 @@ public class Database {
 			
 		}
 		else{
+			System.out.println(chunk.isOwn());
 			sql = "INSERT INTO Chunk (path,fileID,nr,isOwn) VALUES('"+path+"','"+chunk.fileID+"',"+chunk.nr+",'"+Boolean.toString(chunk.isOwn()).toUpperCase()+"');";
 			
 		}
@@ -89,14 +88,15 @@ public class Database {
 		
 	}
 
-	
-	public void setPathForChunk(RecieveChunk chunk){
+	public void setPathForChunk(RecieveChunk chunk) throws Exception{
 		
+		
+		if(!chunk.isOwn())throw new Exception("Impossible to set path of a chunk backed up by us");
 		
 		try{
 			Statement stmt = con.createStatement();
 			
-			String sql = "UPDATE Chunk SET path = '"+ chunk.getPath()+"';";
+			String sql = "UPDATE Chunk SET path = '"+ chunk.getPath()+"' WHERE fileID = '"+chunk.fileID+"' AND nr = "+chunk.nr+";";
 			
 			stmt.execute(sql);
 			
@@ -109,8 +109,6 @@ public class Database {
 
 		
 	}
-
-	
 	
 	public boolean chunkExists(Chunk c){
 		
@@ -312,6 +310,18 @@ public class Database {
 		
 	}
 	
+	public void resetReplicaCountToChunk(String fileID,int nr) throws SQLException{
+		
+		Statement stmt = con.createStatement();
+		
+		String sql = "UPDATE Chunk SET replicas = 0 WHERE fileID = '"+fileID+"' AND nr = "+nr+";";
+		
+		stmt.execute(sql);
+		stmt.close();
+		
+		
+	}
+	
 	public int replicaCountOfChunk(String fileID,int nr) throws SQLException{
 		
 		Statement stmt = con.createStatement();
@@ -330,7 +340,6 @@ public class Database {
 		
 		
 	}
-
 	
 	public void addBackedUpFile(FileToBackup f) throws IOException, SQLException{
 		
@@ -389,5 +398,11 @@ public class Database {
 		
 	}
 	
+	public void removePathsForChunksOfFile(String fileID){
+		
+		
+		//TODO: implement it
+		
+	}
 }
 

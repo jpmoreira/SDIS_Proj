@@ -152,14 +152,15 @@ public class TestSFile {
 			
 		}
 		
-		
-		
-		RecieveChunk[] chunksArray = new RecieveChunk[file.getNrChunks()];
-		for(int i = 0 ;i <file.getNrChunks(); i++){
-			chunksArray[i]=new RecieveChunk(fileID,i,file.getChunk(i).getContent(),"testFiles/RIGPChunks/chunk"+i,true);
-		}
-		
 		try{
+		
+			RecieveChunk[] chunksArray = new RecieveChunk[file.getNrChunks()];
+			for(int i = 0 ;i <file.getNrChunks(); i++){
+				chunksArray[i]=new RecieveChunk(fileID,i,file.getChunk(i).getContent(),"testFiles/RIGPChunks/chunk"+i,true);
+			}
+		
+		
+
 			new File("testFiles/RIGP.pdf").delete();
 			new FileToRestore(fileID, chunksArray);
 		}catch(Exception e){

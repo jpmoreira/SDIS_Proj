@@ -13,8 +13,6 @@ public class RecieveChunk extends Chunk {
 	protected File f = null;
 
 	
-	boolean own = false;
-	
 	/**
 	 * 
 	 * Loads a FileChunk from disk. If the FileChunk doesn't exist an exception is thrown
@@ -163,7 +161,6 @@ public class RecieveChunk extends Chunk {
 		
 	}
 
-
 	public String getPath() {
 		
 		if(f==null)return null;
@@ -180,7 +177,6 @@ public class RecieveChunk extends Chunk {
 		
 	}
 
-
 	/**
 	 * 
 	 * Returns true if the chunk is in memory, false otherwise
@@ -191,51 +187,9 @@ public class RecieveChunk extends Chunk {
 		return f==null;
 		
 	}
-	
-	/**
-	 * 
-	 * @return the number of replicas detected so far. Zero is returned if either zero replicas were detected or this information is not available.
 
-	 */
-	public int getReplicaCount(){
-			
-		try{
-			Database d = new Database();
-			
-			return d.replicaCountOfChunk(this.fileID, this.nr);
-		}
-		catch(SQLException e){
-			
-			return 0;
-		}
-
-		
-		
-	}
-	
-	/**
-	 * increments the number of replicaCounts a given file has
-	 */
-	public void incrementReplicaCount(){
-		
-		try{
-			
-			Database d = new Database();
-			
-			d.addReplicaCountToChunk(this.fileID, this.nr);
-			
-			
-		}catch(SQLException e){
-			
-		}
-		
-		
-		
-	}
 
 	
-	public boolean isOwn(){
-		
-		return false;
-	}
+	
+
 }

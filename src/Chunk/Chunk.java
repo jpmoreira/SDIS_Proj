@@ -1,4 +1,5 @@
 package Chunk;
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -52,6 +53,11 @@ public abstract class Chunk implements Comparable<Chunk>{
 		
 	}
 	
+	/**
+	 * 
+	 * Returns the path to the file that holds the chunk
+	 * @return
+	 */
 	public String getPath(){
 		return null;
 	}
@@ -87,7 +93,10 @@ public abstract class Chunk implements Comparable<Chunk>{
 		
 	}
 
-	
+	/**
+	 * Increments the replica count of this chunk
+	 * 
+	 */
 	public void incrementReplicationCount(){
 		
 		try{	
@@ -104,6 +113,11 @@ public abstract class Chunk implements Comparable<Chunk>{
 		
 	}
 	
+	/**
+	 * 
+	 * Decrements the replica count for this chunk
+	 * 
+	 */
 	public  void resetReplicationCount(){
 		
 		try{	
@@ -114,6 +128,29 @@ public abstract class Chunk implements Comparable<Chunk>{
 		catch(Exception e){
 			
 		}
+		
+	}
+
+	public static void removeChunksOfFile(String fileID){
+		
+		
+		
+		try {
+			
+			Database d = new Database();
+			String[] filesToDelete = d.deleteChunkRegistryForFiles(fileID);
+			
+			for (String filePath : filesToDelete) {
+				
+				File f = new File(filePath);
+				f.delete();
+			}
+			
+		} catch (SQLException e) {
+			
+		}
+		
+		
 		
 	}
 }

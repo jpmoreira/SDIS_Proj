@@ -2,13 +2,21 @@ package Messages;
 
 public class ChunkMsg implements Message {
 
-	public ChunkMsg(byte[] bytes) {
+	
+
+	public ChunkMsg(String version, String fileId, String ChunNo, byte[] body) {
 		// TODO Auto-generated constructor stub
 	}
 
-	public void process() {
+	public Message process() {
 		// TODO Auto-generated method stub
-		
+		return null;
+	}
+
+	@Override
+	public byte[] toBytes() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	

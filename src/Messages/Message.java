@@ -1,9 +1,11 @@
 package Messages;
 
 public interface Message {
-	
-	public final int CRLF = 0xDA;
 
-	public void process();
+	final byte[] HEADEREND = {(byte) 0xDA,(byte) 0xDA};
+	
+	public Message process();
+	
+	public byte[] toBytes();
 	
 }

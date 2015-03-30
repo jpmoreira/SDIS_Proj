@@ -2,13 +2,21 @@ package Messages;
 
 public class RemovedMsg implements Message {
 
-	public RemovedMsg(byte[] bytes) {
-		// TODO Auto-generated constructor stub
+
+	
+	public RemovedMsg(String version, String fileId, String chunkNo) {
+		
 	}
 
-	public void process() {
+	public Message process() {
 		// TODO Auto-generated method stub
-		
+		return null;
+	}
+
+	@Override
+	public byte[] toBytes() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

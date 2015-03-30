@@ -2,7 +2,7 @@ package Messages;
 
 public interface Message {
 
-	final byte[] HEADEREND = {(byte) 0xDA,(byte) 0xDA};
+	final byte[] HEADEREND = {(byte) 0xD, (byte) 0xA, (byte) 0xD, (byte) 0xA};
 	
 	public Message process();
 	

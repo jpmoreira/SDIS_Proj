@@ -16,16 +16,12 @@ import Messages.StoredMsg;
 
 public class MessagesTests {
 	
-	byte[] out, headerEnd,body, msgToBeSent;
-	byte crlf = (byte) 0xDA;
+	byte[] out,body, msgToBeSent;
 	Message processedMsg;
 	
 	@Before
 	public void initialize(){
 		
-		headerEnd = new byte[2];
-		headerEnd[0] = crlf;
-		headerEnd[1] = crlf;
 		body = "BODY".getBytes();
 		
 	}
@@ -33,9 +29,9 @@ public class MessagesTests {
 	
 	private void appendHeaderEnd(byte[] msg) {
 		
-		out = new byte[msg.length + 2];
+		out = new byte[msg.length + Message.HEADEREND.length];
 		System.arraycopy(msg, 0, out, 0, msg.length);
-		System.arraycopy(headerEnd, 0, out, msg.length, 2);
+		System.arraycopy(Message.HEADEREND, 0, out, msg.length, Message.HEADEREND.length);
 		
 	}
 	

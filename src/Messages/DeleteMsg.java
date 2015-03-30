@@ -1,10 +1,24 @@
+/*
+ * 
+ */
 package Messages;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class DeleteMsg.
+ */
 public class DeleteMsg implements Message {
 
+	/** The file id. */
 	private String version, fileID;
-	
+	private final String MSGCOD = "DELETE";
 
+	/**
+	 * Instantiates a new delete msg.
+	 *
+	 * @param version the version
+	 * @param fileId the file id
+	 */
 	public DeleteMsg(String version, String fileId) {
 		
 		this.version = version;
@@ -12,18 +26,30 @@ public class DeleteMsg implements Message {
 		
 	}
 
+	
+	
+	
+	/* (non-Javadoc)
+	 * @see Messages.Message#process()
+	 */
 	public Message process() {
 		// TODO Remove chunk and update database
 		
 		
-		// TODO Enhancement
+		
+		// TODO Enhancement 
 		return null;
 	}
+	
+	
 
+	/* (non-Javadoc)
+	 * @see Messages.Message#toBytes()
+	 */
 	@Override
 	public byte[] toBytes() {
 		
-		byte[] header = ("DELETE " + version + " " + fileID + " ").getBytes();
+		byte[] header = buildHeader();
 		
 		byte[] msgToSend = new byte[header.length + HEADEREND.length];
 		
@@ -32,6 +58,13 @@ public class DeleteMsg implements Message {
 		
 		return msgToSend;
 		
+	}
+
+
+
+
+	public byte[] buildHeader() {
+		return (MSGCOD + " " + version + " " + fileID + " ").getBytes();
 	}
 
 }

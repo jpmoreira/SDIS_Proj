@@ -1,16 +1,31 @@
+/*
+ * 
+ */
 package Messages;
 
 import java.io.IOException;
 
 import Chunk.*;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class ChunkMsg.
+ */
 public class ChunkMsg implements Message {
+
 
 	private String version, fileID;
 	int nr,repDeg;
 	private byte[] body;
 	
+	private final String MSGCOD = "CHUNK";
+	
 
+	/**
+	 * Instantiates a new chunk msg.
+	 *
+	 * @param chunk the chunk
+	 */
 	public ChunkMsg(Chunk chunk) {
 		this.fileID = chunk.fileID;
 		this.nr = chunk.nr;
@@ -23,6 +38,14 @@ public class ChunkMsg implements Message {
 		}
 	}
 
+	/**
+	 * Instantiates a new chunk msg.
+	 *
+	 * @param version the version
+	 * @param fileId the file id
+	 * @param chunkNo the chunk no
+	 * @param body the body
+	 */
 	public ChunkMsg(String version, String fileId, String chunkNo, byte[] body) {
 		this.version = version;
 		this.fileID = fileId;
@@ -31,6 +54,9 @@ public class ChunkMsg implements Message {
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see Messages.Message#process()
+	 */
 	public Message process() {
 		
 		try {
@@ -47,10 +73,13 @@ public class ChunkMsg implements Message {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see Messages.Message#toBytes()
+	 */
 	@Override
 	public byte[] toBytes() {
 		
-		byte[] header = ("CHUNK " + version + " " + fileID + " " + nr + " " + repDeg + " ").getBytes();
+		byte[] header = buildHeader();
 		
 		byte[] msgToSend = new byte[header.length + HEADEREND.length + body.length];
 		
@@ -60,6 +89,11 @@ public class ChunkMsg implements Message {
 		
 		return msgToSend;
 		
+	}
+
+	public byte[] buildHeader() {
+		 
+		return (MSGCOD  + " " + version + " " + fileID + " " + nr + " " + repDeg + " ").getBytes();
 	}
 	
 	

@@ -1,24 +1,69 @@
+/*
+ * 
+ */
 package Messages;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class StoredMsg.
+ */
 public class StoredMsg implements Message {
 
+	private final String MSGCOD = "STORED";
+	private String version;
+	private String fileID;
+	private int nr;
+
+
+	/**
+	 * Instantiates a new stored msg.
+	 *
+	 * @param bytes the bytes
+	 */
 	public StoredMsg(byte[] bytes) {
 		// TODO Auto-generated constructor stub
 	}
 
+	/**
+	 * Instantiates a new stored msg.
+	 *
+	 * @param version the version
+	 * @param fileId the file id
+	 * @param chunkNo the chunk no
+	 */
 	public StoredMsg(String version, String fileId, String chunkNo) {
-		// TODO Auto-generated constructor stub
+		this.version = version;
+		this.fileID = fileId;
+		this.nr = Integer.parseInt(chunkNo);
 	}
 
+	/* (non-Javadoc)
+	 * @see Messages.Message#process()
+	 */
 	public Message process() {
-		// TODO Auto-generated method stub
+		// TODO update database
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see Messages.Message#toBytes()
+	 */
 	@Override
 	public byte[] toBytes() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		byte[] header = buildHeader();
+		
+		byte[] msgToSend = new byte[header.length + HEADEREND.length];
+		
+		System.arraycopy(header, 0, msgToSend, 0, header.length);
+		System.arraycopy(HEADEREND, 0, msgToSend, header.length, HEADEREND.length);	
+		
+		return msgToSend;
+	}
+
+	
+	public byte[] buildHeader() {
+		return  (MSGCOD  + " " + version + " " + fileID + " " + nr + " ").getBytes();
 	}
 
 }

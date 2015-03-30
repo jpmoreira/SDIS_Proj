@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package Messages;
 
 import java.io.IOException;
@@ -5,13 +8,29 @@ import java.io.IOException;
 import Chunk.*;
 
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class PutChunkMsg.
+ */
 public class PutChunkMsg implements Message {
 	
+	private final String MSGCOD = "PUTCHUNK";
+
+	/** The file id. */
 	private String version, fileID;
+	
+	/** The rep deg. */
 	int nr,repDeg;
+	
+	/** The body. */
 	private byte[] body;
 	
 
+	/**
+	 * Instantiates a new put chunk msg.
+	 *
+	 * @param chunk the chunk
+	 */
 	public PutChunkMsg(SendChunk chunk) {
 		this.fileID = chunk.fileID;
 		this.nr = chunk.nr;
@@ -24,7 +43,19 @@ public class PutChunkMsg implements Message {
 		}
 		
 	}
+	
+	
+	
 
+	/**
+	 * Instantiates a new put chunk msg.
+	 *
+	 * @param version the version
+	 * @param fileId the file id
+	 * @param chunkNo the chunk no
+	 * @param repDeg the rep deg
+	 * @param body the body
+	 */
 	public PutChunkMsg(String version, String fileId, String chunkNo,
 			String repDeg, byte[] body) {
 		
@@ -35,6 +66,12 @@ public class PutChunkMsg implements Message {
 		
 	}
 
+	
+	
+	
+	/* (non-Javadoc)
+	 * @see Messages.Message#process()
+	 */
 	public Message process() {
 
 		try {
@@ -51,11 +88,18 @@ public class PutChunkMsg implements Message {
 		return new StoredMsg(version, fileID, "" + nr);
 		
 	}
+	
+	
+	
+	
 
+	/* (non-Javadoc)
+	 * @see Messages.Message#toBytes()
+	 */
 	@Override
 	public byte[] toBytes() {
 		
-		byte[] header = ("PUTCHUNK " + version + " " + fileID + " " + nr + " " + repDeg + " ").getBytes();
+		byte[] header = buildHeader();
 		
 		byte[] msgToSend = new byte[header.length + HEADEREND.length + body.length];
 		
@@ -64,6 +108,13 @@ public class PutChunkMsg implements Message {
 		System.arraycopy(body, 0, msgToSend, header.length+HEADEREND.length, body.length);		
 		
 		return msgToSend;
+	}
+
+
+
+
+	public byte[] buildHeader() {
+		return (MSGCOD + " " + version + " " + fileID + " " + nr + " " + repDeg + " ").getBytes();
 	}
 	
 

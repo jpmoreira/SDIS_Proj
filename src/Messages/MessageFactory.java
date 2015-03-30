@@ -1,7 +1,20 @@
+/*
+ * 
+ */
 package Messages;
 
+
+/**
+ * A factory for creating Message objects.
+ */
 public class MessageFactory {
 	
+	/**
+	 * Process message.
+	 *
+	 * @param msg the msg
+	 * @return the message
+	 */
 	public static Message processMessage(byte[] msg) {
 		
 		int msgSize = msg.length;

@@ -45,7 +45,7 @@ public class FileToBackup implements S_File {
 		
 		String text = file.getName()+file.lastModified()+file.length();
 
-		md.update(text.getBytes("UTF-8")); // Change this to "UTF-16" if needed
+		md.update(text.getBytes("UTF-8"));
 		
 		return md.digest();
 		
@@ -93,7 +93,6 @@ public class FileToBackup implements S_File {
 		
 	}
 	
-	
 	public byte[] contentForChunk(int nr) throws IOException{
 		
 		if( nr >= this.getNrChunks()) return null;
@@ -116,7 +115,6 @@ public class FileToBackup implements S_File {
 		return b;
 		
 	}
-	
 
 	public int getNrChunks(){
 		
@@ -126,7 +124,6 @@ public class FileToBackup implements S_File {
 		return nrChunks;
 		
 	}
-
 
 	public String getFilePath() {
 		
@@ -138,6 +135,7 @@ public class FileToBackup implements S_File {
 		}
 		
 	}
+
 	public void addToBackupRegistry() throws SQLException, IOException{
 		
 		

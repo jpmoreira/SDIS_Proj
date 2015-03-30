@@ -404,5 +404,30 @@ public class Database {
 		//TODO: implement it
 		
 	}
+
+	public String[] deleteChunkRegistryForFiles(String fileID) throws SQLException{
+		
+		Statement stmt = con.createStatement();
+		
+		
+		
+		ResultSet set = stmt.executeQuery("SELECT path FROM Chunk where fileID = '"+fileID+"'");
+		
+		String[] toReturn = new String[set.getFetchSize()];
+		
+		int i = 0;
+		while(set.next()){
+			
+			toReturn[i++]=set.getString("path");
+			
+		}
+		
+		stmt.execute("DELETE FROM Chunk WHERE fileID = '"+fileID+"';");
+		
+		stmt.close();
+		
+		return toReturn;
+		
+	}
 }
 

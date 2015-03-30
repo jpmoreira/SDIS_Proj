@@ -91,7 +91,6 @@ public class TestChunk {
 		
 	}
 
-
 	@Test
 	public void testIncrementAndResetOfReplicaCount() throws Exception{
 		
@@ -117,4 +116,13 @@ public class TestChunk {
 		assertEquals(c.getReplicaCount(), 0);
 		
 	}
+
+	@Test
+	public void testRemovalOfChunks(){
+		
+		
+		
+	}
+
+	
 }

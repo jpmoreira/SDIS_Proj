@@ -52,7 +52,6 @@ public class SendChunk extends Chunk{
 		
 	}
 	
-	
 	@Override
 	public byte[] getContent() throws IOException {
 		

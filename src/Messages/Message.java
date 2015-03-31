@@ -3,7 +3,7 @@
  */
 package Messages;
 
-// TODO: Auto-generated Javadoc
+
 /**
  * The Interface Message.
  */

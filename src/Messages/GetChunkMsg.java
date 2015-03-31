@@ -5,7 +5,7 @@ package Messages;
 
 import Chunk.*;
 
-// TODO: Auto-generated Javadoc
+
 /**
  * The Class GetChunkMsg.
  */

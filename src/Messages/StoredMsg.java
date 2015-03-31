@@ -3,7 +3,7 @@
  */
 package Messages;
 
-// TODO: Auto-generated Javadoc
+
 /**
  * The Class StoredMsg.
  */
@@ -14,15 +14,6 @@ public class StoredMsg implements Message {
 	private String fileID;
 	private int nr;
 
-
-	/**
-	 * Instantiates a new stored msg.
-	 *
-	 * @param bytes the bytes
-	 */
-	public StoredMsg(byte[] bytes) {
-		// TODO Auto-generated constructor stub
-	}
 
 	/**
 	 * Instantiates a new stored msg.
@@ -41,7 +32,9 @@ public class StoredMsg implements Message {
 	 * @see Messages.Message#process()
 	 */
 	public Message process() {
+		
 		// TODO update database
+		
 		return null;
 	}
 

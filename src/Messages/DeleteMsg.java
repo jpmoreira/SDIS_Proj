@@ -3,7 +3,6 @@
  */
 package Messages;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class DeleteMsg.
  */

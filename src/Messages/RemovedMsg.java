@@ -5,7 +5,6 @@ package Messages;
 
 import Chunk.SendChunk;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class RemovedMsg.
  */
@@ -36,18 +35,16 @@ public class RemovedMsg implements Message {
 	 * @see Messages.Message#process()
 	 */
 	public Message process() {
-		// TODO Auto-generated method stub
 		
 		SendChunk chunk;
 		
 		try {
 			chunk = new SendChunk(fileID, nr, false);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			System.out.println("File not found.");
+			System.out.println(e.getMessage());
 			chunk = null;
 		}
-		
+	//TODO check replicationDegree
 		if (chunk == null /*|| repDeg >= expRepDeg */) return null;		
 		
 		return new PutChunkMsg(chunk);

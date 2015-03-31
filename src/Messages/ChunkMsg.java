@@ -7,7 +7,7 @@ import java.io.IOException;
 
 import Chunk.*;
 
-// TODO: Auto-generated Javadoc
+
 /**
  * The Class ChunkMsg.
  */
@@ -33,8 +33,7 @@ public class ChunkMsg implements Message {
 		try {
 			this.body = chunk.getContent();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 	}
 

@@ -3,6 +3,9 @@
  */
 package Messages;
 
+import Chunk.Chunk;
+import Main.Database;
+
 
 /**
  * The Class StoredMsg.
@@ -34,6 +37,7 @@ public class StoredMsg implements Message {
 	public Message process() {
 		
 		// TODO update database
+		
 		
 		return null;
 	}

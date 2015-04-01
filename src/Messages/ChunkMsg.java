@@ -38,12 +38,12 @@ public class ChunkMsg implements Message {
 	}
 
 	/**
-	 * Instantiates a new chunk msg.
+	 * Instantiates a new chunk message.
 	 *
-	 * @param version the version
+	 * @param version the version of the protocol
 	 * @param fileId the file id
-	 * @param chunkNo the chunk no
-	 * @param body the body
+	 * @param chunkNo the chunk number
+	 * @param body the chunk received (bytes)
 	 */
 	public ChunkMsg(String version, String fileId, String chunkNo, byte[] body) {
 		this.version = version;

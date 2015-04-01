@@ -3,6 +3,8 @@
  */
 package Messages;
 
+import Chunk.*;
+
 /**
  * The Class DeleteMsg.
  */
@@ -32,8 +34,8 @@ public class DeleteMsg implements Message {
 	 * @see Messages.Message#process()
 	 */
 	public Message process() {
-		// TODO Remove chunk and update database
 		
+		Chunk.removeChunksOfFile(fileID);
 		
 		
 		// TODO Enhancement 

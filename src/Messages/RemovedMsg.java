@@ -18,7 +18,7 @@ public class RemovedMsg implements Message {
 	int nr, repDeg;
 
 	/**
-	 * Instantiates a new removed msg.
+	 * Instantiates a new removed message.
 	 *
 	 * @param version the version
 	 * @param fileId the file id

@@ -21,10 +21,10 @@ public class SendChunk extends Chunk{
 		
 		try{
 			Database d = new Database();
-			d.chunkExists(this);
+			if(!d.chunkExists(this))throw new Exception();
 			path = d.getPathForChunk(this);
 			
-			if(path == null)throw new Exception();
+			//if(path == null)throw new Exception();
 			
 		}
 		catch(Exception e){
@@ -75,6 +75,8 @@ public class SendChunk extends Chunk{
 			return f.contentForChunk(this.nr);
 		}
 		else{
+			
+			if(this.path == null)return null;
 			
 			File file = new File(this.getPath());
 			FileInputStream is = new FileInputStream(this.getPath());

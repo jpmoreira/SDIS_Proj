@@ -532,5 +532,11 @@ public class Database {
 		
 		
 	}
+
+
+	public RecieveChunk getChunkInBetterConditionToBeDeleted(){
+		
+		
+	}
 }
 

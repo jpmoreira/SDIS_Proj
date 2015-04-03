@@ -133,9 +133,6 @@ public abstract class Chunk implements Comparable<Chunk>{
 	}
 
 
-
-
-
 	public static void cleanupChunks(String fileID){
 		
 		try{
@@ -156,5 +153,22 @@ public abstract class Chunk implements Comparable<Chunk>{
 	
 	public abstract int desiredReplicationDegree();
 	
-	//TODO: Method to say if desired replication rate was met
+	public boolean desiredReplicationDegreeMet() throws SQLException{
+		
+		
+		Database d = new Database();
+		
+		int desired = d.getDesiredReplicationDegreeForChunk(this);
+		
+		int actual = d.replicaCountOfChunk(this.fileID, this.nr);
+		
+		if(desired <= actual)return true;
+		
+		return false;
+		
+		
+		
+	}
+	
+
 }

@@ -217,8 +217,6 @@ public class FileToRestore implements S_File{
 		
 	}
 
-	
-	//TODO check if is given support for desired replication rate...
 	public static String fileIDForBackedFile(String path){
 		
 		File f = new File(path);

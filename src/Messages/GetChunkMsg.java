@@ -9,15 +9,11 @@ import Chunk.*;
 /**
  * The Class GetChunkMsg.
  */
-public class GetChunkMsg implements Message {
+public class GetChunkMsg extends Message {
 
 	private final String MSGCOD = "GETCHUNK";
 
-	/** The file id. */
-	private String version, fileID;
-	
-	/** The rep deg. */
-	int nr;
+	private RecieveChunk chunk;
 
 	
 	
@@ -30,9 +26,13 @@ public class GetChunkMsg implements Message {
 	 * @param chunkNo the chunk no
 	 */
 	public GetChunkMsg(String version, String fileId, String chunkNo) {
-		this.version = version;
-		this.fileID = fileId;
-		this.nr = Integer.parseInt(chunkNo);
+		super(version);
+		
+		try {
+			this.chunk = new RecieveChunk(fileId,Integer.parseInt(chunkNo));
+		} catch (Exception e) {
+			chunk = null;
+		}
 	}
 
 	
@@ -42,16 +42,14 @@ public class GetChunkMsg implements Message {
 	 * @see Messages.Message#process()
 	 */
 	public Message process() {
+		if  (chunk == null) return null;
 		
-		SendChunk chunk;
 		try {
-			chunk = new SendChunk(fileID, nr, false);
+			return new ChunkMsg(new SendChunk(chunk.fileID, chunk.nr),getVersion());
 		} catch (Exception e) {
-			System.out.println("Chunk not found!");
-			chunk = null;
+			
 		}
-	
-		return new ChunkMsg(chunk);
+		return null;
 	}
 
 	
@@ -77,7 +75,7 @@ public class GetChunkMsg implements Message {
 
 
 	public byte[] buildHeader() {
-		return (MSGCOD + " " + version + " " + fileID + " "  + nr + " ").getBytes();
+		return (MSGCOD + " " + getVersion() + " " + chunk.fileID + " "  + chunk.nr + " ").getBytes();
 	}
 
 }

@@ -21,9 +21,7 @@ public class MessagesTests {
 	
 	@Before
 	public void initialize(){
-		
 		body = "BODY".getBytes();
-		
 	}
 	
 	

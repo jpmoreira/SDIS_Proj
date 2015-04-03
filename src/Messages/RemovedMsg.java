@@ -8,14 +8,14 @@ import Chunk.SendChunk;
 /**
  * The Class RemovedMsg.
  */
-public class RemovedMsg implements Message {
+public class RemovedMsg extends Message {
 
 	
 	private final String MSGCOD = "REMOVED";
 	
-	private String version, fileID;
-	
-	int nr, repDeg;
+	int repDeg;
+
+	private SendChunk chunk = null;
 
 	/**
 	 * Instantiates a new removed message.
@@ -25,29 +25,24 @@ public class RemovedMsg implements Message {
 	 * @param chunkNo the chunk no
 	 */
 	public RemovedMsg(String version, String fileId, String chunkNo) {
-		this.version = version;
-		this.fileID = fileId;
-		this.nr = Integer.parseInt(chunkNo);
 		
+		super(version);
+		try {
+			this.chunk = new SendChunk(fileId, Integer.parseInt(chunkNo));
+		} catch (Exception e) {
+			
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see Messages.Message#process()
 	 */
 	public Message process() {
-		
-		SendChunk chunk;
-		
-		try {
-			chunk = new SendChunk(fileID, nr, false);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			chunk = null;
-		}
-	//TODO check replicationDegree
+
+		//TODO check replicationDegree
 		if (chunk == null /*|| repDeg >= expRepDeg */) return null;		
 		
-		return new PutChunkMsg(chunk);
+		return new PutChunkMsg(chunk, getVersion());
 		
 	}
 
@@ -72,7 +67,7 @@ public class RemovedMsg implements Message {
 	@Override
 	public byte[] buildHeader() {
 		
-		return (MSGCOD + " " + version + " " + fileID + " "  + nr + " ").getBytes();
+		return (MSGCOD + " " + getVersion() + " " + chunk.fileID + " "  + chunk.nr + " ").getBytes();
 	}
 
 }

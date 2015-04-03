@@ -15,6 +15,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 
+import Files.FileToBackup;
+
 public class Gui extends Dialog implements UserInterface {
 
 	private static final String VERSION = "1.0";
@@ -105,6 +107,8 @@ public class Gui extends Dialog implements UserInterface {
 					setBackupFileEnable(true);
 				} else {
 					setBackupFileEnable(false);
+					fileToBackup.setText("");
+					pathToFile = "";
 				}
 			}
 		});
@@ -119,7 +123,10 @@ public class Gui extends Dialog implements UserInterface {
 				FileDialog dlg = new FileDialog(btnBrowseBackUp.getShell(),  SWT.OPEN );
 				dlg.setText("Open");
 				pathToFile = dlg.open();
-				if (pathToFile == null) return;	
+				if (pathToFile == null) {
+					pathToFile = "";
+					return;	
+				}
 				fileToBackup.setText(dlg.getFileName());	
 			}
 		});
@@ -153,11 +160,10 @@ public class Gui extends Dialog implements UserInterface {
 		btnBackup.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				String path = fileToBackup.getText();
-				if (path.equals("")) {
-					//MessageDialog.openError(null, "Printer Error Message", "Error getting print reply file.");
+				if (pathToFile.equals("")) {
+//					MessageDialog.openError(null, "Printer Error Message", "Error getting print reply file.");
 				} else {
-					startBackup(path, repDeg.getSelection());
+					startBackup(pathToFile, repDeg.getSelection());
 				}
 			}
 		});
@@ -176,6 +182,8 @@ public class Gui extends Dialog implements UserInterface {
 					setRestoreFileEnable(true);
 				} else {
 					setRestoreFileEnable(false);
+					fileToRestore.setText("");
+					pathToFile = "";
 				}
 			}
 		});
@@ -184,12 +192,19 @@ public class Gui extends Dialog implements UserInterface {
 		btnSelectRestoreFile.setBounds(25, 100, 95, 25);
 		btnSelectRestoreFile.setText("Select File");
 		btnSelectRestoreFile.setEnabled(false);
+		btnSelectRestoreFile.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (selectFileFromBackUp()) {
+					fileToRestore.setText(pathToFile);
+				};	
+			}
+		});
 		
 		lblRestorePath = new Label(grpStandardActions, SWT.NONE);
 		lblRestorePath.setText("Path");
-		lblRestorePath.setBounds(120, 103, 30, 18);
+		lblRestorePath.setBounds(120, 103, 30, 21);
 		lblRestorePath.setEnabled(false);
-		
 		
 		fileToRestore = new Text(grpStandardActions, SWT.BORDER);
 		fileToRestore.setBounds(150, 101, 190, 19);
@@ -227,6 +242,7 @@ public class Gui extends Dialog implements UserInterface {
 					setDeleteFileEnable(true);
 				} else {
 					setDeleteFileEnable(false);
+					fileToDelete.setText("");
 				}
 			}
 		});
@@ -235,6 +251,14 @@ public class Gui extends Dialog implements UserInterface {
 		btnSelectDeleteFile.setBounds(25, 170, 95, 28);
 		btnSelectDeleteFile.setText("Select File");
 		btnSelectDeleteFile.setEnabled(false);
+		btnSelectDeleteFile.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (selectFileFromBackUp()) {
+					fileToDelete.setText(pathToFile);
+				};	
+			}
+		});
 		
 		lblDeletePath = new Label(grpStandardActions, SWT.NONE);
 		lblDeletePath.setText("Path");
@@ -242,7 +266,7 @@ public class Gui extends Dialog implements UserInterface {
 		lblDeletePath.setEnabled(false);
 		
 		fileToDelete = new Text(grpStandardActions, SWT.BORDER);
-		fileToDelete.setBounds(149, 172, 190, 19);
+		fileToDelete.setBounds(149, 172, 190, 21);
 		fileToDelete.setEditable(false);
 		fileToDelete.setEnabled(false);
 		
@@ -297,6 +321,17 @@ public class Gui extends Dialog implements UserInterface {
 		btnFreeSpace.setBounds(150, 237, 100, 28);
 		btnFreeSpace.setText("Free Space");
 		btnFreeSpace.setEnabled(false);
+		btnFreeSpace.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				String path = fileToDelete.getText();
+				if (path.equals("")) {
+					//MessageDialog.openError(null, "Printer Error Message", "Error getting print reply file.");
+				} else {
+					startReclaiming(kbToFree.getSelection());
+				}
+			}
+		});
 		
 		
 		Button btnExit = new Button(shell, SWT.NONE);
@@ -315,6 +350,19 @@ public class Gui extends Dialog implements UserInterface {
 		lblVersion.setText("Version " + VERSION);
 
 	}
+	
+
+	private boolean selectFileFromBackUp() {
+		String[] backupFiles = FileToBackup.backedFiles();
+		BackupTable dlg = new BackupTable(btnRestoreFile.getShell(), backupFiles);
+		
+		if (dlg.open()) {
+			pathToFile = dlg.getFile();
+			return true;
+		}
+		return false;
+	}
+
 	
 	
 	// BUTTON TOOGLES ======================================================================
@@ -351,21 +399,7 @@ public class Gui extends Dialog implements UserInterface {
 		btnFreeSpace.setEnabled(b);	
 	}
 	
-	
-	
-	
 
-	protected void startDelete(String path) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	
-
-	protected void startRestore(String path) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	protected void startBackup(String path, int replications) {
 		// TODO launch threat
@@ -374,8 +408,7 @@ public class Gui extends Dialog implements UserInterface {
 		try {
 			backupFile(path, replications);
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
 		}
 		
 	}
@@ -385,6 +418,19 @@ public class Gui extends Dialog implements UserInterface {
 		// TODO Auto-generated method stub
 		
 	}
+	
+
+	protected void startRestore(String path) {
+		// TODO Auto-generated method stub
+		
+		try {
+			restoreFile(path);
+		} catch (RemoteException e) {
+
+		}
+		
+	}
+	
 
 	@Override
 	public void restoreFile(String path) throws RemoteException {
@@ -392,12 +438,29 @@ public class Gui extends Dialog implements UserInterface {
 		
 	}
 
+	
+	
+	protected void startDelete(String path) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
+
 	@Override
 	public void deleteFile(String path) throws RemoteException {
 		// TODO Auto-generated method stub
 		
 	}
 
+	
+	
+	protected void startReclaiming(int selection) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
 	@Override
 	public void reclaimSpace(int size) throws RemoteException {
 		// TODO Auto-generated method stub

@@ -4,18 +4,18 @@
 package Messages;
 
 import Chunk.Chunk;
+import Chunk.RecieveChunk;
 import Main.Database;
 
 
 /**
  * The Class StoredMsg.
  */
-public class StoredMsg implements Message {
+public class StoredMsg extends Message {
 
 	private final String MSGCOD = "STORED";
-	private String version;
-	private String fileID;
-	private int nr;
+
+	private RecieveChunk chunk = null;
 
 
 	/**
@@ -26,9 +26,14 @@ public class StoredMsg implements Message {
 	 * @param chunkNo the chunk no
 	 */
 	public StoredMsg(String version, String fileId, String chunkNo) {
-		this.version = version;
-		this.fileID = fileId;
-		this.nr = Integer.parseInt(chunkNo);
+		super(version);
+	
+		try {
+			this.chunk = new RecieveChunk(fileId, Integer.parseInt(chunkNo));
+		} catch (Exception e) {
+
+		}
+		
 	}
 
 	/* (non-Javadoc)
@@ -37,10 +42,14 @@ public class StoredMsg implements Message {
 	public Message process() {
 		
 		// TODO update database
+		if (chunk == null) return null;
 		
+		chunk.incrementReplicationCount();
 		
 		return null;
 	}
+	
+	
 
 	/* (non-Javadoc)
 	 * @see Messages.Message#toBytes()
@@ -60,7 +69,7 @@ public class StoredMsg implements Message {
 
 	
 	public byte[] buildHeader() {
-		return  (MSGCOD  + " " + version + " " + fileID + " " + nr + " ").getBytes();
+		return  (MSGCOD  + " " + getVersion() + " " + chunk.fileID + " " + chunk.nr + " ").getBytes();
 	}
 
 }

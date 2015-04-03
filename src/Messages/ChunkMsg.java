@@ -6,19 +6,17 @@ package Messages;
 import java.io.IOException;
 
 import Chunk.*;
+import Files.FileToRestore;
 
 
 /**
  * The Class ChunkMsg.
  */
-public class ChunkMsg implements Message {
+public class ChunkMsg extends Message {
 
 
-	private String version, fileID;
-	int nr,repDeg;
-	private byte[] body;
-	
 	private final String MSGCOD = "CHUNK";
+	private Chunk chunk;
 	
 
 	/**
@@ -26,15 +24,9 @@ public class ChunkMsg implements Message {
 	 *
 	 * @param chunk the chunk
 	 */
-	public ChunkMsg(Chunk chunk) {
-		this.fileID = chunk.fileID;
-		this.nr = chunk.nr;
-		//this.repDeg = chunk.
-		try {
-			this.body = chunk.getContent();
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		}
+	public ChunkMsg(SendChunk chunk, String version) {
+		super(version);
+		this.chunk = chunk;
 	}
 
 	/**
@@ -45,12 +37,15 @@ public class ChunkMsg implements Message {
 	 * @param chunkNo the chunk number
 	 * @param body the chunk received (bytes)
 	 */
-	public ChunkMsg(String version, String fileId, String chunkNo, byte[] body) {
-		this.version = version;
-		this.fileID = fileId;
-		this.nr = Integer.parseInt(chunkNo);
-		this.body = body;
+	public ChunkMsg(String version, String fileId, String chunkNo, byte[] body) {	
+		super(version);
 		
+		try {
+			new FileToRestore(fileId);
+			this.chunk = new RecieveChunk(fileId,Integer.parseInt(chunkNo),body);
+		} catch (Exception e1) {
+			
+		}
 	}
 
 	/* (non-Javadoc)
@@ -59,15 +54,11 @@ public class ChunkMsg implements Message {
 	public Message process() {
 		
 		try {
-
-			new RecieveChunk(fileID, nr, body, "path", false);
-
-			System.out.println("Chunk stored...");
-
-		} catch (Exception e) {
-			System.out.println("Chunk already exists.");
+			new FileToRestore(chunk.fileID).addChunk((RecieveChunk) chunk);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
-		
 		//TODO Enhancement
 		return null;
 	}
@@ -79,6 +70,14 @@ public class ChunkMsg implements Message {
 	public byte[] toBytes() {
 		
 		byte[] header = buildHeader();
+		
+		byte[] body = new byte[0];
+		try {
+			body = chunk.getContent();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		byte[] msgToSend = new byte[header.length + HEADEREND.length + body.length];
 		
@@ -92,7 +91,7 @@ public class ChunkMsg implements Message {
 
 	public byte[] buildHeader() {
 		 
-		return (MSGCOD  + " " + version + " " + fileID + " " + nr + " " + repDeg + " ").getBytes();
+		return (MSGCOD  + " " + getVersion() + " " + chunk.fileID + " " + chunk.nr + " ").getBytes();
 	}
 	
 	

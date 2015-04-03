@@ -8,11 +8,12 @@ import Chunk.*;
 /**
  * The Class DeleteMsg.
  */
-public class DeleteMsg implements Message {
+public class DeleteMsg extends Message {
 
 	/** The file id. */
-	private String version, fileID;
 	private final String MSGCOD = "DELETE";
+	private String fileID;
+	
 
 	/**
 	 * Instantiates a new delete msg.
@@ -21,8 +22,7 @@ public class DeleteMsg implements Message {
 	 * @param fileId the file id
 	 */
 	public DeleteMsg(String version, String fileId) {
-		
-		this.version = version;
+		super(version);
 		this.fileID = fileId;
 		
 	}
@@ -35,7 +35,7 @@ public class DeleteMsg implements Message {
 	 */
 	public Message process() {
 		
-		Chunk.removeChunksOfFile(fileID);
+		Chunk.cleanupChunks(fileID);
 		
 		
 		// TODO Enhancement 
@@ -65,7 +65,7 @@ public class DeleteMsg implements Message {
 
 
 	public byte[] buildHeader() {
-		return (MSGCOD + " " + version + " " + fileID + " ").getBytes();
+		return (MSGCOD + " " + getVersion() + " " + fileID + " ").getBytes();
 	}
 
 }

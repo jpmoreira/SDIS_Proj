@@ -12,18 +12,10 @@ import Chunk.*;
 /**
  * The Class PutChunkMsg.
  */
-public class PutChunkMsg implements Message {
+public class PutChunkMsg extends Message {
 	
 	private final String MSGCOD = "PUTCHUNK";
-
-	/** The file id. */
-	private String version, fileID;
-	
-	/** The rep deg. */
-	int nr,repDeg;
-	
-	/** The body. */
-	private byte[] body;
+	private Chunk chunk = null;
 	
 
 	/**
@@ -31,15 +23,9 @@ public class PutChunkMsg implements Message {
 	 *
 	 * @param chunk the chunk
 	 */
-	public PutChunkMsg(SendChunk chunk) {
-		this.fileID = chunk.fileID;
-		this.nr = chunk.nr;
-		//this.repDeg = chunk.
-		try {
-			this.body = chunk.getContent();
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		}
+	public PutChunkMsg(SendChunk chunk, String version) {
+		super(version);
+		this.chunk = chunk;
 		
 	}
 	
@@ -58,10 +44,17 @@ public class PutChunkMsg implements Message {
 	public PutChunkMsg(String version, String fileId, String chunkNo,
 			String repDeg, byte[] body) {
 		
-		this.version = version;
-		this.fileID = fileId;
-		this.nr = Integer.parseInt(chunkNo);
-		this.body = body;
+		super(version);
+		try {
+			this.chunk = new RecieveChunk(fileId, Integer.parseInt(chunkNo));
+			this.chunk = null;
+		} catch (Exception e) {
+			try {
+				this.chunk = new RecieveChunk(fileId, Integer.parseInt(chunkNo),body);
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+		}
 		
 	}
 
@@ -73,18 +66,18 @@ public class PutChunkMsg implements Message {
 	 */
 	public Message process() {
 
+		if (chunk == null) return null;
+	
+		
+		//TODO reverter se necessário
 		try {
-			
-			new RecieveChunk(fileID, nr, body, "path", false);
-
-			System.out.println("Chunk stored...");
 			
 		} catch (Exception e) {
 			System.out.println("Chunk already exists.");
 			return null;
 		}
 		
-		return new StoredMsg(version, fileID, "" + nr);
+		return new StoredMsg(getVersion(), chunk.fileID, "" + chunk.nr);
 		
 	}
 	
@@ -100,6 +93,14 @@ public class PutChunkMsg implements Message {
 		
 		byte[] header = buildHeader();
 		
+		byte[] body = new byte[0];
+		try {
+			body = chunk.getContent();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		byte[] msgToSend = new byte[header.length + HEADEREND.length + body.length];
 		
 		System.arraycopy(header, 0, msgToSend, 0, header.length);
@@ -113,7 +114,8 @@ public class PutChunkMsg implements Message {
 
 
 	public byte[] buildHeader() {
-		return (MSGCOD + " " + version + " " + fileID + " " + nr + " " + repDeg + " ").getBytes();
+		//TODO add replication number
+		return (MSGCOD + " " + getVersion() + " " + chunk.fileID + " " + chunk.nr + " " + 1 + " ").getBytes();
 	}
 	
 

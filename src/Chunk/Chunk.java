@@ -153,7 +153,7 @@ public abstract class Chunk implements Comparable<Chunk>{
 	
 	public abstract int desiredReplicationDegree();
 	
-	public boolean desiredReplicationDegreeMet() throws SQLException{
+	public boolean desiredReplicationDegreeMet(){
 		
 		
 		

@@ -535,11 +535,12 @@ public class Database {
 
 
 	public RecieveChunk getChunkInBetterConditionToBeDeleted(){
+	
+		/*
+		Statement stmt = con.createStatement();
 		
-		//Statement stmt = con.createStatement();
-		
-		//stmt.executeQuery("SELECT * from Chunk WHERE ()");
-		
+		stmt.executeQuery("SELECT * from Chunk WHERE (SELECT * from BackedFiles WHERE BackedFiles.fileID = Chunk.fileID)");
+		*/
 		return null;
 	}
 }

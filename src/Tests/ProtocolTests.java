@@ -141,62 +141,7 @@ public class ProtocolTests {
 			}
 		
 			
-			SendChunk[] chunksToSend = file.getChunks();
-			ArrayList<byte[]> msgsRecieved = new ArrayList<byte[]>();
-			
-			assertEquals(dbSource.nrChunksStored(),file.getNrChunks());
-			
-			//SEND MESSAGES
-			for (SendChunk sendChunk : chunksToSend) {
-				
-				Message msgToSend = new PutChunkMsg(sendChunk, Message.getVersion());
-				
-				msgsRecieved.add(msgToSend.toBytes());
-				
-			}
-			
-			
-			// RECEIVE MESSAGES
-			Database.databaseToUse = "supportingFiles/supportingDB_2.db";
-			Database dbDest = new Database(true);
-			ArrayList<byte[]> returnMsgs = new ArrayList<byte[]>();
-			
-			for (byte[] bs : msgsRecieved) {
-				
-				Message msg = MessageFactory.processMessage(bs);			
-				assertTrue(msg instanceof PutChunkMsg);
-				
-				Message rtrnMsg = msg.process();
-				assertTrue(rtrnMsg instanceof StoredMsg);
-				
-				returnMsgs.add(rtrnMsg.toBytes());
-							
-			}
-			
-			
-			// RETURN MESSAGES
-			Database.databaseToUse = "supportingFiles/supportingDB.db";
-			for (byte[] bs : returnMsgs) {
-				
-				Message msg = MessageFactory.processMessage(bs);
-				assertTrue(msg instanceof StoredMsg);
-				
-				Message resultMsg = msg.process();
-				assertNull(resultMsg);
-				
-			}
-			
-			
-			// Check Source DB
-			String[] files = dbSource.backedFilePaths();
-			
-			assertEquals(files.length,1);
-			assertEquals(files[0],file.getFilePath());			
-			assertEquals(dbSource.nrChunksStored(),file.getNrChunks());
-			
-			
-			// Check Destiny DB
-			assertEquals(dbDest.chunksForFile(file.getFileID()).length,file.getNrChunks());
+
 			
 		} catch (Exception e) {
 			fail("Error");

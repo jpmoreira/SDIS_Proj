@@ -3,7 +3,7 @@ package Chunk;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-
+import java.sql.SQLException;
 
 import Files.FileToBackup;
 import Main.Database;
@@ -15,7 +15,6 @@ public class SendChunk extends Chunk{
 	FileToBackup f = null;
 	String path = null;
 	
-//TODO test loading sendchunk
 	public SendChunk(String fileID,int number) throws Exception{
 		super(fileID,number);
 		
@@ -96,8 +95,7 @@ public class SendChunk extends Chunk{
 	}
 	
 	
-	
-	//TODO recievechunk é facultativo o repDeg
+
 	
 
 }

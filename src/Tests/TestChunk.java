@@ -233,4 +233,56 @@ public class TestChunk {
 		
 		
 	}
+
+	@Test
+	public void testReplicaCountMetOrNot() throws Exception{
+		
+		
+		Database d = new Database(true);
+		RecieveChunk r = new RecieveChunk("ola", 1, new String("aasdasd").getBytes(),10);
+		
+		assertFalse(r.desiredReplicationDegreeMet());
+		
+		assertEquals(r.getReplicaCount(),0);
+		assertEquals(d.replicaCountOfChunk(r.fileID, r.nr),0);
+		
+		r.incrementReplicationCount();
+		
+		assertEquals(r.getReplicaCount(),1);
+		assertEquals(d.replicaCountOfChunk(r.fileID, r.nr),1);
+		
+		assertFalse(r.desiredReplicationDegreeMet());
+		
+		r.incrementReplicationCount();
+		r.incrementReplicationCount();
+		r.incrementReplicationCount();
+		r.incrementReplicationCount();
+		r.incrementReplicationCount();
+		r.incrementReplicationCount();
+		r.incrementReplicationCount();
+		r.incrementReplicationCount();
+		
+		assertEquals(r.getReplicaCount(),9);
+		assertEquals(d.replicaCountOfChunk(r.fileID, r.nr),9);
+		
+		assertFalse(r.desiredReplicationDegreeMet());
+		
+		r.incrementReplicationCount();
+		
+		assertTrue(r.desiredReplicationDegreeMet());
+		assertEquals(r.getReplicaCount(),10);
+		assertEquals(d.replicaCountOfChunk(r.fileID, r.nr),10);
+		
+		r.incrementReplicationCount();
+		
+		assertTrue(r.desiredReplicationDegreeMet());
+		assertEquals(r.getReplicaCount(),11);
+		assertEquals(d.replicaCountOfChunk(r.fileID, r.nr),11);
+		
+		
+		
+		
+		
+		
+	}
 }

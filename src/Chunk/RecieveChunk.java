@@ -43,6 +43,10 @@ public class RecieveChunk extends Chunk {
 		
 	}
 	
+	//TODO: get chunk with most degree
+	
+	//TODO: verify when creating receive chunk that space is available
+	
 	/**
 	 * 
 	 * Creates a FileChunk stored in memory.The chunk must be from a file we backed before. The content of the chunk is stored with the default name on the default folder
@@ -113,7 +117,7 @@ public class RecieveChunk extends Chunk {
 	
 	}
 	
-	//TODO when creating filetobackup desired degree should be passed in constructor
+
 	/**
 	 * 
 	 * Creates a FileChunk but stores it on disk.The chunk must not belong to us. If the chunk already exists an exception is thrown
@@ -252,7 +256,6 @@ public class RecieveChunk extends Chunk {
 		
 	}
 
-	
 	public void cleanup() throws Exception{
 		
 		

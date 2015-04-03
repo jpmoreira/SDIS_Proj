@@ -400,10 +400,16 @@ public class TestSFile {
 	}
 
 	@Test
-	public void testFileDesiredRepDegreeInDB() throws SQLException{
+	public void testFileDesiredRepDegreeInDB() throws Exception{
 		
 		
 		Database d = new Database(true);
+		
+		FileToBackup b = new FileToBackup("testFiles/RIGP.pdf", 7);
+		
+		
+		assertEquals(b.desiredRepDegree,7);
+		assertEquals(7,d.getDesiredReplicationDegreeForFile(b.getFileID()));
 		
 		
 	}

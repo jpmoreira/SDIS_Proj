@@ -539,7 +539,8 @@ public class Database {
 		/*
 		Statement stmt = con.createStatement();
 		
-		stmt.executeQuery("SELECT * from Chunk WHERE (SELECT * from BackedFiles WHERE BackedFiles.fileID = Chunk.fileID)");
+		
+		stmt.executeQuery("SELECT * from Chunk WHERE (SELECT Count(*) FROM BackedFiles WHERE BackedFiles.fileID = Chunk.fileID) = 0");
 		*/
 		return null;
 	}

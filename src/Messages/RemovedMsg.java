@@ -41,7 +41,7 @@ public class RemovedMsg extends Message {
 
 		//TODO check replicationDegree
 		
-		if (chunk == null || chunk. >= expRepDeg */) return null;		
+		if (chunk == null || chunk.desiredReplicationDegreeMet()) return null;		
 		
 		return new PutChunkMsg(chunk, getVersion());
 		

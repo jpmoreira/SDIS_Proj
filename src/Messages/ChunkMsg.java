@@ -56,8 +56,7 @@ public class ChunkMsg extends Message {
 		try {
 			new FileToRestore(chunk.fileID).addChunk((RecieveChunk) chunk);
 		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+
 		}
 		//TODO Enhancement
 		return null;
@@ -75,8 +74,7 @@ public class ChunkMsg extends Message {
 		try {
 			body = chunk.getContent();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
 		}
 		
 		byte[] msgToSend = new byte[header.length + HEADEREND.length + body.length];

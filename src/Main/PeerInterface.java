@@ -3,7 +3,7 @@ package Main;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface UserInterface extends Remote {
+public interface PeerInterface extends Remote {
 	
 	public void backupFile(String path, int repDeg) throws RemoteException; 
 	

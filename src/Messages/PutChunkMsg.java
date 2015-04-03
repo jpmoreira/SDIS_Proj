@@ -97,8 +97,7 @@ public class PutChunkMsg extends Message {
 		try {
 			body = chunk.getContent();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
 		}
 		
 		byte[] msgToSend = new byte[header.length + HEADEREND.length + body.length];
@@ -114,8 +113,7 @@ public class PutChunkMsg extends Message {
 
 
 	public byte[] buildHeader() {
-		//TODO add replication number
-		return (MSGCOD + " " + getVersion() + " " + chunk.fileID + " " + chunk.nr + " " + 1 + " ").getBytes();
+		return (MSGCOD + " " + getVersion() + " " + chunk.fileID + " " + chunk.nr + " " + chunk.desiredReplicationDegree() + " ").getBytes();
 	}
 	
 

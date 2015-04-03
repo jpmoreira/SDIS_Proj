@@ -2,7 +2,7 @@ package Main;
 
 import java.rmi.RemoteException;
 
-public class App implements UserInterface {
+public class App implements PeerInterface {
 	
 	
 	public static void main(String[] args) {

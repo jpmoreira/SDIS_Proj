@@ -1,6 +1,9 @@
 package Main;
 
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -17,7 +20,7 @@ import org.eclipse.swt.widgets.Text;
 
 import Files.FileToBackup;
 
-public class Gui extends Dialog implements UserInterface {
+public class Gui extends Dialog {
 
 	private static final String VERSION = "1.0";
 	
@@ -50,6 +53,8 @@ public class Gui extends Dialog implements UserInterface {
 	
 	
 	private String pathToFile;
+
+	private PeerInterface p;
 	
 	
 
@@ -61,6 +66,16 @@ public class Gui extends Dialog implements UserInterface {
 	public Gui(Shell parent) {
 		super(parent, SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
 		setText("Serverless Distributed Backup Service");
+		
+		try {
+			Registry registry = LocateRegistry.getRegistry();
+			
+			p = (PeerInterface) registry.lookup("peer");
+	
+			
+		} catch (RemoteException | NotBoundException e) {}
+		
+		
 	}
 
 	/**
@@ -402,69 +417,33 @@ public class Gui extends Dialog implements UserInterface {
 
 
 	protected void startBackup(String path, int replications) {
-		// TODO launch threat
-		
-		
 		try {
-			backupFile(path, replications);
-		} catch (RemoteException e) {
-
-		}
-		
+			p.backupFile(path, replications);
+		} catch (RemoteException e) {}
 	}
 
-	@Override
-	public void backupFile(String path, int repDeg) throws RemoteException {
-		// TODO Auto-generated method stub
-		
-	}
 	
-
+	
 	protected void startRestore(String path) {
-		// TODO Auto-generated method stub
-		
 		try {
-			restoreFile(path);
-		} catch (RemoteException e) {
-
-		}
-		
+			p.restoreFile(path);
+		} catch (RemoteException e) {}	
 	}
 	
-
-	@Override
-	public void restoreFile(String path) throws RemoteException {
-		// TODO Auto-generated method stub
-		
-	}
-
 	
 	
 	protected void startDelete(String path) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	
-
-	@Override
-	public void deleteFile(String path) throws RemoteException {
-		// TODO Auto-generated method stub
-		
+		try {
+			p.deleteFile(path);
+		} catch (RemoteException e) {}
 	}
 
 	
 	
-	protected void startReclaiming(int selection) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	
-	@Override
-	public void reclaimSpace(int size) throws RemoteException {
-		// TODO Auto-generated method stub
-		
+	protected void startReclaiming(int size) {
+		try {
+			p.reclaimSpace(size);
+		} catch (RemoteException e) {}	
 	}
 	
 	

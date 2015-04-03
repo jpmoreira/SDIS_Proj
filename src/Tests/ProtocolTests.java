@@ -11,7 +11,10 @@ import org.junit.runners.MethodSorters;
 
 import Chunk.SendChunk;
 import Files.FileToBackup;
+import Files.FileToRestore;
 import Main.Database;
+import Messages.ChunkMsg;
+import Messages.GetChunkMsg;
 import Messages.Message;
 import Messages.MessageFactory;
 import Messages.PutChunkMsg;
@@ -27,7 +30,7 @@ public class ProtocolTests {
 			Database.databaseToUse = "supportingFiles/supportingDB.db";
 			Database dbSource = new Database(true);
 			
-			FileToBackup file = new FileToBackup("testFiles/oneChunkFile");
+			FileToBackup file = new FileToBackup("testFiles/oneChunkFile", 1);
 			
 		
 			
@@ -109,10 +112,33 @@ public class ProtocolTests {
 
 		try {
 			Database.databaseToUse = "supportingFiles/supportingDB.db";
-			Database dbSource = new Database(true);
+			Database dbSource = new Database();
 			
-			FileToBackup file = new FileToBackup("testFiles/oneChunkFile");
+			FileToRestore file = new FileToRestore(FileToRestore.fileIDForBackedFile("testFiles/oneChunkFile"));
 			
+			// ASK FOR CHUNKS
+			ArrayList<byte[]> msgsToSend = new ArrayList<byte[]>();
+			for (int i = 0; i < file.getNrChunks(); i++){
+				
+				Message msg = new GetChunkMsg(Message.getVersion(), file.fileID, Integer.toString(i));
+				msgsToSend.add(msg.toBytes());
+				
+			}
+			
+			
+			// PROCESS REQUESTS
+			Database.databaseToUse = "supportingFiles/supportingDB_2.db";
+			Database dbDest = new Database();
+			for (byte[] bs : msgsToSend) {
+				
+				Message request = MessageFactory.processMessage(bs);
+				assertTrue(request instanceof GetChunkMsg);
+				
+				Message returnMessage = request.process();
+				assertTrue(returnMessage instanceof ChunkMsg);
+				
+				
+			}
 		
 			
 			SendChunk[] chunksToSend = file.getChunks();

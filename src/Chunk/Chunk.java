@@ -1,5 +1,4 @@
 package Chunk;
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -12,6 +11,8 @@ public abstract class Chunk implements Comparable<Chunk>{
 	public String fileID = null;
 
 	protected byte[] content = null;
+	
+
 	
 	Chunk(String fileID,int nr){
 		
@@ -60,9 +61,7 @@ public abstract class Chunk implements Comparable<Chunk>{
 	 * Returns the path to the file that holds the chunk
 	 * @return
 	 */
-	public String getPath(){
-		return null;
-	}
+	public abstract String getPath();
 	
 	public final int compareTo(Chunk c){
 		
@@ -154,6 +153,8 @@ public abstract class Chunk implements Comparable<Chunk>{
 		
 	}
 	
+	
+	public abstract int desiredReplicationDegree();
 	
 	//TODO: Method to say if desired replication rate was met
 }

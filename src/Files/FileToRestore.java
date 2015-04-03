@@ -60,6 +60,9 @@ public class FileToRestore implements S_File{
 		this.filePath = d.getPathForRestoreFile(this);
 		
 		
+		if(this.filePath == null) throw new Exception("Attempt to restore non backedup file"); 
+		
+		
 		
 		
 		
@@ -173,7 +176,6 @@ public class FileToRestore implements S_File{
 		
 	}
 
-
 	public boolean isRestored(){
 		
 		
@@ -215,4 +217,25 @@ public class FileToRestore implements S_File{
 		
 	}
 
+	
+	//TODO check if is given support for desired replication rate...
+	public static String fileIDForBackedFile(String path){
+		
+		File f = new File(path);
+		
+		
+		try{
+			Database d = new Database();
+			
+			return d.fileIDForBackedFile(f.getCanonicalPath());	
+			
+		}
+		catch(Exception e){
+			
+			return null;
+			
+		}
+
+		
+	}
 }

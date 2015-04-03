@@ -1,18 +1,21 @@
 package Tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.sql.SQLException;
+
+import org.junit.Before;
+import org.junit.Test;
 
 import Chunk.Chunk;
 import Chunk.RecieveChunk;
 import Chunk.SendChunk;
 import Files.FileToBackup;
 import Main.Database;
-
-import org.junit.Before;
-import org.junit.Test;
 
 public class TestChunk {
 	
@@ -34,7 +37,7 @@ public class TestChunk {
 			
 			new Database(true);//we have to clear the db first
 			
-			RecieveChunk c  = new RecieveChunk("id",0,s.getBytes(),testOutputFile);
+			RecieveChunk c  = new RecieveChunk("id",0,s.getBytes(),testOutputFile,1);
 			
 			assertTrue(s.equals(new String(c.getContent())));//
 			
@@ -72,7 +75,7 @@ public class TestChunk {
 	
 		
 		
-		RecieveChunk c = new RecieveChunk("id",0,s.getBytes(),testOutputFile);
+		RecieveChunk c = new RecieveChunk("id",0,s.getBytes(),testOutputFile,5);
 		
 		assertTrue(s.equals(new String(c.getContent())));//
 		
@@ -94,7 +97,7 @@ public class TestChunk {
 		
 		new Database(true);
 		
-		FileToBackup b = new FileToBackup("testFiles/RIGP.pdf");
+		FileToBackup b = new FileToBackup("testFiles/RIGP.pdf",100);
 		
 		SendChunk c = b.getChunk(7);
 		
@@ -114,15 +117,14 @@ public class TestChunk {
 		
 	}
 
-
 	@Test
 	public void testCleanupOfChunks() throws Exception{
 		
 		new Database(true);
 		
 		
-		RecieveChunk c1 = new RecieveChunk("asdasdasff", 0, new String("OLA BOM DIA").getBytes());
-		RecieveChunk c2 = new RecieveChunk("asdasdasff", 10, new String("OLA BOA TARDE").getBytes());
+		RecieveChunk c1 = new RecieveChunk("asdasdasff", 0, new String("OLA BOM DIA").getBytes(),3);
+		RecieveChunk c2 = new RecieveChunk("asdasdasff", 10, new String("OLA BOA TARDE").getBytes(),5);
 		
 		
 		File f1 = new File(c1.getPath());
@@ -132,7 +134,7 @@ public class TestChunk {
 		assertTrue(f2.exists());
 		
 		
-		Database d = new Database();
+		new Database();
 		
 
 		assertNotNull(c1.getPath());
@@ -158,6 +160,77 @@ public class TestChunk {
 		
 	}
 
+	@Test
+	public void testLoadingSendChunkFromPreviouslyStoredChunk() throws Exception{
+		
+		new Database(true);
+		
+		
+		byte[] content = new String("ola bom dia").getBytes("UTF8");
+		
+		new RecieveChunk("ola", 7, content,3);
+		
+		try{
+			
+			new SendChunk("ola", 0);
+			fail("failed to throw exception while loadin inexisting chunk to send");
+		}
+		catch(Exception e){
+			
+			assertTrue(true);
+		}
+		
+		SendChunk s = new SendChunk("ola",7);
+		
+		String str = new String(s.getContent());
+		
+		assertEquals(str,"ola bom dia");
+		
+		
+		
+		
+	}
 
-	
+	@Test
+	public void testReplicationRateFromFile() throws Exception{
+		
+		Database d = new Database(true);
+		
+		FileToBackup b = new FileToBackup("testFiles/RIGP.pdf",10);
+		
+		SendChunk[] chunks = b.getChunks();
+		
+		for (SendChunk sendChunk : chunks) {
+			
+			assertEquals(sendChunk.desiredReplicationDegree(),b.desiredRepDegree);
+			assertEquals(b.desiredRepDegree, d.getDesiredReplicationDegreeForChunk(sendChunk));
+		}
+
+		
+		
+		
+	}
+
+	@Test
+	public void testReplicationRateWithoutFile() throws Exception{
+		
+		Database d = new Database(true);
+		
+		try{
+			
+			RecieveChunk r = new RecieveChunk("aFileID", 0, new String("aContent").getBytes());
+			fail("failed to notice that shouldn't allow creation of recievechunk cause file doesn't exist");
+		}
+		catch(Exception e ){
+			
+			assertTrue(true);
+		}
+		
+		RecieveChunk r = new RecieveChunk("aFileID", 0, new String("aContent").getBytes(),15);
+		
+		assertEquals(d.getDesiredReplicationDegreeForChunk(r),15);
+		
+		
+		
+	}
 }

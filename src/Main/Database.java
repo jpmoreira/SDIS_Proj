@@ -1,5 +1,7 @@
 package Main;
 
+
+//TODO: space management
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
@@ -20,6 +22,8 @@ public class Database {
 	
 	public static String databaseToUse = null;
 	private static String defaultDeploymentDB = "supportingFiles/supportingDB.db";
+	
+	public static String defaultBackupDir = "backups/";
 	
 	/**
 	 * 
@@ -93,8 +97,9 @@ public class Database {
 		
 		if(!chunk.isOwn())throw new Exception("Impossible to set path of a chunk backed up by us");
 		
+		Statement stmt = null;
 		try{
-			Statement stmt = con.createStatement();
+			stmt = con.createStatement();
 			
 			String sql = "UPDATE Chunk SET path = '"+ chunk.getPath()+"' WHERE fileID = '"+chunk.fileID+"' AND nr = "+chunk.nr+";";
 			
@@ -103,7 +108,10 @@ public class Database {
 			stmt.close();
 			
 		}
-		catch(Exception e){}
+		catch(Exception e){
+			
+			if(stmt != null)stmt.close();
+		}
 		
 		
 
@@ -272,24 +280,32 @@ public class Database {
 	 * @return an array with the found chunks, ordered in ascending order of chunk number
 	 * @throws Exception an exception thrown if anything goes wrong
 	 */
-	public RecieveChunk[] chunksForFile(String fileID,boolean ownChunks) throws Exception{
+	public RecieveChunk[] chunksForFile(String fileID) throws Exception{
 	
 		Statement stmt = con.createStatement();
 		
-		String sql = "SELECT nr,path from Chunk where isOwn = '"+Boolean.toString(ownChunks).toUpperCase()+"' AND fileID='"+fileID+"' ORDER BY nr ASC;";
+		String sql = "SELECT nr,path from Chunk where fileID='"+fileID+"' ORDER BY nr ASC;";
 		
 		ResultSet set = stmt.executeQuery(sql);
 		
-		//TODO: maybe discover the size before and then allocate the whole array before. More efficient
+		
 		ArrayList<RecieveChunk> chunkList = new ArrayList<RecieveChunk>();
 		
-		while(set.next()){
+		try{
+		
+			while(set.next()){
+				
+				chunkList.add(new RecieveChunk(fileID,set.getInt("nr"),set.getString("path")));
+			}
 			
-			chunkList.add(new RecieveChunk(fileID,set.getInt("nr"),set.getString("path"),ownChunks));
 		}
+		catch(Exception e){}
+		
 		
 		RecieveChunk[] array = new RecieveChunk[chunkList.size()];
 		chunkList.toArray(array);
+		
+		stmt.close();
 		
 		return array;
 		
@@ -398,35 +414,76 @@ public class Database {
 		
 	}
 	
-	public void removePathsForChunksOfFile(String fileID){
-		
-		
-		//TODO: implement it
-		
-	}
-
-	public String[] deleteChunkRegistryForFiles(String fileID) throws SQLException{
+	public void removePathsForChunksOfFile(String fileID) throws SQLException{
 		
 		Statement stmt = con.createStatement();
 		
+		stmt.execute("UPDATE Chunk SET path = null WHERE fileID = '"+fileID+"';");
+		
+		stmt.close();
+
+	}
+
+	public boolean isOurFile(String fileID) throws SQLException{
 		
 		
-		ResultSet set = stmt.executeQuery("SELECT path FROM Chunk where fileID = '"+fileID+"'");
-		
-		String[] toReturn = new String[set.getFetchSize()];
-		
-		int i = 0;
-		while(set.next()){
+		boolean returnValue = false;
+		Statement stmt = null;
+		try{
 			
-			toReturn[i++]=set.getString("path");
+			stmt = con.createStatement();
+			ResultSet set = stmt.executeQuery("SELECT * from BackedFiles WHERE fileID = '"+fileID+"';");
 			
+			if (set.next())returnValue = true;
+			
+			stmt.close();
+			return returnValue;
+		}
+		catch(Exception e){
+			
+			if(stmt != null)stmt.close();
+			return returnValue;
 		}
 		
-		stmt.execute("DELETE FROM Chunk WHERE fileID = '"+fileID+"';");
+		
+		
+	}
+
+
+	public String[] backedFilePaths() throws SQLException{
+		
+		ArrayList<String> paths = new ArrayList<>();
+		
+		Statement stmt = con.createStatement();
+		ResultSet set = stmt.executeQuery("SELECT path from BackedFiles;");
+		
+		while(set.next()){
+			
+			paths.add(set.getString("path"));
+		}
+		
+		
+		stmt.close();
+		String[] pathsArray = new String[paths.size()];
+		paths.toArray(pathsArray);
+		return pathsArray;
+		
+		
+		
+		
+	}
+	
+
+	public void removeBackedFile(String path) throws SQLException {
+		
+		
+		Statement stmt = con.createStatement();
+		
+		stmt.execute("DELETE FROM BackedFiles WHERE path = '"+path+"';");
 		
 		stmt.close();
 		
-		return toReturn;
+		
 		
 	}
 }

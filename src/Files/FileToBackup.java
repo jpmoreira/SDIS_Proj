@@ -80,8 +80,25 @@ public class FileToBackup implements S_File {
 		
 		if(file==null || !file.exists() || !file.isFile()) throw new Exception("File doesn't exist");
 		
+		this.addToBackupRegistry();
+		
 	}
 
+	public SendChunk[] getChunks() throws Exception{
+		
+		SendChunk[] chunks = new SendChunk[getNrChunks()];
+		
+		for(int i = 0 ; i < chunks.length; i++){
+			
+			chunks[i] = this.getChunk(i);
+			
+		}
+		
+		return chunks;
+		
+		
+	}
+	
 	public SendChunk getChunk(int nr) throws Exception{
 		
 		
@@ -136,7 +153,7 @@ public class FileToBackup implements S_File {
 		
 	}
 
-	public void addToBackupRegistry() throws SQLException, IOException{
+	private void addToBackupRegistry() throws SQLException, IOException{
 		
 		
 		try{
@@ -151,4 +168,22 @@ public class FileToBackup implements S_File {
 
 		
 	}
+
+
+	public static String[] backedFiles(){
+		
+		try{
+			
+			return new Database().backedFilePaths();
+		}
+		catch(SQLException e){
+			
+			return new String[0];
+		}
+		
+		
+		
+	} 
+	
+	
 }

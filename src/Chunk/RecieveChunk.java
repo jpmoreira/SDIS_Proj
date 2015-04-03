@@ -21,8 +21,8 @@ public class RecieveChunk extends Chunk {
 	 * @param restore
 	 * @throws Exception
 	 */
-	public RecieveChunk(String fileID, int nr,boolean own) throws Exception {
-		super(fileID, nr,own);
+	public RecieveChunk(String fileID, int nr) throws Exception {
+		super(fileID, nr);
 		
 		Database d = new Database();
 
@@ -44,15 +44,16 @@ public class RecieveChunk extends Chunk {
 	
 	/**
 	 * 
-	 * Creates a FileChunk stored in memory. The content of the chunk is not stored in disk, nor is a registry of it's existence.
+	 * Creates a FileChunk stored in memory. The content of the chunk is stored with the default name on the default folder
 	 * @param fileID
 	 * @param nr
 	 * @param content
 	 * @param restore
-	 * @throws SQLException
+	 * @throws Exception 
 	 */
-	public RecieveChunk(String fileID, int nr , byte[] content,boolean own) throws SQLException{
-		super(fileID,nr,content,own);
+	public RecieveChunk(String fileID, int nr , byte[] content) throws Exception{
+		
+		this(fileID,nr,content,Database.defaultBackupDir+fileID+"_"+nr+".chunk");
 
 		
 	}
@@ -67,9 +68,9 @@ public class RecieveChunk extends Chunk {
 	 * @param restore
 	 * @throws Exception
 	 */
-	public RecieveChunk(String fileID,int number, byte[] contentBytes, String path,boolean own) throws Exception{
+	public RecieveChunk(String fileID,int number, byte[] contentBytes, String path) throws Exception{
 		
-		super(fileID,number,contentBytes,own);
+		super(fileID,number,contentBytes);
 		
 		FileOutputStream fos = new FileOutputStream(path);
 		fos.write(content);
@@ -85,7 +86,7 @@ public class RecieveChunk extends Chunk {
 		
 		Database d = new Database();
 		
-		if(d.chunkExists(this))d.setPathForChunk(this);
+		if(this.isOwn())d.setPathForChunk(this);
 		else d.addChunk(this);
 		
 	
@@ -100,9 +101,9 @@ public class RecieveChunk extends Chunk {
 	 * @param restore
 	 * @throws Exception
 	 */
-	public RecieveChunk(String fileID,int number, String path,boolean own) throws Exception{
+	public RecieveChunk(String fileID,int number, String path) throws Exception{
 		
-		super(fileID,number,own);
+		super(fileID,number);
 	
 		f = new File(path);
 		
@@ -131,11 +132,13 @@ public class RecieveChunk extends Chunk {
 		return super.getContent();
 	}
 
+	
 	/**
 	 * Save a chunk to the disk and registers it. If the chunk already has an attributed file to hold it, this call is silently ignored.
 	 * @param path the path to the file where the chunk is to be saved.
 	 * @throws Exception
 	 */
+	/*
 	public void saveToFile(String path) throws Exception{
 		
 		
@@ -154,16 +157,18 @@ public class RecieveChunk extends Chunk {
 		}
 		
 		Database d = new Database();
-		d.addChunk(this);
+		d.setPathForChunk(this);
 
 		content = null;//immediatly free the content if possible
 		
 		
 	}
+	
+	*/
 
 	public String getPath() {
 		
-		if(f==null)return null;
+		if(f==null || !f.exists())return null;
 		
 		try{
 			return f.getCanonicalPath();
@@ -189,6 +194,28 @@ public class RecieveChunk extends Chunk {
 	}
 
 	
+	public void cleanup() throws Exception{
+		
+		
+		if(this.getPath() != null) {
+			File f = new File(this.getPath());
+			
+			f.delete();
+			
+		}
+		try{
+			
+			new Database().removeChunk(this);
+			
+		}catch(Exception e){
+			throw new Exception("unable to clear itself");
+		}
+		
+		
+		
+	}
+	
+
 
 
 	

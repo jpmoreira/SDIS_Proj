@@ -13,22 +13,16 @@ public abstract class Chunk implements Comparable<Chunk>{
 
 	protected byte[] content = null;
 	
-	boolean own = false;
-	
-	
-	Chunk(String fileID,int nr,boolean own){
+	Chunk(String fileID,int nr){
 		
 		this.fileID = fileID;
 		this.nr = nr;
 		
-		this.own = own;
-		
-		
 	}
 	
-	Chunk(String fileID,int nr, byte[] content,boolean own){
+	Chunk(String fileID,int nr, byte[] content){
 		
-		this(fileID,nr,own);
+		this(fileID,nr);
 		this.content = content;
 		
 	}
@@ -49,7 +43,15 @@ public abstract class Chunk implements Comparable<Chunk>{
 
 	public boolean isOwn(){
 		
-		return own;
+		try{
+			Database d = new Database();
+			return d.isOurFile(this.fileID);
+			
+		}
+		catch(Exception e){
+			
+			return false;
+		}
 		
 	}
 	
@@ -131,26 +133,27 @@ public abstract class Chunk implements Comparable<Chunk>{
 		
 	}
 
-	public static void removeChunksOfFile(String fileID){
+
+
+
+
+	public static void cleanupChunks(String fileID){
 		
-		
-		
-		try {
-			
+		try{
 			Database d = new Database();
-			String[] filesToDelete = d.deleteChunkRegistryForFiles(fileID);
 			
-			for (String filePath : filesToDelete) {
-				
-				File f = new File(filePath);
-				f.delete();
-			}
+			RecieveChunk[] rc = d.chunksForFile(fileID);
 			
-		} catch (SQLException e) {
-			
+			for (RecieveChunk recieveChunk : rc) recieveChunk.cleanup();
 		}
-		
+		catch(Exception e ){
+			e.printStackTrace();
+		}
+
 		
 		
 	}
+	
+	
+	//TODO: Method to say if desired replication rate was met
 }

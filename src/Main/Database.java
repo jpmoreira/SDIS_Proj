@@ -536,7 +536,11 @@ public class Database {
 
 	public RecieveChunk getChunkInBetterConditionToBeDeleted(){
 		
+		//Statement stmt = con.createStatement();
 		
+		//stmt.executeQuery("SELECT * from Chunk WHERE ()");
+		
+		return null;
 	}
 }
 

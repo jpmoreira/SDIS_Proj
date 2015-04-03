@@ -38,8 +38,6 @@ public class RemovedMsg extends Message {
 	 * @see Messages.Message#process()
 	 */
 	public Message process() {
-
-		//TODO check replicationDegree
 		
 		if (chunk == null || chunk.desiredReplicationDegreeMet()) return null;		
 		

@@ -69,14 +69,17 @@ public class PutChunkMsg extends Message {
 		if (chunk == null) return null;
 	
 		
-		//TODO reverter se necessário
+		//TODO Testar
 		try {
-			
+			if(chunk.desiredReplicationDegreeMet()) {
+				((RecieveChunk) chunk).cleanup();
+			}
 		} catch (Exception e) {
 			System.out.println("Chunk already exists.");
 			return null;
 		}
 		
+		chunk.incrementReplicationCount();
 		return new StoredMsg(getVersion(), chunk.fileID, "" + chunk.nr);
 		
 	}

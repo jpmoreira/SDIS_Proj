@@ -3,9 +3,7 @@
  */
 package Messages;
 
-import Chunk.Chunk;
-import Chunk.RecieveChunk;
-import Main.Database;
+import Chunk.*;
 
 
 /**
@@ -15,7 +13,7 @@ public class StoredMsg extends Message {
 
 	private final String MSGCOD = "STORED";
 
-	private RecieveChunk chunk = null;
+	private SendChunk chunk = null;
 
 
 	/**
@@ -29,9 +27,9 @@ public class StoredMsg extends Message {
 		super(version);
 	
 		try {
-			this.chunk = new RecieveChunk(fileId, Integer.parseInt(chunkNo));
+			this.chunk = new SendChunk(fileId, Integer.parseInt(chunkNo));
 		} catch (Exception e) {
-
+			this.chunk = null;
 		}
 		
 	}
@@ -41,7 +39,6 @@ public class StoredMsg extends Message {
 	 */
 	public Message process() {
 		
-		// TODO update database
 		if (chunk == null) return null;
 		
 		chunk.incrementReplicationCount();

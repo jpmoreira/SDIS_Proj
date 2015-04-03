@@ -1,5 +1,6 @@
 package Files;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,10 +13,8 @@ import Main.Database;
 public class FileToRestore implements S_File{
 
 	
-	static String pathToRecoveryFolder = null;
-	
 
-	ArrayList<RecieveChunk> chunks = new ArrayList<RecieveChunk>();
+	public ArrayList<RecieveChunk> chunks = new ArrayList<RecieveChunk>();
 	
 	public String fileID = null;
 	String filePath = null;
@@ -40,7 +39,7 @@ public class FileToRestore implements S_File{
 			Collections.addAll(this.chunks, chunks);
 		}
 		
-		if(this.chunks.size() == this.nrChunks) this.resconstructFile();
+		if(this.chunks.size() == this.nrChunks) this.reconstructFile();
 		
 		
 		
@@ -85,45 +84,65 @@ public class FileToRestore implements S_File{
 		
 	}
 	
-
 	public void addChunk(RecieveChunk chunk){
 		
-		if(chunk.fileID != fileID) return;
+		if(!chunk.fileID.equals(fileID)) return;
 		
 		fastInsert(chunk);
 		
-		if(chunk.inMemory()){//try to save it
-			try{
-				chunk.saveToFile(pathToRecoveryFolder+fileID+"_"+chunk.nr);
-			}
-			catch(Exception e){}
-		}
+		if(nrChunks == chunks.size())return;
 		
-		
-		
-		if(nrChunks == chunks.size()){
-			
-			
-			
-		}
 	
-		
-		//TODO implement it
 		
 		
 	}
 
 
+	
+	public Integer[] missingChunkNrs(){
+		
+		
+		ArrayList<Integer> missingOnes = new ArrayList<Integer>();
+		
+		for(int i = 0 ; i < this.chunks.size() -1 ; i++){
+			
+			int a = this.chunks.get(i).nr;
+			int b = this.chunks.get(i+1).nr;
+			if (b == a + 1) continue;
+			else{
+				for(int x = a + 1 ; x < b ; x++) missingOnes.add(x);	//add the ones between a and b
+			}
+
+		}
+		
+		
+		int lastNr;
+		if(this.chunks.size()==0) lastNr = -1;
+		else lastNr = this.chunks.get(this.chunks.size()-1).nr;
+		
+		if (lastNr + 1 != this.nrChunks){//add missing ones at the end
+			for(int i = lastNr + 1 ; i < this.nrChunks ; i++) missingOnes.add(i);
+		}
+		
+		
+		Integer [] array = new Integer[missingOnes.size()];
+		missingOnes.toArray(array);
+		return array;
+		
+	}
+	
 	public void fastInsert(RecieveChunk c) {
 	    int pos = Collections.binarySearch(chunks, c);
 	    
-	    if(chunks.get(pos).nr == c.nr)return;//don't insert if it's already there
 	    if (pos < 0) {
 	        chunks.add(-pos-1, c);
+	        return;
 	    }
+	    if(chunks.get(pos).nr == c.nr)return;//don't insert if it's already there
+
 	}
 
-	public void resconstructFile() throws Exception{
+	public void reconstructFile() throws Exception{
 		
 		
 		int lastNr = chunks.get(0).nr;
@@ -153,4 +172,47 @@ public class FileToRestore implements S_File{
 		fos.close();
 		
 	}
+
+
+	public boolean isRestored(){
+		
+		
+		if(filePath == null)return false;
+		
+		File f = new File(filePath);
+		
+		if(f.exists() && f.isFile()) return true;
+		
+		return false;
+		
+
+		
+		
+	}
+	
+	public void cleanup(){
+		
+
+
+		for (RecieveChunk recieveChunk : chunks) {
+			
+			String path = recieveChunk.getPath();
+			
+			File f = new File(path);
+			
+			f.delete();
+			
+			
+		}
+		
+		try{
+			Database d = new Database();
+			d.removePathsForChunksOfFile(this.fileID);
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		
+	}
+
 }

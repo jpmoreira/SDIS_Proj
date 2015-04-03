@@ -12,8 +12,8 @@ public class SendChunk extends Chunk{
 	FileToBackup f = null;
 	
 	
-	public SendChunk(String fileID,int number,boolean own) throws Exception{
-		super(fileID,number,own);
+	public SendChunk(String fileID,int number) throws Exception{
+		super(fileID,number);
 		
 		try{
 			Database d = new Database();
@@ -31,7 +31,7 @@ public class SendChunk extends Chunk{
 	public SendChunk(int nr, FileToBackup file){
 		
 		
-		super(file.getFileID(),nr,true);// a chunk that holds a pointer to a file is indeed a chunk that is from a file of ours
+		super(file.getFileID(),nr);
 		
 		f = file;
 		

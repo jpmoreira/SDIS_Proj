@@ -4,14 +4,18 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 
 import org.junit.Test;
 
 import Chunk.Chunk;
 import Chunk.RecieveChunk;
+import Chunk.SendChunk;
 import Files.FileToBackup;
 import Files.FileToRestore;
 import Main.Database;
@@ -138,11 +142,15 @@ public class TestSFile {
 		f1.read(f1Buffer);
 		f1.close();
 		
+		FileOutputStream fw = new FileOutputStream("testFiles/RIGP-copy.pdf");
+		fw.write(f1Buffer);
+		fw.close();
+		
 		
 		new Database(true);
 		
-		FileToBackup file = new FileToBackup("testFiles/RIGP.pdf");
-		file.addToBackupRegistry();
+		FileToBackup file = new FileToBackup("testFiles/RIGP-copy.pdf");
+		//file.addToBackupRegistry();
 		String fileID = file.getFileID();
 		
 		
@@ -156,13 +164,40 @@ public class TestSFile {
 		
 			RecieveChunk[] chunksArray = new RecieveChunk[file.getNrChunks()];
 			for(int i = 0 ;i <file.getNrChunks(); i++){
-				chunksArray[i]=new RecieveChunk(fileID,i,file.getChunk(i).getContent(),"testFiles/RIGPChunks/chunk"+i,true);
+				chunksArray[i]=new RecieveChunk(fileID,i,file.getChunk(i).getContent(),"testFiles/RIGPChunks/chunk"+i);
 			}
 		
 		
 
-			new File("testFiles/RIGP.pdf").delete();
-			new FileToRestore(fileID, chunksArray);
+			new File("testFiles/RIGP-copy.pdf").delete();
+			FileToRestore r = new FileToRestore(fileID);
+			
+			File theFileThatDoesntExist = new File("testFiles/RIGP-copy.pdf");
+			
+			assertFalse(theFileThatDoesntExist.exists());
+			
+			r.addChunk(chunksArray[0]);
+			r.addChunk(chunksArray[0]);
+			
+			
+			try{
+				r.reconstructFile();
+				fail("didn't throw exception but should have");
+				
+			}
+			catch(Exception e ){
+				
+				assertTrue(true);
+			}
+			
+			
+			for (RecieveChunk recieveChunk : chunksArray) {
+				r.addChunk(recieveChunk);
+			}
+			
+			assertFalse(r.isRestored());
+			r.reconstructFile();
+			assertTrue(r.isRestored());
 		}catch(Exception e){
 			
 			e.printStackTrace();
@@ -174,7 +209,7 @@ public class TestSFile {
 	
 
 		FileInputStream f2 = new FileInputStream("testFiles/RIGP.pdf");
-		byte[] f2Buffer = new byte[(int) new File("testFiles/RIGP.pdf").length()];
+		byte[] f2Buffer = new byte[(int) new File("testFiles/RIGP-copy.pdf").length()];
 		f2.read(f2Buffer);
 		f2.close();
 		
@@ -187,6 +222,140 @@ public class TestSFile {
 		}
 		
 		
+		
+		
 	}
 
+	@Test
+	public void testMissingChunksMethod() throws Exception {
+		
+		new Database(true);
+		
+		FileInputStream fi = new FileInputStream("testFiles/RIGP.pdf");
+		byte[] buffer = new byte[(int) new File("testFiles/RIGP.pdf").length()];
+		fi.read(buffer);
+		
+		FileOutputStream fo = new FileOutputStream("testFiles/RIGP-clone.pdf");
+		fo.write(buffer);
+		
+		
+		FileToBackup fb = new FileToBackup("testFiles/RIGP-clone.pdf");
+		
+		SendChunk[] chunks = fb.getChunks();
+		
+		RecieveChunk[] rec_chunks = new RecieveChunk[chunks.length];
+		
+		for(int i = 0 ; i < chunks.length ; i++){
+			
+			rec_chunks[i] = new RecieveChunk(chunks[i].fileID, chunks[i].nr,chunks[i].getContent());
+		}
+		
+		FileToRestore r = new FileToRestore(fb.getFileID());
+		
+		Integer[] missing = r.missingChunkNrs();
+		
+		for(int i = 0 ; i < chunks.length ; i ++) assertEquals(missing[i].intValue(),chunks[i].nr);
+		
+		r.addChunk(rec_chunks[0]);
+		
+		missing = r.missingChunkNrs();
+		
+		for(int i = 0 ; i < missing.length ; i ++) assertEquals(missing[i].intValue(),chunks[i+1].nr);
+		
+		
+		r.addChunk(rec_chunks[7]);
+		missing = r.missingChunkNrs();
+		assertEquals(r.chunks.size(),2);
+		
+		for(int i = 0 ; i < 6; i++) assertEquals(missing[i].intValue(),i+1);
+		
+		for(int i = 6 ; i < missing.length; i++) assertEquals(missing[i].intValue(),i+2);
+		
+		for(int i = 0 ; i < rec_chunks.length; i++){
+			r.addChunk(rec_chunks[i]);
+		}
+		
+		assertEquals(r.chunks.size(),rec_chunks.length);
+		
+		assertEquals(r.missingChunkNrs().length,0);
+		
+	}
+
+	@Test
+	public void testCleanup() throws Exception{
+		
+		
+		Database d = new Database(true);
+		
+		FileInputStream fi = new FileInputStream("testFiles/RIGP.pdf");
+		byte[] buffer = new byte[(int) new File("testFiles/RIGP.pdf").length()];
+		fi.read(buffer);
+		
+		FileOutputStream fo = new FileOutputStream("testFiles/RIGP-clone.pdf");
+		fo.write(buffer);
+		
+		
+		FileToBackup fb = new FileToBackup("testFiles/RIGP-clone.pdf");
+		
+		SendChunk[] chunks = fb.getChunks();
+		
+		RecieveChunk[] rec_chunks = new RecieveChunk[chunks.length];
+		
+		for(int i = 0 ; i < chunks.length ; i++){
+			
+			rec_chunks[i] = new RecieveChunk(chunks[i].fileID, chunks[i].nr,chunks[i].getContent());
+		}
+		
+		FileToRestore r = new FileToRestore(fb.getFileID(),rec_chunks);
+		
+		for(int i = 0 ; i < rec_chunks.length; i++){
+			File f = new File(rec_chunks[i].getPath());
+			
+			assertTrue(f.exists());
+			assertTrue(f.isFile());
+			assertNotNull(d.getPathForChunk(rec_chunks[i]));
+			
+		}
+		
+		r.reconstructFile();
+		r.cleanup();
+		
+		
+		
+		
+		for(int i = 0 ; i < rec_chunks.length; i++){
+			
+			assertNull(rec_chunks[i].getPath());
+			
+		}
+		
+	}
+
+
+	@Test 
+	public void testListOfBackedUpFiles() throws Exception{
+		
+
+		
+		new Database(true);
+
+		assertEquals(FileToBackup.backedFiles().length,0);
+		
+		FileToBackup b = new FileToBackup("testFiles/RIGP.pdf");
+		
+		FileToBackup b2 = new FileToBackup("testFiles/oneChunkFile");
+		
+		assertEquals(FileToBackup.backedFiles().length, 2);
+		
+		assertEquals(FileToBackup.backedFiles()[0], new File("testFiles/RIGP.pdf").getCanonicalPath());
+		
+		assertEquals(FileToBackup.backedFiles()[1], new File("testFiles/oneChunkFile").getCanonicalPath());
+		
+		
+		
+		
+		
+		
+		
+	}
 }

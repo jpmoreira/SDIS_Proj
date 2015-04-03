@@ -4,13 +4,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.sql.SQLException;
 
 import Main.Database;
 
 public class RecieveChunk extends Chunk {
 
 	protected File f = null;
+	
+	protected int desiredRepDegree = -1;
 
 	
 	/**
@@ -44,7 +45,7 @@ public class RecieveChunk extends Chunk {
 	
 	/**
 	 * 
-	 * Creates a FileChunk stored in memory. The content of the chunk is stored with the default name on the default folder
+	 * Creates a FileChunk stored in memory.The chunk must be from a file we backed before. The content of the chunk is stored with the default name on the default folder
 	 * @param fileID
 	 * @param nr
 	 * @param content
@@ -60,7 +61,23 @@ public class RecieveChunk extends Chunk {
 	
 	/**
 	 * 
-	 * Creates a FileChunk but stores it on disk. If the chunk already exists an exception is thrown
+	 * Creates a FileChunk stored in memory. The chunk must not be from a file of ours. The content of the chunk is stored with the default name on the default folder
+	 * @param fileID
+	 * @param nr
+	 * @param content
+	 * @param restore
+	 * @throws Exception 
+	 */
+	public RecieveChunk(String fileID, int nr , byte[] content,int desiredReplicationDegree) throws Exception{
+		
+		this(fileID,nr,content,Database.defaultBackupDir+fileID+"_"+nr+".chunk",desiredReplicationDegree);
+
+		
+	}
+	
+	/**
+	 * 
+	 * Creates a FileChunk but stores it on disk.The chunk must belong to us. If the chunk already exists an exception is thrown
 	 * @param fileID
 	 * @param number
 	 * @param contentBytes
@@ -86,7 +103,49 @@ public class RecieveChunk extends Chunk {
 		
 		Database d = new Database();
 		
-		if(this.isOwn())d.setPathForChunk(this);
+		if(this.isOwn()){
+			this.desiredRepDegree = d.getDesiredReplicationDegreeForFile(this.fileID);
+			d.setPathForChunk(this);
+			
+		}
+		else throw new Exception("Missing replication degree");
+		
+	
+	}
+	
+	//TODO when creating filetobackup desired degree should be passed in constructor
+	/**
+	 * 
+	 * Creates a FileChunk but stores it on disk.The chunk must not belong to us. If the chunk already exists an exception is thrown
+	 * @param fileID
+	 * @param number
+	 * @param contentBytes
+	 * @param path
+	 * @param restore
+	 * @throws Exception
+	 */
+	public RecieveChunk(String fileID,int number, byte[] contentBytes, String path,int desiredReplicationDegree) throws Exception{
+		
+		super(fileID,number,contentBytes);
+		this.desiredRepDegree = desiredReplicationDegree;
+		
+		FileOutputStream fos = new FileOutputStream(path);
+		fos.write(content);
+		fos.close();
+		
+		f = new File(path);
+		
+		if (!f.isFile() || !f.exists()){
+			
+			throw new Exception();
+			
+		}
+		
+
+		
+		Database d = new Database();
+		
+		if(this.isOwn())throw new Exception("Tried to force replication degree on file thats ours");
 		else d.addChunk(this);
 		
 	
@@ -217,6 +276,11 @@ public class RecieveChunk extends Chunk {
 	
 
 
+	@Override
+	public int desiredReplicationDegree() {
+		
+		return this.desiredRepDegree;
+	}
 
 	
 	

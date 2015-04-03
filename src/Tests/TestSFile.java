@@ -4,9 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
@@ -26,7 +24,7 @@ public class TestSFile {
 	public void testCreateFileThatExists() {
 		
 		try {
-			new FileToBackup("testFiles/oneChunkFile");
+			new FileToBackup("testFiles/oneChunkFile",5);
 		} catch (Exception e) {
 			fail("coudn't open file that acctually exists");
 			e.printStackTrace();
@@ -38,7 +36,7 @@ public class TestSFile {
 	public void testReadInexistentChunk() throws Exception{
 		
 		
-		FileToBackup file = new FileToBackup("testFiles/oneChunkFile");
+		FileToBackup file = new FileToBackup("testFiles/oneChunkFile",7);
 		
 		assertNull(file.getChunk(1));
 		
@@ -48,7 +46,7 @@ public class TestSFile {
 	@Test
 	public void testReadExistingChunk() throws Exception{
 		
-		FileToBackup file = new FileToBackup("testFiles/oneChunkFile");
+		FileToBackup file = new FileToBackup("testFiles/oneChunkFile",10);
 		
 		String s = new String(file.getChunk(0).getContent());
 		
@@ -64,7 +62,7 @@ public class TestSFile {
 	public void testLastChunkOn64KFile() throws Exception{
 		
 		
-		FileToBackup s = new FileToBackup("testFiles/twoChunkFileWithLastChunkEmpty");
+		FileToBackup s = new FileToBackup("testFiles/twoChunkFileWithLastChunkEmpty",5);
 		
 		assertNotNull(s.getChunk(0));
 		assertNotNull(s.getChunk(1));
@@ -74,7 +72,7 @@ public class TestSFile {
 	@Test
 	public void testLastChunkOn64Kplus1BytesFile() throws Exception{
 		
-		FileToBackup s = new FileToBackup("testFiles/twoChunkFileWithLastChunkWithOneCharOnly");
+		FileToBackup s = new FileToBackup("testFiles/twoChunkFileWithLastChunkWithOneCharOnly",7);
 		
 		Chunk c = s.getChunk(1);
 		
@@ -88,7 +86,7 @@ public class TestSFile {
 	public void testSha256AsHexAndBack() throws Exception{
 
 		
-		FileToBackup s = new FileToBackup("testFiles/oneChunkFile");
+		FileToBackup s = new FileToBackup("testFiles/oneChunkFile",10);
 		
 		String id = s.getFileID();
 		
@@ -120,9 +118,9 @@ public class TestSFile {
 		fos.write(buffer,0,readSize);
 		fos.close();
 		
-		FileToBackup s1 = new FileToBackup("testFiles/oneChunkFile");
-		FileToBackup s3 = new FileToBackup("testFiles/oneChunkFile");		
-		FileToBackup s2 = new FileToBackup("testFiles/oneChunkFile2");
+		FileToBackup s1 = new FileToBackup("testFiles/oneChunkFile",6);
+		FileToBackup s3 = new FileToBackup("testFiles/oneChunkFile",5);		
+		FileToBackup s2 = new FileToBackup("testFiles/oneChunkFile2",4);
 		
 		assertEquals(s1.getFileID(),s3.getFileID());
 		assertNotEquals(s1.getFileID(),s2.getFileID());
@@ -149,7 +147,7 @@ public class TestSFile {
 		
 		new Database(true);
 		
-		FileToBackup file = new FileToBackup("testFiles/RIGP-copy.pdf");
+		FileToBackup file = new FileToBackup("testFiles/RIGP-copy.pdf",10);
 		//file.addToBackupRegistry();
 		String fileID = file.getFileID();
 		
@@ -235,11 +233,15 @@ public class TestSFile {
 		byte[] buffer = new byte[(int) new File("testFiles/RIGP.pdf").length()];
 		fi.read(buffer);
 		
+		fi.close();
+		
 		FileOutputStream fo = new FileOutputStream("testFiles/RIGP-clone.pdf");
 		fo.write(buffer);
 		
+		fo.close();
 		
-		FileToBackup fb = new FileToBackup("testFiles/RIGP-clone.pdf");
+		
+		FileToBackup fb = new FileToBackup("testFiles/RIGP-clone.pdf",10);
 		
 		SendChunk[] chunks = fb.getChunks();
 		
@@ -291,11 +293,14 @@ public class TestSFile {
 		byte[] buffer = new byte[(int) new File("testFiles/RIGP.pdf").length()];
 		fi.read(buffer);
 		
+		fi.close();
+		
 		FileOutputStream fo = new FileOutputStream("testFiles/RIGP-clone.pdf");
 		fo.write(buffer);
 		
+		fo.close();
 		
-		FileToBackup fb = new FileToBackup("testFiles/RIGP-clone.pdf");
+		FileToBackup fb = new FileToBackup("testFiles/RIGP-clone.pdf",10);
 		
 		SendChunk[] chunks = fb.getChunks();
 		
@@ -331,7 +336,6 @@ public class TestSFile {
 		
 	}
 
-
 	@Test 
 	public void testListOfBackedUpFiles() throws Exception{
 		
@@ -341,9 +345,9 @@ public class TestSFile {
 
 		assertEquals(FileToBackup.backedFiles().length,0);
 		
-		FileToBackup b = new FileToBackup("testFiles/RIGP.pdf");
+		new FileToBackup("testFiles/RIGP.pdf",10);
 		
-		FileToBackup b2 = new FileToBackup("testFiles/oneChunkFile");
+		new FileToBackup("testFiles/oneChunkFile",10);
 		
 		assertEquals(FileToBackup.backedFiles().length, 2);
 		
@@ -355,6 +359,51 @@ public class TestSFile {
 		
 		
 		
+		
+		
+	}
+
+	@Test
+	public void testRemovalOfBackupFiles() throws Exception{
+		
+		Database d = new Database(true);
+		
+		FileToBackup b = new FileToBackup("testFiles/RIGP.pdf",10);
+		new FileToBackup("testFiles/RIGP.pdf",50);
+		
+		assertEquals(d.backedFilePaths().length,1);
+		
+		b.remove();
+		
+		assertEquals(d.backedFilePaths().length, 0);
+		
+		assertTrue(true);
+		
+		
+	}
+
+	@Test
+	public void testPathToFileID() throws Exception{
+		
+		new Database(true);
+		FileToBackup b = new FileToBackup("testFiles/RIGP.pdf",10);
+		
+		String fileID = FileToRestore.fileIDForBackedFile("testFiles/RIGP.pdf");
+		
+		assertNotNull(fileID);
+		
+		assertEquals(fileID,b.getFileID());
+		
+		
+		
+		
+	}
+
+	@Test
+	public void testFileDesiredRepDegreeInDB() throws SQLException{
+		
+		
+		Database d = new Database(true);
 		
 		
 	}

@@ -12,7 +12,4 @@ public interface S_File {
 	public String getFilePath();
 
 
-	//TODO: função de delete
-	
-	//TODO from filePath to fileID
 }

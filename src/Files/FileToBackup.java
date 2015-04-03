@@ -1,7 +1,6 @@
 package Files;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
@@ -16,6 +15,8 @@ import Main.Database;
 public class FileToBackup implements S_File {
 
 	public File file;
+	
+	public int desiredRepDegree;
 	
 	final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
 	
@@ -73,9 +74,10 @@ public class FileToBackup implements S_File {
 	 * @throws Exception an exception is thrown in case the file doesn't exist
 	 */ 
 	
-	public FileToBackup(String filePath) throws Exception{
+	public FileToBackup(String filePath,int repDegree) throws Exception{
 	
 		
+		this.desiredRepDegree = repDegree;
 		file = new File(filePath);
 		
 		if(file==null || !file.exists() || !file.isFile()) throw new Exception("File doesn't exist");
@@ -185,5 +187,16 @@ public class FileToBackup implements S_File {
 		
 	} 
 	
-	
+	public void remove(){
+		
+		try{
+			
+			Database d = new Database();
+			
+			d.removeBackedFile(this.getFilePath());
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
 }

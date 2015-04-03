@@ -76,12 +76,12 @@ public class Database {
 		
 		if(path == null){
 			
-			sql = "INSERT INTO Chunk (fileID,nr,isOwn) VALUES('"+chunk.fileID+"',"+chunk.nr+",'"+Boolean.toString(chunk.isOwn()).toUpperCase()+"');";
+			sql = "INSERT INTO Chunk (fileID,nr,isOwn,desiredReplicas) VALUES('"+chunk.fileID+"',"+chunk.nr+",'"+Boolean.toString(chunk.isOwn()).toUpperCase()+"',"+chunk.desiredReplicationDegree()+");";
 			
 		}
 		else{
 			System.out.println(chunk.isOwn());
-			sql = "INSERT INTO Chunk (path,fileID,nr,isOwn) VALUES('"+path+"','"+chunk.fileID+"',"+chunk.nr+",'"+Boolean.toString(chunk.isOwn()).toUpperCase()+"');";
+			sql = "INSERT INTO Chunk (path,fileID,nr,isOwn,desiredReplicas) VALUES('"+path+"','"+chunk.fileID+"',"+chunk.nr+",'"+Boolean.toString(chunk.isOwn()).toUpperCase()+"',"+chunk.desiredReplicationDegree()+");";
 			
 		}
 		
@@ -361,7 +361,7 @@ public class Database {
 		
 		Statement stmt = con.createStatement();
 		
-		String sql = "INSERT INTO BackedFiles (path,nrChunks,fileID) VALUES('"+f.file.getCanonicalPath()+"',"+f.getNrChunks()+",'"+f.getFileID()+"');";
+		String sql = "INSERT INTO BackedFiles (path,nrChunks,fileID,rep) VALUES('"+f.file.getCanonicalPath()+"',"+f.getNrChunks()+",'"+f.getFileID()+"',"+f.desiredRepDegree+");";
 		
 		stmt.execute(sql);
 		
@@ -483,6 +483,52 @@ public class Database {
 		
 		stmt.close();
 		
+		
+		
+	}
+
+
+	public String fileIDForBackedFile(String path) throws SQLException{
+		
+		Statement stmt = con.createStatement();
+		
+		ResultSet set = stmt.executeQuery("SELECT fileID from BackedFiles WHERE path = '"+path+"';");
+		
+		if(set.next())return set.getString("fileID");
+		
+		return null;
+		
+	}
+
+
+	public int getDesiredReplicationDegreeForChunk(Chunk rc) throws SQLException{
+		
+		Statement stmt = con.createStatement();
+		
+		ResultSet set = stmt.executeQuery("SELECT desiredReplicas from Chunk WHERE fileID = '"+rc.fileID+"';");
+		
+		int toRet = 0;
+		if(set.next())toRet = set.getInt("desiredReplicas");
+		
+		stmt.close();
+		return toRet;
+		
+	}
+
+
+	public int getDesiredReplicationDegreeForFile(String fileID) throws SQLException{
+		
+		
+		Statement stmt = con.createStatement();
+		
+		ResultSet set = stmt.executeQuery("SELECT rep from BackedFiles WHERE fileID = '"+fileID+"';");
+		
+		int toRet = 0;
+		
+		if(set.next())toRet = set.getInt("rep");
+		
+		stmt.close();
+		return toRet;
 		
 		
 	}

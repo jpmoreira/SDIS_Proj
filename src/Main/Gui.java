@@ -1,9 +1,6 @@
 package Main;
 
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -24,13 +21,15 @@ public class Gui extends Dialog {
 
 	private static final String VERSION = "1.0";
 	
+	public static boolean RUNNING = false;
+	
 	protected boolean result;
 	protected Shell shell;
 	private Text fileToBackup;
 	private Text fileToRestore;
 	private Text fileToDelete;
 	private int width = 450;
-	private int height = 360;
+	private int height = 505;
 	private Button btnBackupFile;
 	private Button btnBrowseBackUp;
 	private Button btnBackup;
@@ -52,9 +51,22 @@ public class Gui extends Dialog {
 	
 	
 	
-	private String pathToFile;
+	private String pathToFile = "";
 
 	private PeerInterface p;
+	private Text mdbIP;
+	private Text mdrIP;
+	private Text mcIP;
+	private Label lblPort;
+	private Label lblIp;
+
+	private Button btnStart;
+
+	private Spinner mdbPort;
+
+	private Spinner mdrPort;
+
+	private Spinner mcPort;
 	
 	
 
@@ -67,13 +79,13 @@ public class Gui extends Dialog {
 		super(parent, SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
 		setText("Serverless Distributed Backup Service");
 		
-		try {
-			Registry registry = LocateRegistry.getRegistry();
-			
-			p = (PeerInterface) registry.lookup("peer");
-	
-			
-		} catch (RemoteException | NotBoundException e) {}
+//		try {
+//			Registry registry = LocateRegistry.getRegistry();
+//			
+//			p = (PeerInterface) registry.lookup("peer");
+//	
+//			
+//		} catch (RemoteException | NotBoundException e) {}
 		
 		
 	}
@@ -105,9 +117,98 @@ public class Gui extends Dialog {
 		shell.setLocation(Display.getCurrent().getPrimaryMonitor().getBounds().width/2-width/2, 
 				Display.getCurrent().getPrimaryMonitor().getBounds().height/2-height/2);
 		
+		
+		// COMUNICATIONS PANEL ============================================================================
+		
+		Group grpComunicationSettings = new Group(shell, SWT.NONE);
+		grpComunicationSettings.setText("Comunication Settings");
+		grpComunicationSettings.setBounds(10, 10, 430, 145);
+		
+		mdbPort = new Spinner(grpComunicationSettings, SWT.BORDER);
+		mdbPort.setMaximum(9999);
+		mdbPort.setSelection(8888);
+		mdbPort.setBounds(240, 45, 60, 22);
+		
+		mdrPort = new Spinner(grpComunicationSettings, SWT.BORDER);
+		mdrPort.setMaximum(9999);
+		mdrPort.setSelection(8887);
+		mdrPort.setBounds(240, 70, 60, 22);
+		
+		mcPort = new Spinner(grpComunicationSettings, SWT.BORDER);
+		mcPort.setMaximum(9999);
+		mcPort.setSelection(8886);
+		mcPort.setBounds(240, 95, 60, 22);
+		
+		mdbIP = new Text(grpComunicationSettings, SWT.BORDER);
+		mdbIP.setText("227.0.0.1");
+		mdbIP.setBounds(310, 45, 110, 21);
+		
+		Label label = new Label(grpComunicationSettings, SWT.SEPARATOR | SWT.VERTICAL);
+		label.setBounds(185, 5, 2, 115);
+		
+		Label lblChannels = new Label(grpComunicationSettings, SWT.NONE);
+		lblChannels.setBounds(270, 5, 70, 14);
+		lblChannels.setText("Channels");
+		
+		mdrIP = new Text(grpComunicationSettings, SWT.BORDER);
+		mdrIP.setText("227.0.0.2");
+		mdrIP.setBounds(310, 70, 110, 21);
+		
+		mcIP = new Text(grpComunicationSettings, SWT.BORDER);
+		mcIP.setText("227.0.0.3");
+		mcIP.setBounds(310, 95, 110, 21);
+		
+		Label lblMdb = new Label(grpComunicationSettings, SWT.NONE);
+		lblMdb.setBounds(195, 48, 40, 14);
+		lblMdb.setText("MDB");
+		
+		Label lblMdr = new Label(grpComunicationSettings, SWT.NONE);
+		lblMdr.setBounds(195, 73, 40, 14);
+		lblMdr.setText("MDR");
+		
+		Label lblMc = new Label(grpComunicationSettings, SWT.NONE);
+		lblMc.setBounds(195, 98, 40, 14);
+		lblMc.setText("MC");
+		
+		lblPort = new Label(grpComunicationSettings, SWT.NONE);
+		lblPort.setBounds(240, 27, 50, 14);
+		lblPort.setText("Port");
+		
+		lblIp = new Label(grpComunicationSettings, SWT.NONE);
+		lblIp.setBounds(310, 27, 60, 14);
+		lblIp.setText("IP");
+		
+		btnStart = new Button(grpComunicationSettings, SWT.TOGGLE);
+		btnStart.setBounds(44, 89, 95, 28);
+		btnStart.setText("Start");
+		btnStart.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e ) {
+				if (btnStart.getSelection()) {
+					btnStart.setText("Stop");
+					setActionsEnable(true);
+					RUNNING = true;
+				} else {
+					btnStart.setText("Start");
+					setActionsEnable(false);
+					RUNNING = false;
+				}
+			}
+		});
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		// ACTIONS CONTROL ============================================================================
+		
 		Group grpStandardActions = new Group(shell, SWT.NONE);
 		grpStandardActions.setText("Standard Actions");
-		grpStandardActions.setBounds(10, 10, 430, 296);
+		grpStandardActions.setBounds(10, 160, 430, 296);
 		
 		
 		//BACKUP BLOCK ============================================================================
@@ -115,6 +216,7 @@ public class Gui extends Dialog {
 		btnBackupFile = new Button(grpStandardActions, SWT.RADIO);
 		btnBackupFile.setBounds(10, 10, 100, 20);
 		btnBackupFile.setText("Backup File");
+		btnBackupFile.setEnabled(false);
 		btnBackupFile.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -190,6 +292,7 @@ public class Gui extends Dialog {
 		btnRestoreFile = new Button(grpStandardActions, SWT.RADIO);
 		btnRestoreFile.setBounds(10, 80, 100, 20);
 		btnRestoreFile.setText("Restore File");
+		btnRestoreFile.setEnabled(false);
 		btnRestoreFile.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -250,6 +353,7 @@ public class Gui extends Dialog {
 		btnDeleteFile = new Button(grpStandardActions, SWT.RADIO);
 		btnDeleteFile.setBounds(10, 150, 92, 20);
 		btnDeleteFile.setText("Delete File");
+		btnDeleteFile.setEnabled(false);
 		btnDeleteFile.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -308,6 +412,7 @@ public class Gui extends Dialog {
 		btnReclaimSpace = new Button(grpStandardActions, SWT.RADIO);
 		btnReclaimSpace.setBounds(10, 220, 120, 18);
 		btnReclaimSpace.setText("Reclaim Space");
+		btnReclaimSpace.setEnabled(false);
 		btnReclaimSpace.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -350,7 +455,7 @@ public class Gui extends Dialog {
 		
 		
 		Button btnExit = new Button(shell, SWT.NONE);
-		btnExit.setBounds(345, 310, 95, 25);
+		btnExit.setBounds(345, 455, 95, 25);
 		btnExit.setText("Exit");
 		btnExit.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -361,11 +466,11 @@ public class Gui extends Dialog {
 		});
 		
 		Label lblVersion = new Label(shell, SWT.NONE);
-		lblVersion.setBounds(10, 315, 75, 14);
+		lblVersion.setBounds(10, 460, 75, 14);
 		lblVersion.setText("Version " + VERSION);
 
+
 	}
-	
 
 	private boolean selectFileFromBackUp() {
 		String[] backupFiles = FileToBackup.backedFiles();
@@ -381,6 +486,40 @@ public class Gui extends Dialog {
 	
 	
 	// BUTTON TOOGLES ======================================================================
+	
+	
+	
+
+	protected void setActionsEnable(boolean b) {
+		btnBackupFile.setEnabled(b);
+		btnRestoreFile.setEnabled(b);
+		btnDeleteFile.setEnabled(b);
+		btnReclaimSpace.setEnabled(b);
+		
+		mcIP.setEditable(!b);
+		mcIP.setEnabled(!b);
+		mcPort.setEnabled(!b);
+		
+		mdbIP.setEditable(!b);
+		mdbIP.setEnabled(!b);
+		mdbPort.setEnabled(!b);
+		
+		mdrIP.setEditable(!b);
+		mdrIP.setEnabled(!b);
+		mdrPort.setEnabled(!b);
+		
+		if (btnBackupFile.getSelection()) {
+			setBackupFileEnable(b);
+		} else if (btnRestoreFile.getSelection()) {
+			setRestoreFileEnable(b);
+		} else if (btnDeleteFile.getSelection()) {
+			setDeleteFileEnable(b);
+		} else if (btnReclaimSpace.getSelection()) {
+			setReclaimSpaceEnable(b);
+		}
+	}
+
+	
 	
 	protected void setBackupFileEnable(boolean b) {	
 		btnBrowseBackUp.setEnabled(b);
@@ -462,6 +601,4 @@ public class Gui extends Dialog {
 		
 		
 	}
-	
-	
 }

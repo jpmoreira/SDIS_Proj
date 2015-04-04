@@ -44,7 +44,7 @@ public class MessagesTests {
 	@Test
 	public void creatPutMsg() {
 		
-		byte[] msg = "PUTCHUNK 12.0 FileId 1 ReplicationGeg ".getBytes();
+		byte[] msg = "PUTCHUNK 12.0 FileId 1 3 ".getBytes();
 		
 		appendHeaderEnd(msg);
 		appendBody();

@@ -32,6 +32,7 @@ public class ProtocolTests {
 		
 		try {
 			Database.databaseToUse = "supportingFiles/supportingDB.db";
+			Database.defaultBackupDir = "backups/";
 			Database dbSource = new Database(true);
 			
 			FileToBackup file = new FileToBackup("testFiles/oneChunkFile", 1);
@@ -55,6 +56,7 @@ public class ProtocolTests {
 			
 			// REQUEST PROCESS
 			Database.databaseToUse = "supportingFiles/supportingDB_2.db";
+			Database.defaultBackupDir = "backups_2/";
 			Database dbDest = new Database(true);
 			ArrayList<byte[]> returnMsgs = new ArrayList<byte[]>();
 			
@@ -73,6 +75,7 @@ public class ProtocolTests {
 			
 			// REPLY PROCESS
 			Database.databaseToUse = "supportingFiles/supportingDB.db";
+			Database.defaultBackupDir = "backups/";
 			for (byte[] bs : returnMsgs) {
 				
 				Message msg = MessageFactory.processMessage(bs);
@@ -117,6 +120,7 @@ public class ProtocolTests {
 
 		try {
 			Database.databaseToUse = "supportingFiles/supportingDB.db";
+			Database.defaultBackupDir = "backups/";
 			Database dbSource = new Database();
 			
 			FileToRestore file = new FileToRestore(FileToRestore.fileIDForBackedFile("testFiles/oneChunkFile"));
@@ -133,6 +137,7 @@ public class ProtocolTests {
 			
 			// PROCESS REQUESTS
 			Database.databaseToUse = "supportingFiles/supportingDB_2.db";
+			Database.defaultBackupDir = "backups_2/";
 			Database dbDest = new Database();
 			
 			ArrayList<byte[]> answers = new ArrayList<byte[]>();
@@ -150,6 +155,7 @@ public class ProtocolTests {
 			
 			// REPLY PROCESS
 			Database.databaseToUse = "supportingFiles/supportingDB.db";
+			Database.defaultBackupDir = "backups/";
 			
 			for (byte[] bs : answers) {
 				
@@ -163,6 +169,7 @@ public class ProtocolTests {
 			
 			// REPLY PROCESS - PEER THAT IS NOT THE OWNER
 			Database.databaseToUse = "supportingFiles/supportingDB_2.db";
+			Database.defaultBackupDir = "backups_2/";
 
 			for (byte[] bs : answers) {
 
@@ -175,6 +182,7 @@ public class ProtocolTests {
 			}
 			
 			Database.databaseToUse = "supportingFiles/supportingDB.db";
+			Database.defaultBackupDir = "backups/";
 			// CHECK FILE RESTORED
 			assertEquals(file.missingChunkNrs().length,0);
 			file.reconstructFile();
@@ -198,6 +206,7 @@ public class ProtocolTests {
 			
 			// CHECK DESTINY DATABASE
 			Database.databaseToUse = "supportingFiles/supportingDB_2.db";
+			Database.defaultBackupDir = "backups_2/";
 			
 			assertEquals(dbDest.nrChunksStored(),1);
 			
@@ -219,30 +228,38 @@ public class ProtocolTests {
 		
 	}
 	
-//	@Test
-	public void c_deleteSubProtocol() throws SQLException {
+	@Test
+	public void c_deleteSubProtocol() {
 		
 		
 		
 		try {
 			Database.databaseToUse = "supportingFiles/supportingDB.db";
+			Database.defaultBackupDir = "backups/";
 			Database dbSource = new Database();
 
-			FileToRestore file = new FileToRestore(FileToRestore.fileIDForBackedFile("testFiles/oneChunkFile"));
+			FileToBackup file = new FileToBackup("testFiles/oneChunkFile");
 
 			// DELETE REQUEST
 			ArrayList<byte[]> msgsToSend = new ArrayList<byte[]>();
-			for (int i = 0; i < file.getNrChunks(); i++){
+			
+			Message msg = new DeleteMsg(Message.getVersion(), file.getFileID());
+			msgsToSend.add(msg.toBytes());
 
-				Message msg = new DeleteMsg(Message.getVersion(), file.fileID);
-				msgsToSend.add(msg.toBytes());
+			
+			file.remove();
+			
+			// Check Source DB
+			String[] files = dbSource.backedFilePaths();
 
-			}
+			assertEquals(files.length,0);		
+			assertEquals(dbSource.nrChunksStored(),0);
 			
 			
 			
 			// PROCESS REQUESTS
 			Database.databaseToUse = "supportingFiles/supportingDB_2.db";
+			Database.defaultBackupDir = "backups_2/";
 			Database dbDest = new Database();
 
 			for (byte[] bs : msgsToSend) {
@@ -255,13 +272,6 @@ public class ProtocolTests {
 
 			}
 			
-			
-			// Check Source DB
-			String[] files = dbSource.backedFilePaths();
-
-			assertEquals(files.length,0);		
-			assertEquals(dbSource.nrChunksStored(),0);
-
 
 			// Check Destiny DB
 			assertEquals(dbDest.chunksForFile(file.getFileID()).length,0);

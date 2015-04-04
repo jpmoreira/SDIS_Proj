@@ -95,6 +95,8 @@ public class FileToBackup implements S_File {
 			Database d = new Database();
 			
 			
+			file = new File(filePath);
+			if(file==null || !file.exists() || !file.isFile()) throw new Exception("File doesn't exist");
 			
 			String id = d.fileIDForBackedFile(new File(filePath).getCanonicalPath());
 			if(id == null)throw new Exception();

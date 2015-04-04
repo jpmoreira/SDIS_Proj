@@ -1,5 +1,4 @@
 package Files;
-//TODO: how to remove file
 
 import java.io.File;
 import java.io.FileOutputStream;

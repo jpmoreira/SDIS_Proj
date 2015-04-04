@@ -12,7 +12,7 @@ import java.util.Arrays;
 import Chunk.SendChunk;
 import Main.Database;
 
-public class FileToBackup implements S_File {
+public class FileToBackup extends S_File {
 
 	public File file;
 	

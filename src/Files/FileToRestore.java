@@ -10,7 +10,7 @@ import Chunk.Chunk;
 import Chunk.RecieveChunk;
 import Main.Database;
 
-public class FileToRestore implements S_File{
+public class FileToRestore extends S_File{
 
 	
 

@@ -242,10 +242,10 @@ public class ProtocolTests {
 
 			// DELETE REQUEST
 			ArrayList<byte[]> msgsToSend = new ArrayList<byte[]>();
-			
-			Message msg = new DeleteMsg(Message.getVersion(), file.getFileID());
+			String temp = file.getFileID();
+			Message msg = new DeleteMsg(Message.getVersion(), temp);
 			msgsToSend.add(msg.toBytes());
-
+			
 			
 			file.remove();
 			
@@ -266,6 +266,8 @@ public class ProtocolTests {
 
 				Message request = MessageFactory.processMessage(bs);
 				assertTrue(request instanceof DeleteMsg);
+				
+				assertEquals(file.getFileID(),((DeleteMsg) request).getFileID());
 
 				Message returnMessage = request.process();
 				assertNull(returnMessage);
@@ -279,8 +281,7 @@ public class ProtocolTests {
 			
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			fail("Error");
 		}
 	}
 	

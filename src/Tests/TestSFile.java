@@ -1,5 +1,7 @@
 package Tests;
 
+//TODO test if removal is done properly
+
 import static org.junit.Assert.*;
 
 import java.io.File;

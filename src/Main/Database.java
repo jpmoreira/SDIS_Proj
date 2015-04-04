@@ -24,6 +24,7 @@ public class Database {
 	private static String defaultDeploymentDB = "supportingFiles/supportingDB.db";
 	
 	public static String defaultBackupDir = "backups/";
+	public static String defaultRestoreDir = "restores/";
 	
 	/**
 	 * 

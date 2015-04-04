@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import Chunk.Chunk;
 import Chunk.RecieveChunk;
 import Files.FileToBackup;
-import Files.FileToRestore;
+import Files.S_File;
 
 public class Database {
 	
@@ -446,7 +446,7 @@ public class Database {
 		
 	}
 	
-	public int getNrChunks(FileToRestore f) {
+	public int getNrChunks(S_File f) {
 		
 		
 		Statement stmt = null;
@@ -474,7 +474,7 @@ public class Database {
 		
 	}
 
-	public String getPathForRestoreFile(FileToRestore f) throws SQLException{
+	public String getPathForRestoreFile(S_File f) throws SQLException{
 			
 		Statement stmt = null;
 		String result = null;

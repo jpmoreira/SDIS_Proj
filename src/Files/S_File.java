@@ -13,11 +13,15 @@ public abstract class S_File {
 	
 
 
+	public String fileID = null;
+
 	public abstract int getNrChunks();
+	
 	public abstract String getFileID();
+
 	public abstract String getFilePath();
 	
-	public int consumedSpace(){
+	public static int consumedSpace(){
 		
 		File backupDir = new File(Database.defaultBackupDir);
 		
@@ -39,5 +43,13 @@ public abstract class S_File {
 	    return size;
 	}
 
+	public static void cleanFolder(File folder) {
+	    File[] files = folder.listFiles();
+	    if(files!=null) { //some JVMs return null for empty dirs
+	        for(File f: files) {
+	            if(f.isFile()) f.delete();
+	        }
+	    }
+	}
 
 }

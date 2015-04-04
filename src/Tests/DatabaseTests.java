@@ -12,6 +12,7 @@ import Chunk.RecieveChunk;
 import Chunk.SendChunk;
 import Files.FileToBackup;
 import Files.FileToRestore;
+import Files.S_File;
 import Main.Database;
 
 public class DatabaseTests {
@@ -320,7 +321,7 @@ public class DatabaseTests {
 		FileToBackup f = new FileToBackup("testFiles/twoChunkFileWithLastChunkEmpty",10);
 		//f.addToBackupRegistry();
 		
-		FileToRestore r = new FileToRestore(f.getFileID());
+		S_File r = new FileToRestore(f.getFileID());
 		
 		assertEquals(f.getFileID(),r.getFileID());
 		assertEquals(f.getFilePath(),r.getFilePath());
@@ -372,7 +373,7 @@ public class DatabaseTests {
 		}
 
 		
-		FileToRestore r = new FileToRestore(b.getFileID());
+		S_File r = new FileToRestore(b.getFileID());
 		
 
 		

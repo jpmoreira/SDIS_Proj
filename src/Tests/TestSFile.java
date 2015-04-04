@@ -18,6 +18,7 @@ import Chunk.RecieveChunk;
 import Chunk.SendChunk;
 import Files.FileToBackup;
 import Files.FileToRestore;
+import Files.S_File;
 import Main.Database;
 
 public class TestSFile {
@@ -43,7 +44,6 @@ public class TestSFile {
 		assertNull(file.getChunk(1));
 		
 	}
-	
 	
 	@Test
 	public void testReadExistingChunk() throws Exception{
@@ -83,7 +83,6 @@ public class TestSFile {
 		assertEquals(str,"a");
 	}
 
-
 	@Test
 	public void testSha256AsHexAndBack() throws Exception{
 
@@ -102,7 +101,6 @@ public class TestSFile {
 		}
 		
 	}
-
 
 	@Test
 	public void testShaDifferentForDifferentDateFileWithSameContent() throws Exception{
@@ -433,4 +431,37 @@ public class TestSFile {
 		
 		
 	}
+
+	@Test
+	public void testEmptyDirectorySize() throws SQLException {
+		
+		
+		new Database(true);
+		File backupDir = new File("backups/");
+		
+		S_File.cleanFolder(backupDir);
+		
+		assertEquals(S_File.consumedSpace(),0);
+	}
+	
+	@Test
+	public void testNotEmptyDirectorySize() throws Exception{
+		
+		
+		new Database(true);
+		
+		File backupDir = new File("backups/");
+		
+		S_File.cleanFolder(backupDir);
+		
+		byte[] content = new String("ola").getBytes();
+		
+		new RecieveChunk("ola ola", 9, content,10);
+
+		assertEquals(S_File.consumedSpace(),content.length);
+		
+	}
+	
+	
+
 }

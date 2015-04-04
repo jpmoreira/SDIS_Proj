@@ -16,7 +16,6 @@ public class FileToRestore extends S_File{
 
 	public ArrayList<RecieveChunk> chunks = new ArrayList<RecieveChunk>();
 	
-	public String fileID = null;
 	String filePath = null;
 	int nrChunks = -1;
 

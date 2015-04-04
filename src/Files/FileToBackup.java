@@ -56,13 +56,13 @@ public class FileToBackup extends S_File {
 		
 		
 		try{
-			return bytesToHex(this.sha256());
-		}
-		
-		catch(Exception e){
 			
-			return null;
+			if(fileID == null)fileID = bytesToHex(this.sha256());
+			
+		}		
+		catch(Exception e){
 		}
+		return fileID;
 		
 	}
 
@@ -98,10 +98,10 @@ public class FileToBackup extends S_File {
 			file = new File(filePath);
 			if(file==null || !file.exists() || !file.isFile()) throw new Exception("File doesn't exist");
 			
-			String id = d.fileIDForBackedFile(new File(filePath).getCanonicalPath());
-			if(id == null)throw new Exception();
+			this.fileID = d.fileIDForBackedFile(new File(filePath).getCanonicalPath());
+			if(this.fileID == null)throw new Exception();
 			
-			this.desiredRepDegree = d.getDesiredReplicationDegreeForFile(id);
+			this.desiredRepDegree = d.getDesiredReplicationDegreeForFile(fileID);
 			
 			
 		}

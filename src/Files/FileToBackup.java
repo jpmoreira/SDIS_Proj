@@ -85,6 +85,24 @@ public class FileToBackup implements S_File {
 		this.addToBackupRegistry();
 		
 	}
+	
+	
+	public FileToBackup(String filePath) throws Exception{
+		
+		
+		
+		try{
+			Database d = new Database();
+			
+			String id = d.fileIDForBackedFile(filePath);
+			
+			this.desiredRepDegree = d.getDesiredReplicationDegreeForFile(id);
+		}
+		catch(Exception e){}
+		
+		
+		
+	}
 
 	public SendChunk[] getChunks() throws Exception{
 		

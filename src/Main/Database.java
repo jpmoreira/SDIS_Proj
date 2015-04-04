@@ -584,15 +584,21 @@ public class Database {
 	}
 
 
-	public String fileIDForBackedFile(String path) throws SQLException{
+	public String fileIDForBackedFile(String path){
+		Statement stmt = null;
+		String toRet = null;
+		try {
+			stmt = con.createStatement();
+			
+			ResultSet set = stmt.executeQuery("SELECT fileID from BackedFiles WHERE path = '"+path+"';");
+			
+			if(set.next())toRet = set.getString("fileID");
+		} catch (SQLException e) {}
+		finally{
+			closeSTMT(stmt);
+		}
 		
-		Statement stmt = con.createStatement();
-		
-		ResultSet set = stmt.executeQuery("SELECT fileID from BackedFiles WHERE path = '"+path+"';");
-		
-		if(set.next())return set.getString("fileID");
-		
-		return null;
+		return toRet;
 		
 	}
 
@@ -624,7 +630,6 @@ public class Database {
 		} catch (Exception e) {
 		}
 		finally{
-			
 			closeSTMT(stmt);
 		}
 		return toRet;

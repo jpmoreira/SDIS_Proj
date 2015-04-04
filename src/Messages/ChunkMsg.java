@@ -53,11 +53,11 @@ public class ChunkMsg extends Message {
 	 */
 	public Message process() {
 		
-		try {
-			new FileToRestore(chunk.fileID).addChunk((RecieveChunk) chunk);
-		} catch (Exception e1) {
-
-		}
+//		try {
+//			new FileToRestore(chunk.fileID).addChunk((RecieveChunk) chunk);
+//		} catch (Exception e1) {
+//
+//		}
 		//TODO Enhancement
 		return null;
 	}

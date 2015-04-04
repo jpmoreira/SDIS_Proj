@@ -3,17 +3,21 @@ package Tests;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import Chunk.RecieveChunk;
 import Chunk.SendChunk;
 import Files.FileToBackup;
 import Files.FileToRestore;
 import Main.Database;
 import Messages.ChunkMsg;
+import Messages.DeleteMsg;
 import Messages.GetChunkMsg;
 import Messages.Message;
 import Messages.MessageFactory;
@@ -28,6 +32,7 @@ public class ProtocolTests {
 		
 		try {
 			Database.databaseToUse = "supportingFiles/supportingDB.db";
+			Database.defaultBackupDir = "backups/";
 			Database dbSource = new Database(true);
 			
 			FileToBackup file = new FileToBackup("testFiles/oneChunkFile", 1);
@@ -39,7 +44,7 @@ public class ProtocolTests {
 			
 			assertEquals(dbSource.nrChunksStored(),file.getNrChunks());
 			
-			//SEND MESSAGES
+			// BACKUP REQUEST
 			for (SendChunk sendChunk : chunksToSend) {
 				
 				Message msgToSend = new PutChunkMsg(sendChunk, Message.getVersion());
@@ -49,8 +54,9 @@ public class ProtocolTests {
 			}
 			
 			
-			// RECEIVE MESSAGES
+			// REQUEST PROCESS
 			Database.databaseToUse = "supportingFiles/supportingDB_2.db";
+			Database.defaultBackupDir = "backups_2/";
 			Database dbDest = new Database(true);
 			ArrayList<byte[]> returnMsgs = new ArrayList<byte[]>();
 			
@@ -67,8 +73,9 @@ public class ProtocolTests {
 			}
 			
 			
-			// RETURN MESSAGES
+			// REPLY PROCESS
 			Database.databaseToUse = "supportingFiles/supportingDB.db";
+			Database.defaultBackupDir = "backups/";
 			for (byte[] bs : returnMsgs) {
 				
 				Message msg = MessageFactory.processMessage(bs);
@@ -108,15 +115,17 @@ public class ProtocolTests {
 		}else{
 			System.out.println("Sorry! the file can't be renamed");
 		}
-
+		
+		assertFalse(oldfile.isFile());
 
 		try {
 			Database.databaseToUse = "supportingFiles/supportingDB.db";
+			Database.defaultBackupDir = "backups/";
 			Database dbSource = new Database();
 			
 			FileToRestore file = new FileToRestore(FileToRestore.fileIDForBackedFile("testFiles/oneChunkFile"));
 			
-			// ASK FOR CHUNKS
+			// CHUNK REQUEST
 			ArrayList<byte[]> msgsToSend = new ArrayList<byte[]>();
 			for (int i = 0; i < file.getNrChunks(); i++){
 				
@@ -128,7 +137,10 @@ public class ProtocolTests {
 			
 			// PROCESS REQUESTS
 			Database.databaseToUse = "supportingFiles/supportingDB_2.db";
+			Database.defaultBackupDir = "backups_2/";
 			Database dbDest = new Database();
+			
+			ArrayList<byte[]> answers = new ArrayList<byte[]>();
 			for (byte[] bs : msgsToSend) {
 				
 				Message request = MessageFactory.processMessage(bs);
@@ -137,18 +149,147 @@ public class ProtocolTests {
 				Message returnMessage = request.process();
 				assertTrue(returnMessage instanceof ChunkMsg);
 				
+				answers.add(returnMessage.toBytes());
 				
 			}
-		
+			
+			// REPLY PROCESS
+			Database.databaseToUse = "supportingFiles/supportingDB.db";
+			Database.defaultBackupDir = "backups/";
+			
+			for (byte[] bs : answers) {
+				
+				Message reply = MessageFactory.processMessage(bs);
+				assertTrue(reply instanceof ChunkMsg);
+				
+				Message result = reply.process();
+				assertNull(result);
+				
+			}
+			
+			// REPLY PROCESS - PEER THAT IS NOT THE OWNER
+			Database.databaseToUse = "supportingFiles/supportingDB_2.db";
+			Database.defaultBackupDir = "backups_2/";
+
+			for (byte[] bs : answers) {
+
+				Message reply = MessageFactory.processMessage(bs);
+				assertTrue(reply instanceof ChunkMsg);
+
+				Message result = reply.process();
+				assertNull(result);
+
+			}
+			
+			Database.databaseToUse = "supportingFiles/supportingDB.db";
+			Database.defaultBackupDir = "backups/";
+			// CHECK FILE RESTORED
+			assertEquals(file.missingChunkNrs().length,0);
+			file.reconstructFile();
+			
+			assertTrue(file.isRestored());
+			assertTrue(oldfile.isFile());
+			
+			RecieveChunk chunk = new RecieveChunk(file.fileID,0);
+			assertNotNull(dbSource.getPathForChunk(chunk));
+			
+			file.cleanup();
+			assertNull(dbSource.getPathForChunk(chunk));
+			
+			// CHECK SOURCE DATABASE
+			String[] files = dbSource.backedFilePaths();
+			
+			assertEquals(files.length,1);
+			assertEquals(files[0],file.getFilePath());			
+			assertEquals(dbSource.nrChunksStored(),file.getNrChunks());
+			
+			
+			// CHECK DESTINY DATABASE
+			Database.databaseToUse = "supportingFiles/supportingDB_2.db";
+			Database.defaultBackupDir = "backups_2/";
+			
+			assertEquals(dbDest.nrChunksStored(),1);
+			
 			
 
+			Files.delete(newfile.toPath());
+			assertFalse(newfile.isFile());
 			
 		} catch (Exception e) {
+
+			if(newfile.renameTo(oldfile)){
+				System.out.println("File renamed");
+			}else{
+				System.out.println("Sorry! the file can't be renamed");
+			}
+			
 			fail("Error");
 		}
 		
 	}
 	
+	@Test
+	public void c_deleteSubProtocol() {
+		
+		
+		
+		try {
+			Database.databaseToUse = "supportingFiles/supportingDB.db";
+			Database.defaultBackupDir = "backups/";
+			Database dbSource = new Database();
+
+			FileToBackup file = new FileToBackup("testFiles/oneChunkFile");
+
+			// DELETE REQUEST
+			ArrayList<byte[]> msgsToSend = new ArrayList<byte[]>();
+			
+			Message msg = new DeleteMsg(Message.getVersion(), file.getFileID());
+			msgsToSend.add(msg.toBytes());
+			
+			
+			file.remove();
+			
+			// Check Source DB
+			String[] files = dbSource.backedFilePaths();
+
+			assertEquals(files.length,0);		
+			assertEquals(dbSource.nrChunksStored(),0);
+			
+			
+			
+			// PROCESS REQUESTS
+			Database.databaseToUse = "supportingFiles/supportingDB_2.db";
+			Database.defaultBackupDir = "backups_2/";
+			Database dbDest = new Database();
+
+			for (byte[] bs : msgsToSend) {
+
+				Message request = MessageFactory.processMessage(bs);
+				assertTrue(request instanceof DeleteMsg);
+				
+				assertEquals(file.getFileID(),((DeleteMsg) request).getFileID());
+
+				Message returnMessage = request.process();
+				assertNull(returnMessage);
+
+			}
+			
+
+			// Check Destiny DB
+			assertEquals(dbDest.chunksForFile(file.getFileID()).length,0);
+
+			
+			
+		} catch (Exception e) {
+			fail("Error");
+		}
+	}
+	
+	
+//	@Test
+	public void reclaimSpaceSubProtocol() {
+		
+	}
 	
 	
 	

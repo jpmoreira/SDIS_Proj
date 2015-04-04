@@ -13,7 +13,7 @@ public class GetChunkMsg extends Message {
 
 	private final String MSGCOD = "GETCHUNK";
 
-	private RecieveChunk chunk;
+	private Chunk chunk;
 
 	
 	
@@ -29,7 +29,7 @@ public class GetChunkMsg extends Message {
 		super(version);
 		
 		try {
-			this.chunk = new RecieveChunk(fileId,Integer.parseInt(chunkNo));
+			this.chunk = new SendChunk(fileId,Integer.parseInt(chunkNo));
 		} catch (Exception e) {
 			chunk = null;
 		}

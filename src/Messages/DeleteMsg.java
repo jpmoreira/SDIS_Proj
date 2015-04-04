@@ -67,5 +67,9 @@ public class DeleteMsg extends Message {
 	public byte[] buildHeader() {
 		return (MSGCOD + " " + getVersion() + " " + fileID + " ").getBytes();
 	}
+	
+	public String getFileID() {
+		return fileID;
+	}
 
 }

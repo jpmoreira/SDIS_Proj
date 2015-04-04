@@ -15,7 +15,7 @@ public class BackupTable extends Dialog {
 
 	protected boolean result;
 	protected Shell shell;
-	private int width = 400;
+	private int width = 500;
 	private int height = 400;
 	private Table fileTable;
 	
@@ -64,16 +64,16 @@ public class BackupTable extends Dialog {
 				Display.getCurrent().getPrimaryMonitor().getBounds().height/2-height/2);
 		
 		fileTable = new Table(shell, SWT.BORDER | SWT.FULL_SELECTION);
-		fileTable.setBounds(10, 10, 380, 330);
+		fileTable.setBounds(10, 10, 480, 330);
 		fileTable.setHeaderVisible(true);
 		fileTable.setLinesVisible(true);
 		
 		TableColumn tblclmnFile = new TableColumn(fileTable, SWT.LEFT);
-		tblclmnFile.setWidth(378);
+		tblclmnFile.setWidth(478);
 		tblclmnFile.setText("File");
 		
 		Button btnSelectFile = new Button(shell, SWT.NONE);
-		btnSelectFile.setBounds(194, 346, 95, 28);
+		btnSelectFile.setBounds(294, 346, 95, 28);
 		btnSelectFile.setText("Select File");
 		btnSelectFile.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -85,7 +85,7 @@ public class BackupTable extends Dialog {
 		});
 		
 		Button btnCancel = new Button(shell, SWT.NONE);
-		btnCancel.setBounds(295, 346, 95, 28);
+		btnCancel.setBounds(395, 346, 95, 28);
 		btnCancel.setText("Cancel");
 		btnCancel.addSelectionListener(new SelectionAdapter() {
 			@Override

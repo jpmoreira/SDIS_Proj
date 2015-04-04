@@ -50,7 +50,7 @@ public class PutChunkMsg extends Message {
 			this.chunk = null;
 		} catch (Exception e) {
 			try {
-				this.chunk = new RecieveChunk(fileId, Integer.parseInt(chunkNo),body);
+				this.chunk = new RecieveChunk(fileId, Integer.parseInt(chunkNo),body,Integer.parseInt(repDeg));
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}

@@ -512,7 +512,7 @@ public class Database {
 
 	}
 
-	public boolean isOurFile(String fileID) throws SQLException{
+	public boolean isOurFile(String fileID){
 		
 		
 		boolean returnValue = false;
@@ -523,36 +523,39 @@ public class Database {
 			ResultSet set = stmt.executeQuery("SELECT * from BackedFiles WHERE fileID = '"+fileID+"';");
 			
 			if (set.next())returnValue = true;
-			
-			stmt.close();
-			return returnValue;
 		}
-		catch(Exception e){
-			
-			if(stmt != null)stmt.close();
-			return returnValue;
+		catch(Exception e){}
+		finally{
+			closeSTMT(stmt);	
 		}
-		
+		return returnValue;
 		
 		
 	}
 
-	public String[] backedFilePaths() throws SQLException{
+	public String[] backedFilePaths(){
 		
-		ArrayList<String> paths = new ArrayList<>();
-		
-		Statement stmt = con.createStatement();
-		ResultSet set = stmt.executeQuery("SELECT path from BackedFiles;");
-		
-		while(set.next()){
+
+		String[] pathsArray = new String[0];
+		Statement stmt = null;
+		try {
+			ArrayList<String> paths = new ArrayList<>();
+			stmt =  con.createStatement();
+			ResultSet set = stmt.executeQuery("SELECT path from BackedFiles;");
 			
-			paths.add(set.getString("path"));
+			while(set.next()){
+				
+				paths.add(set.getString("path"));
+			}
+			
+			
+			stmt.close();
+			pathsArray = new String[paths.size()];
+			paths.toArray(pathsArray);
+		} catch (SQLException e) {}
+		finally{
+			closeSTMT(stmt);
 		}
-		
-		
-		stmt.close();
-		String[] pathsArray = new String[paths.size()];
-		paths.toArray(pathsArray);
 		return pathsArray;
 		
 		
@@ -560,29 +563,42 @@ public class Database {
 		
 	}
 	
-	public void removeBackedFile(String path) throws SQLException {
+	public void removeBackedFile(String path){
 		
 		
-		Statement stmt = con.createStatement();
-		
-		stmt.execute("DELETE FROM BackedFiles WHERE path = '"+path+"';");
-		
-		stmt.close();
+		Statement stmt = null;
+		try {
+			stmt = con.createStatement();
+			
+			stmt.execute("DELETE FROM BackedFiles WHERE path = '"+path+"';");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		finally{
+			closeSTMT(stmt);
+		}
 		
 		
 		
 	}
 
 
-	public String fileIDForBackedFile(String path) throws SQLException{
+	public String fileIDForBackedFile(String path){
+		Statement stmt = null;
+		String toRet = null;
+		try {
+			stmt = con.createStatement();
+			
+			ResultSet set = stmt.executeQuery("SELECT fileID from BackedFiles WHERE path = '"+path+"';");
+			
+			if(set.next())toRet = set.getString("fileID");
+		} catch (SQLException e) {}
+		finally{
+			closeSTMT(stmt);
+		}
 		
-		Statement stmt = con.createStatement();
-		
-		ResultSet set = stmt.executeQuery("SELECT fileID from BackedFiles WHERE path = '"+path+"';");
-		
-		if(set.next())return set.getString("fileID");
-		
-		return null;
+		return toRet;
 		
 	}
 
@@ -602,18 +618,20 @@ public class Database {
 	}
 
 
-	public int getDesiredReplicationDegreeForFile(String fileID) throws SQLException{
+	public int getDesiredReplicationDegreeForFile(String fileID){
 		
 		
-		Statement stmt = con.createStatement();
-		
-		ResultSet set = stmt.executeQuery("SELECT rep from BackedFiles WHERE fileID = '"+fileID+"';");
-		
+		Statement stmt = null;
 		int toRet = 0;
-		
-		if(set.next())toRet = set.getInt("rep");
-		
-		stmt.close();
+		try {
+			stmt = con.createStatement();
+			ResultSet set = stmt.executeQuery("SELECT rep from BackedFiles WHERE fileID = '"+fileID+"';");			
+			if(set.next())toRet = set.getInt("rep");
+		} catch (Exception e) {
+		}
+		finally{
+			closeSTMT(stmt);
+		}
 		return toRet;
 		
 		

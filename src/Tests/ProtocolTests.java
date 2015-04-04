@@ -160,12 +160,10 @@ public class ProtocolTests {
 				
 			}
 			
-			FileToRestore restoredFile = new FileToRestore(file.fileID);
-			
 			// CHECK FILE RESTORED
-			assertEquals(restoredFile.missingChunkNrs().length,0);
-			restoredFile.reconstructFile();
-			assertTrue(restoredFile.isRestored());
+			assertEquals(file.missingChunkNrs().length,0);
+			file.reconstructFile();
+			assertTrue(file.isRestored());
 			assertTrue(oldfile.isFile());
 			
 			// CHECK SOURCE DATABASE
@@ -197,7 +195,7 @@ public class ProtocolTests {
 		
 	}
 	
-	@Test
+//	@Test
 	public void c_deleteSubProtocol() throws SQLException {
 		
 		
@@ -216,14 +214,13 @@ public class ProtocolTests {
 				msgsToSend.add(msg.toBytes());
 
 			}
-
+			
 			
 			
 			// PROCESS REQUESTS
 			Database.databaseToUse = "supportingFiles/supportingDB_2.db";
 			Database dbDest = new Database();
 
-			ArrayList<byte[]> answers = new ArrayList<byte[]>();
 			for (byte[] bs : msgsToSend) {
 
 				Message request = MessageFactory.processMessage(bs);
@@ -235,12 +232,29 @@ public class ProtocolTests {
 			}
 			
 			
+			// Check Source DB
+			String[] files = dbSource.backedFilePaths();
+
+			assertEquals(files.length,0);		
+			assertEquals(dbSource.nrChunksStored(),0);
+
+
+			// Check Destiny DB
+			assertEquals(dbDest.chunksForFile(file.getFileID()).length,0);
+
+			
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
+	
+	@Test
+	public void reclaimSpaceSubProtocol() {
+		
+	}
 	
 	
 	

@@ -44,7 +44,7 @@ public class ChunkMsg extends Message {
 			new FileToRestore(fileId);
 			this.chunk = new RecieveChunk(fileId,Integer.parseInt(chunkNo),body);
 		} catch (Exception e1) {
-			
+			e1.printStackTrace();
 		}
 	}
 
@@ -53,11 +53,11 @@ public class ChunkMsg extends Message {
 	 */
 	public Message process() {
 		
-		try {
-			new FileToRestore(chunk.fileID).addChunk((RecieveChunk) chunk);
-		} catch (Exception e1) {
-
-		}
+//		try {
+//			new FileToRestore(chunk.fileID).addChunk((RecieveChunk) chunk);
+//		} catch (Exception e1) {
+//
+//		}
 		//TODO Enhancement
 		return null;
 	}

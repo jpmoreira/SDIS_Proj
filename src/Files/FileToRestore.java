@@ -1,4 +1,5 @@
 package Files;
+//TODO: how to remove file
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,6 +20,7 @@ public class FileToRestore implements S_File{
 	public String fileID = null;
 	String filePath = null;
 	int nrChunks = -1;
+
 	
 	
 	/**
@@ -29,6 +31,7 @@ public class FileToRestore implements S_File{
 	 * @param chunks the chunks that constitute the file
 	 * @throws Exception 
 	 */
+	/*
 	public FileToRestore(String fileID, RecieveChunk[] chunks) throws Exception{
 		
 		
@@ -49,6 +52,7 @@ public class FileToRestore implements S_File{
 		
 		
 	}
+	*/
 	public FileToRestore(String fileID) throws Exception{
 		
 		
@@ -62,7 +66,12 @@ public class FileToRestore implements S_File{
 		
 		if(this.filePath == null) throw new Exception("Attempt to restore non backedup file"); 
 		
+		RecieveChunk[] r = d.chunksForFile(fileID);
 		
+		for (RecieveChunk recieveChunk : r) {
+			
+			this.addChunk(recieveChunk);
+		}
 		
 		
 		
@@ -86,8 +95,9 @@ public class FileToRestore implements S_File{
 		return filePath;
 		
 	}
+
 	
-	public void addChunk(RecieveChunk chunk){
+	private void addChunk(RecieveChunk chunk){
 		
 		if(!chunk.fileID.equals(fileID)) return;
 		
@@ -103,6 +113,16 @@ public class FileToRestore implements S_File{
 
 	
 	public Integer[] missingChunkNrs(){
+		
+		try{
+			Database d = new Database();
+		
+			RecieveChunk[] r = d.chunksForFile(fileID);
+		
+			for (RecieveChunk recieveChunk : r) this.addChunk(recieveChunk);
+			
+		}
+		catch(Exception e){}
 		
 		
 		ArrayList<Integer> missingOnes = new ArrayList<Integer>();
@@ -146,6 +166,16 @@ public class FileToRestore implements S_File{
 	}
 
 	public void reconstructFile() throws Exception{
+		
+		
+		Database d = new Database();
+		
+		RecieveChunk[] r = d.chunksForFile(fileID);
+		
+		for (RecieveChunk recieveChunk : r) {
+			
+			this.addChunk(recieveChunk);
+		}
 		
 		
 		int lastNr = chunks.get(0).nr;

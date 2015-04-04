@@ -160,24 +160,8 @@ public class TestSFile {
 		
 		try{
 		
-			RecieveChunk[] chunksArray = new RecieveChunk[file.getNrChunks()];
-			for(int i = 0 ;i <file.getNrChunks(); i++){
-				chunksArray[i]=new RecieveChunk(fileID,i,file.getChunk(i).getContent(),"testFiles/RIGPChunks/chunk"+i);
-			}
-		
-		
-
-			new File("testFiles/RIGP-copy.pdf").delete();
+			
 			FileToRestore r = new FileToRestore(fileID);
-			
-			File theFileThatDoesntExist = new File("testFiles/RIGP-copy.pdf");
-			
-			assertFalse(theFileThatDoesntExist.exists());
-			
-			r.addChunk(chunksArray[0]);
-			r.addChunk(chunksArray[0]);
-			
-			
 			try{
 				r.reconstructFile();
 				fail("didn't throw exception but should have");
@@ -188,10 +172,35 @@ public class TestSFile {
 				assertTrue(true);
 			}
 			
-			
-			for (RecieveChunk recieveChunk : chunksArray) {
-				r.addChunk(recieveChunk);
+			/*
+			RecieveChunk[] chunksArray = new RecieveChunk[file.getNrChunks()];
+			for(int i = 0 ;i <file.getNrChunks(); i++){
+				chunksArray[i]=new RecieveChunk(fileID,i,file.getChunk(i).getContent(),"testFiles/RIGPChunks/chunk"+i);
 			}
+		
+			*/
+		
+
+
+			r = new FileToRestore(fileID);
+			
+
+			
+			new RecieveChunk(fileID,0,file.getChunk(0).getContent(),"testFiles/RIGPChunks/chunk0");
+			
+			
+			
+
+			
+			for(int i = 1 ;i <file.getNrChunks(); i++){
+				new RecieveChunk(fileID,i,file.getChunk(i).getContent(),"testFiles/RIGPChunks/chunk"+i);
+			}
+			
+			new File("testFiles/RIGP-copy.pdf").delete();
+
+			File theFileThatDoesntExist = new File("testFiles/RIGP-copy.pdf");
+			
+			assertFalse(theFileThatDoesntExist.exists());
 			
 			assertFalse(r.isRestored());
 			r.reconstructFile();
@@ -247,10 +256,12 @@ public class TestSFile {
 		
 		RecieveChunk[] rec_chunks = new RecieveChunk[chunks.length];
 		
+		/*
 		for(int i = 0 ; i < chunks.length ; i++){
 			
 			rec_chunks[i] = new RecieveChunk(chunks[i].fileID, chunks[i].nr,chunks[i].getContent());
 		}
+		*/
 		
 		FileToRestore r = new FileToRestore(fb.getFileID());
 		
@@ -258,14 +269,17 @@ public class TestSFile {
 		
 		for(int i = 0 ; i < chunks.length ; i ++) assertEquals(missing[i].intValue(),chunks[i].nr);
 		
-		r.addChunk(rec_chunks[0]);
+		
+		new RecieveChunk(chunks[0].fileID, chunks[0].nr,chunks[0].getContent());
+		
+		
 		
 		missing = r.missingChunkNrs();
 		
 		for(int i = 0 ; i < missing.length ; i ++) assertEquals(missing[i].intValue(),chunks[i+1].nr);
 		
 		
-		r.addChunk(rec_chunks[7]);
+		new RecieveChunk(chunks[7].fileID, chunks[7].nr,chunks[7].getContent());
 		missing = r.missingChunkNrs();
 		assertEquals(r.chunks.size(),2);
 		
@@ -273,10 +287,14 @@ public class TestSFile {
 		
 		for(int i = 6 ; i < missing.length; i++) assertEquals(missing[i].intValue(),i+2);
 		
+		
 		for(int i = 0 ; i < rec_chunks.length; i++){
-			r.addChunk(rec_chunks[i]);
+			
+			new RecieveChunk(chunks[i].fileID, chunks[i].nr,chunks[i].getContent());
+			
 		}
 		
+		r.missingChunkNrs();//to force chunks array actualization
 		assertEquals(r.chunks.size(),rec_chunks.length);
 		
 		assertEquals(r.missingChunkNrs().length,0);
@@ -311,7 +329,7 @@ public class TestSFile {
 			rec_chunks[i] = new RecieveChunk(chunks[i].fileID, chunks[i].nr,chunks[i].getContent());
 		}
 		
-		FileToRestore r = new FileToRestore(fb.getFileID(),rec_chunks);
+		FileToRestore r = new FileToRestore(fb.getFileID());
 		
 		for(int i = 0 ; i < rec_chunks.length; i++){
 			File f = new File(rec_chunks[i].getPath());

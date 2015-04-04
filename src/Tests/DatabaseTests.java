@@ -320,7 +320,7 @@ public class DatabaseTests {
 		FileToBackup f = new FileToBackup("testFiles/twoChunkFileWithLastChunkEmpty",10);
 		//f.addToBackupRegistry();
 		
-		FileToRestore r = new FileToRestore(f.getFileID(), null);
+		FileToRestore r = new FileToRestore(f.getFileID());
 		
 		assertEquals(f.getFileID(),r.getFileID());
 		assertEquals(f.getFilePath(),r.getFilePath());
@@ -374,11 +374,7 @@ public class DatabaseTests {
 		
 		FileToRestore r = new FileToRestore(b.getFileID());
 		
-		for (RecieveChunk recieveChunk : rc) {
-			
-			r.addChunk(recieveChunk);
-			
-		}
+
 		
 		//r.resconstructFile();
 		

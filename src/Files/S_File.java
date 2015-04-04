@@ -1,15 +1,43 @@
 package Files;
 
-public interface S_File {
+import java.io.File;
+
+import Main.Database;
+
+
+
+public abstract class S_File {
 	
 	
 
 	
 
 
-	public int getNrChunks();
-	public String getFileID();
-	public String getFilePath();
+	public abstract int getNrChunks();
+	public abstract String getFileID();
+	public abstract String getFilePath();
+	
+	public int consumedSpace(){
+		
+		File backupDir = new File(Database.defaultBackupDir);
+		
+		return getFolderSize(backupDir);
+		
+		
+		
+	}
+	
+	private static int getFolderSize(File dir) {
+	    int size = 0;
+	    for (File file : dir.listFiles()) {
+	        if (file.isFile()) {
+	            // System.out.println(file.getName() + " " + file.length());
+	            size += file.length();
+	        } else
+	            size += getFolderSize(file);
+	    }
+	    return size;
+	}
 
 
 }

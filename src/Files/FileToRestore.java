@@ -1,5 +1,4 @@
 package Files;
-//TODO: how to remove file
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -11,7 +10,7 @@ import Chunk.Chunk;
 import Chunk.RecieveChunk;
 import Main.Database;
 
-public class FileToRestore implements S_File{
+public class FileToRestore extends S_File{
 
 	
 

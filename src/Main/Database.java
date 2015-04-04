@@ -295,7 +295,11 @@ public class Database {
 		
 			while(set.next()){
 				
-				chunkList.add(new RecieveChunk(fileID,set.getInt("nr"),set.getString("path")));
+				try{
+					chunkList.add(new RecieveChunk(fileID,set.getInt("nr"),set.getString("path")));
+					
+				}catch(Exception e){}
+				
 			}
 			
 		}
@@ -534,14 +538,15 @@ public class Database {
 	}
 
 
-	public RecieveChunk getChunkInBetterConditionToBeDeleted(){
+	public RecieveChunk getChunkInBetterConditionToBeDeleted() throws SQLException{
 	
-		/*
+		
 		Statement stmt = con.createStatement();
 		
 		
 		stmt.executeQuery("SELECT * from Chunk WHERE (SELECT Count(*) FROM BackedFiles WHERE BackedFiles.fileID = Chunk.fileID) = 0");
-		*/
+		
+		
 		return null;
 	}
 }

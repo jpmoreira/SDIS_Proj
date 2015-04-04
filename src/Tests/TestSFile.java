@@ -387,7 +387,7 @@ public class TestSFile {
 		Database d = new Database(true);
 		
 		FileToBackup b = new FileToBackup("testFiles/RIGP.pdf",10);
-		new FileToBackup("testFiles/RIGP.pdf",50);
+		new FileToBackup("testFiles/RIGP.pdf");
 		
 		assertEquals(d.backedFilePaths().length,1);
 		

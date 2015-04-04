@@ -460,6 +460,12 @@ public class TestSFile {
 
 		assertEquals(S_File.consumedSpace(),content.length);
 		
+		
+		new RecieveChunk("ola adues", 3, content,10);
+		
+		assertEquals(S_File.consumedSpace(),2*content.length);
+		
+		
 	}
 	
 	

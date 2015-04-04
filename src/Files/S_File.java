@@ -10,7 +10,7 @@ public abstract class S_File {
 	
 	
 
-	
+	static int availableSpace = 256000;
 
 
 	public String fileID = null;
@@ -52,4 +52,9 @@ public abstract class S_File {
 	    }
 	}
 
+	public static int spaceLeft(){
+		
+		return availableSpace - consumedSpace();
+		
+	} 
 }

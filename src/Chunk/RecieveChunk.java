@@ -58,7 +58,7 @@ public class RecieveChunk extends Chunk {
 	 */
 	public RecieveChunk(String fileID, int nr , byte[] content) throws Exception{
 		
-		this(fileID,nr,content,Database.defaultBackupDir+fileID+"_"+nr+".chunk");
+		this(fileID,nr,content,Database.defaultRestoreDir+fileID+"_"+nr+".chunk");
 
 		
 	}

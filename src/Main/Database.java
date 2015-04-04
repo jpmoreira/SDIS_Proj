@@ -570,9 +570,17 @@ public class Database {
 		try {
 			stmt = con.createStatement();
 			
+			ResultSet set = stmt.executeQuery("SELECT fileID from BackedFiles WHERE path = '"+path+"';");
+			
+			String fileID = null;
+			if(set.next()) fileID = set.getString("fileID");
+			
 			stmt.execute("DELETE FROM BackedFiles WHERE path = '"+path+"';");
+			stmt.execute("DELETE FROM Chunk WHERE fileID ='"+fileID+"';");
+			
+			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 		finally{
@@ -603,16 +611,20 @@ public class Database {
 	}
 
 
-	public int getDesiredReplicationDegreeForChunk(Chunk rc) throws SQLException{
+	public int getDesiredReplicationDegreeForChunk(Chunk rc){
 		
-		Statement stmt = con.createStatement();
-		
-		ResultSet set = stmt.executeQuery("SELECT desiredReplicas from Chunk WHERE fileID = '"+rc.fileID+"';");
-		
+		Statement stmt = null;
 		int toRet = 0;
-		if(set.next())toRet = set.getInt("desiredReplicas");
+		try {
+			stmt = con.createStatement();
+			
+			ResultSet set = stmt.executeQuery("SELECT desiredReplicas from Chunk WHERE fileID = '"+rc.fileID+"';");
+			if(set.next())toRet = set.getInt("desiredReplicas");
+		} catch (Exception e) {}
+		finally{
+			closeSTMT(stmt);
+		}
 		
-		stmt.close();
 		return toRet;
 		
 	}
@@ -638,16 +650,20 @@ public class Database {
 	}
 
 
-	public RecieveChunk getChunkInBetterConditionToBeDeleted() throws SQLException{
+	public RecieveChunk getChunkInBetterConditionToBeDeleted() {
 	
+		/*
 		
 		Statement stmt = con.createStatement();
 		
 		
 		stmt.executeQuery("SELECT * from Chunk WHERE (SELECT Count(*) FROM BackedFiles WHERE BackedFiles.fileID = Chunk.fileID) = 0");
 		
+		*/
 		
 		return null;
+		
+		
 	}
 
 

@@ -94,11 +94,19 @@ public class FileToBackup implements S_File {
 		try{
 			Database d = new Database();
 			
-			String id = d.fileIDForBackedFile(filePath);
+			
+			
+			String id = d.fileIDForBackedFile(new File(filePath).getCanonicalPath());
+			if(id == null)throw new Exception();
 			
 			this.desiredRepDegree = d.getDesiredReplicationDegreeForFile(id);
+			
+			
 		}
-		catch(Exception e){}
+		catch(Exception e){
+			
+			throw new Exception("Unable to load backed file cause it doesn't exist");
+		}
 		
 		
 		
@@ -205,12 +213,10 @@ public class FileToBackup implements S_File {
 		
 	} 
 	
-	public void remove(){
-		
+	public void remove(){		
 		try{
 			
 			Database d = new Database();
-			
 			d.removeBackedFile(this.getFilePath());
 			
 		}catch(Exception e){

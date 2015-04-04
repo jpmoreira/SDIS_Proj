@@ -3,6 +3,8 @@ package Tests;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.junit.FixMethodOrder;
@@ -14,6 +16,7 @@ import Files.FileToBackup;
 import Files.FileToRestore;
 import Main.Database;
 import Messages.ChunkMsg;
+import Messages.DeleteMsg;
 import Messages.GetChunkMsg;
 import Messages.Message;
 import Messages.MessageFactory;
@@ -39,7 +42,7 @@ public class ProtocolTests {
 			
 			assertEquals(dbSource.nrChunksStored(),file.getNrChunks());
 			
-			//SEND MESSAGES
+			// BACKUP REQUEST
 			for (SendChunk sendChunk : chunksToSend) {
 				
 				Message msgToSend = new PutChunkMsg(sendChunk, Message.getVersion());
@@ -49,7 +52,7 @@ public class ProtocolTests {
 			}
 			
 			
-			// RECEIVE MESSAGES
+			// REQUEST PROCESS
 			Database.databaseToUse = "supportingFiles/supportingDB_2.db";
 			Database dbDest = new Database(true);
 			ArrayList<byte[]> returnMsgs = new ArrayList<byte[]>();
@@ -67,7 +70,7 @@ public class ProtocolTests {
 			}
 			
 			
-			// RETURN MESSAGES
+			// REPLY PROCESS
 			Database.databaseToUse = "supportingFiles/supportingDB.db";
 			for (byte[] bs : returnMsgs) {
 				
@@ -108,7 +111,8 @@ public class ProtocolTests {
 		}else{
 			System.out.println("Sorry! the file can't be renamed");
 		}
-
+		
+		assertFalse(oldfile.isFile());
 
 		try {
 			Database.databaseToUse = "supportingFiles/supportingDB.db";
@@ -116,7 +120,7 @@ public class ProtocolTests {
 			
 			FileToRestore file = new FileToRestore(FileToRestore.fileIDForBackedFile("testFiles/oneChunkFile"));
 			
-			// ASK FOR CHUNKS
+			// CHUNK REQUEST
 			ArrayList<byte[]> msgsToSend = new ArrayList<byte[]>();
 			for (int i = 0; i < file.getNrChunks(); i++){
 				
@@ -129,6 +133,8 @@ public class ProtocolTests {
 			// PROCESS REQUESTS
 			Database.databaseToUse = "supportingFiles/supportingDB_2.db";
 			Database dbDest = new Database();
+			
+			ArrayList<byte[]> answers = new ArrayList<byte[]>();
 			for (byte[] bs : msgsToSend) {
 				
 				Message request = MessageFactory.processMessage(bs);
@@ -137,16 +143,102 @@ public class ProtocolTests {
 				Message returnMessage = request.process();
 				assertTrue(returnMessage instanceof ChunkMsg);
 				
+				answers.add(returnMessage.toBytes());
 				
 			}
-		
+			
+			// REPLY PROCESS
+			Database.databaseToUse = "supportingFiles/supportingDB.db";
+			
+			for (byte[] bs : answers) {
+				
+				Message reply = MessageFactory.processMessage(bs);
+				assertTrue(reply instanceof ChunkMsg);
+				
+				Message result = reply.process();
+				assertNull(result);
+				
+			}
+			
+			FileToRestore restoredFile = new FileToRestore(file.fileID);
+			
+			// CHECK FILE RESTORED
+			assertEquals(restoredFile.missingChunkNrs().length,0);
+			restoredFile.reconstructFile();
+			assertTrue(restoredFile.isRestored());
+			assertTrue(oldfile.isFile());
+			
+			// CHECK SOURCE DATABASE
+			String[] files = dbSource.backedFilePaths();
+			
+			assertEquals(files.length,1);
+			assertEquals(files[0],file.getFilePath());			
+			assertEquals(dbSource.nrChunksStored(),file.getNrChunks());
+			
+			
+			// CHECK DESTINY DATABASE
+			assertEquals(dbDest.chunksForFile(file.getFileID()).length,file.getNrChunks());
+			
 			
 
+			Files.delete(newfile.toPath());
+			assertFalse(newfile.isFile());
 			
 		} catch (Exception e) {
+
+			if(newfile.renameTo(oldfile)){
+				System.out.println("File renamed");
+			}else{
+				System.out.println("Sorry! the file can't be renamed");
+			}
+			
 			fail("Error");
 		}
 		
+	}
+	
+	@Test
+	public void c_deleteSubProtocol() throws SQLException {
+		
+		
+		
+		try {
+			Database.databaseToUse = "supportingFiles/supportingDB.db";
+			Database dbSource = new Database();
+
+			FileToRestore file = new FileToRestore(FileToRestore.fileIDForBackedFile("testFiles/oneChunkFile"));
+
+			// DELETE REQUEST
+			ArrayList<byte[]> msgsToSend = new ArrayList<byte[]>();
+			for (int i = 0; i < file.getNrChunks(); i++){
+
+				Message msg = new DeleteMsg(Message.getVersion(), file.fileID);
+				msgsToSend.add(msg.toBytes());
+
+			}
+
+			
+			
+			// PROCESS REQUESTS
+			Database.databaseToUse = "supportingFiles/supportingDB_2.db";
+			Database dbDest = new Database();
+
+			ArrayList<byte[]> answers = new ArrayList<byte[]>();
+			for (byte[] bs : msgsToSend) {
+
+				Message request = MessageFactory.processMessage(bs);
+				assertTrue(request instanceof DeleteMsg);
+
+				Message returnMessage = request.process();
+				assertNull(returnMessage);
+
+			}
+			
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	

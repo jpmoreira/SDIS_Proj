@@ -11,7 +11,7 @@ public abstract class Message {
 
 	/** The HEADEREND. */
 	public final static byte[] HEADEREND = {(byte) 0xD, (byte) 0xA, (byte) 0xD, (byte) 0xA};
-	private static String version;
+	private static String version = "1.0";
 	
 	
 	public Message(String version) {

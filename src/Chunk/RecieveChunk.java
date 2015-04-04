@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import Files.S_File;
 import Main.Database;
 
 public class RecieveChunk extends Chunk {
@@ -73,7 +74,7 @@ public class RecieveChunk extends Chunk {
 	 * @throws Exception 
 	 */
 	public RecieveChunk(String fileID, int nr , byte[] content,int desiredReplicationDegree) throws Exception{
-		
+			
 		this(fileID,nr,content,Database.defaultBackupDir+fileID+"_"+nr+".chunk",desiredReplicationDegree);
 
 		
@@ -131,6 +132,9 @@ public class RecieveChunk extends Chunk {
 	public RecieveChunk(String fileID,int number, byte[] contentBytes, String path,int desiredReplicationDegree) throws Exception{
 		
 		super(fileID,number,contentBytes);
+		
+		if(S_File.spaceLeft()<content.length)throw new Exception("Unable to create chunk because there is no space available");
+		
 		this.desiredRepDegree = desiredReplicationDegree;
 		
 		FileOutputStream fos = new FileOutputStream(path);

@@ -10,8 +10,7 @@ public abstract class S_File {
 	
 	
 
-	static int availableSpace = 256000;
-
+	public static long availableSpace = 256000;
 
 	public String fileID = null;
 
@@ -21,7 +20,7 @@ public abstract class S_File {
 
 	public abstract String getFilePath();
 	
-	public static int consumedSpace(){
+	public static long consumedSpace(){
 		
 		File backupDir = new File(Database.defaultBackupDir);
 		
@@ -31,8 +30,8 @@ public abstract class S_File {
 		
 	}
 	
-	private static int getFolderSize(File dir) {
-	    int size = 0;
+	private static long getFolderSize(File dir) {
+	    long size = 0;
 	    for (File file : dir.listFiles()) {
 	        if (file.isFile()) {
 	            // System.out.println(file.getName() + " " + file.length());
@@ -52,7 +51,7 @@ public abstract class S_File {
 	    }
 	}
 
-	public static int spaceLeft(){
+	public static long spaceLeft(){
 		
 		return availableSpace - consumedSpace();
 		

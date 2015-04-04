@@ -1,6 +1,5 @@
 package Tests;
 
-//TODO test if removal is done properly
 
 import static org.junit.Assert.*;
 
@@ -467,6 +466,60 @@ public class TestSFile {
 		
 		
 	}
+	
+	@Test
+	public void testUnableToCreatChunkDueToSpaceConstraints() throws Exception{
+		
+		
+		S_File.availableSpace = 128000; // only two chunks can be stored
+		
+		S_File.cleanFolder(new File("backups/"));
+		
+		new Database(true);
+		
+		FileToBackup bk = new FileToBackup("testFiles/RIGP.pdf", 10);
+		
+		SendChunk[] sendChunks = bk.getChunks();
+		
+		
+		new Database(true);
+		
+		try{
+			new RecieveChunk(bk.fileID, 0, sendChunks[0].getContent(),10);
+			assertTrue(true);
+		}
+		catch(Exception e){
+			fail("Could not create chunk");
+		}
+		
+		try{
+			new RecieveChunk(bk.fileID, 1, sendChunks[1].getContent(),10);
+			assertTrue(true);
+		}
+		catch(Exception e){
+			fail("Could not create chunk");	
+		}
+		
+		try{
+			new RecieveChunk(bk.fileID, 2, sendChunks[2].getContent(),10);
+			fail("Allowed chunk creation but shouldn't");	
+		}
+		catch(Exception e){
+			assertTrue(true);
+		}
+		
+		
+		assertTrue(true);
+		
+		
+		
+		
+		
+		
+		
+	}
+	
+	
 	
 	
 

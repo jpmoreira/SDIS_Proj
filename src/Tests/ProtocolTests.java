@@ -11,6 +11,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import Chunk.RecieveChunk;
 import Chunk.SendChunk;
 import Files.FileToBackup;
 import Files.FileToRestore;
@@ -160,11 +161,32 @@ public class ProtocolTests {
 				
 			}
 			
+			// REPLY PROCESS - PEER THAT IS NOT THE OWNER
+			Database.databaseToUse = "supportingFiles/supportingDB_2.db";
+
+			for (byte[] bs : answers) {
+
+				Message reply = MessageFactory.processMessage(bs);
+				assertTrue(reply instanceof ChunkMsg);
+
+				Message result = reply.process();
+				assertNull(result);
+
+			}
+			
+			Database.databaseToUse = "supportingFiles/supportingDB.db";
 			// CHECK FILE RESTORED
 			assertEquals(file.missingChunkNrs().length,0);
 			file.reconstructFile();
+			
 			assertTrue(file.isRestored());
 			assertTrue(oldfile.isFile());
+			
+			RecieveChunk chunk = new RecieveChunk(file.fileID,0);
+			assertNotNull(dbSource.getPathForChunk(chunk));
+			
+			file.cleanup();
+			assertNull(dbSource.getPathForChunk(chunk));
 			
 			// CHECK SOURCE DATABASE
 			String[] files = dbSource.backedFilePaths();
@@ -175,7 +197,9 @@ public class ProtocolTests {
 			
 			
 			// CHECK DESTINY DATABASE
-			assertEquals(dbDest.chunksForFile(file.getFileID()).length,file.getNrChunks());
+			Database.databaseToUse = "supportingFiles/supportingDB_2.db";
+			
+			assertEquals(dbDest.nrChunksStored(),1);
 			
 			
 

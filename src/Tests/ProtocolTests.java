@@ -242,8 +242,8 @@ public class ProtocolTests {
 
 			// DELETE REQUEST
 			ArrayList<byte[]> msgsToSend = new ArrayList<byte[]>();
-			String temp = file.getFileID();
-			Message msg = new DeleteMsg(Message.getVersion(), temp);
+			
+			Message msg = new DeleteMsg(Message.getVersion(), file.getFileID());
 			msgsToSend.add(msg.toBytes());
 			
 			

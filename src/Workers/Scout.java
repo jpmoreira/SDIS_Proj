@@ -7,7 +7,7 @@ import java.net.MulticastSocket;
 
 import Main.Gui;
 
-public class Scout implements Runnable{
+public class Scout extends Thread{
 
 
 	private static final int BUFFERSIZE = 70000;
@@ -24,9 +24,10 @@ public class Scout implements Runnable{
 			address = InetAddress.getByName(ip);
 			socket = new MulticastSocket(port);
 
-		} catch (IOException e) {
-			System.out.println("Adress/ Socket Error");
 		}
+		catch (IOException e) {
+			System.out.println("Adress/ Socket Error");
+		} 
 
 	}
 
@@ -35,9 +36,7 @@ public class Scout implements Runnable{
 
 	@Override
 	public void run() {
-
-		System.out.println("Receiving...");
-
+		
 		try {
 			
 			socket.joinGroup(address);
@@ -51,6 +50,9 @@ public class Scout implements Runnable{
 
 				socket.receive(packet);
 
+				//TODO Checks this call
+				if(Thread.interrupted()) return;
+				
 				byte[] msg = new byte[packet.getLength()];
 
 				msg = packet.getData();
@@ -61,12 +63,13 @@ public class Scout implements Runnable{
 			}
 			
 			socket.close();
-
+			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
 		}
 
 	}
+	
+	
 
 }

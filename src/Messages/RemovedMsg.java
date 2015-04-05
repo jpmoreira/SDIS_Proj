@@ -3,6 +3,7 @@
  */
 package Messages;
 
+import Chunk.Chunk;
 import Chunk.SendChunk;
 
 /**
@@ -15,7 +16,7 @@ public class RemovedMsg extends Message {
 	
 	int repDeg;
 
-	private SendChunk chunk = null;
+	private Chunk chunk = null;
 
 	/**
 	 * Instantiates a new removed message.
@@ -34,6 +35,11 @@ public class RemovedMsg extends Message {
 		}
 	}
 
+	public RemovedMsg(Chunk chunk) {
+		super(Message.getVersion());
+		this.chunk = chunk;
+	}
+
 	/* (non-Javadoc)
 	 * @see Messages.Message#process()
 	 */
@@ -41,7 +47,7 @@ public class RemovedMsg extends Message {
 		
 		if (chunk == null || chunk.desiredReplicationDegreeMet()) return null;		
 		
-		return new PutChunkMsg(chunk, getVersion());
+		return new PutChunkMsg((SendChunk)chunk, getVersion());
 		
 	}
 

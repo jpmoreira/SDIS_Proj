@@ -61,7 +61,7 @@ public class BackupOrder extends WorkOrder{
 				if(allChunkDelivered)break;
 				
 				nrOfRepeats++;
-				Thread.sleep(time);
+				currentThread().sleep(time);
 				time = time*2;
 				
 

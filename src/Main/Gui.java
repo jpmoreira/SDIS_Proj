@@ -64,10 +64,6 @@ public class Gui extends Dialog {
 	private Spinner mdrPort;
 	private Spinner mcPort;
 	
-	
-	private Scout mdbScout;
-	private Scout mdrScout;
-	private Scout mcScout;
 	private Spinner backupSpace;
 
 	
@@ -619,9 +615,7 @@ public class Gui extends Dialog {
 	
 	protected void startRestore(String path) {
 		
-		//TODO Check this call and see what is the condition to sleep
-		
-		if (!mdrScout.isAlive()) mdrScout.start();	
+		//TODO Check this call and see what is the condition to sleep	
 		
 		new RestoreOrder(path).start();
 		
@@ -682,14 +676,9 @@ public class Gui extends Dialog {
 		setActionsEnable(true);
 		RUNNING = true;
 		
-		mdbScout = new Scout(mdbPort.getSelection(), Message.MDB_ADDRESS);
-		mdrScout = new Scout(mdrPort.getSelection(), Message.MDR_ADDRESS);
-		mcScout = new Scout(mcPort.getSelection(), Message.MC_ADDRESS);
-		
-		
-		if (!mdbScout.isAlive()) mdbScout.start();
-		if (!mcScout.isAlive()) mcScout.start();
-		if (!mdrScout.isAlive()) mdrScout.start();
+		Scout.getMDBScout().start();
+		Scout.getMCScout().start();
+		Scout.getMDRScout().start();
 		
 	}
 
@@ -703,9 +692,9 @@ public class Gui extends Dialog {
 		setActionsEnable(false);
 		RUNNING = false;
 		
-		mdbScout.closeSocket();
-		mdrScout.closeSocket();
-		mcScout.closeSocket();
+		Scout.getMDBScout().closeSocket();
+		Scout.getMCScout().closeSocket();
+		Scout.getMDRScout().closeSocket();
 		
 	}
 

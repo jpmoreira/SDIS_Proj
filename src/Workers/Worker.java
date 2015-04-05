@@ -6,20 +6,26 @@ import Messages.*;
 public class Worker extends Thread {
 
 	
-	private byte[] msg;
+	private Message msg;
 
-	public Worker(byte[] msg) {
+	public Worker(Message msg) {
 		this.msg = msg;
 	}
 	
 	@Override
 	public void run() {
 		
-		Message returnMsg = (MessageFactory.processMessage(msg)).process();
+		Message returnMsg = msg.process();
 		
 		if (returnMsg == null) return;
 		
 		returnMsg.send();
+		
+	}
+
+	
+	public void update(Message msg) {
+		// TODO Auto-generated method stub
 		
 	}
 

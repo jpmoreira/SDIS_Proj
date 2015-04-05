@@ -141,6 +141,7 @@ public class PutChunkMsg extends Message {
 
 		} catch (IOException e) {
 
+			e.printStackTrace();
 		} finally {
 			socket.close();
 		}

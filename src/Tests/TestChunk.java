@@ -220,7 +220,7 @@ public class TestChunk {
 		
 		try{
 			
-			RecieveChunk r = new RecieveChunk("aFileID", 0, new String("aContent").getBytes());
+			new RecieveChunk("aFileID", 0, new String("aContent").getBytes());
 			fail("failed to notice that shouldn't allow creation of recievechunk cause file doesn't exist");
 		}
 		catch(Exception e ){

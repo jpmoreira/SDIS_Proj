@@ -1,10 +1,9 @@
 package Tests;
-
+//TODO add random
 import static org.junit.Assert.*;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.junit.FixMethodOrder;
@@ -407,7 +406,7 @@ public class ProtocolTests {
 		
 		FileToBackup b = new FileToBackup("testFiles/RIGP.pdf",1);
 		
-		SendChunk[] chunksOnOrigin = b.getChunks(); // register the chunks
+		b.getChunks(); // register the chunks
 		
 		GetChunkMsg getChunkMessage_origin = new GetChunkMsg("1.0", b.fileID, "0");
 		

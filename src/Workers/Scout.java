@@ -5,7 +5,6 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
-import Files.FileToRestore;
 import Main.Gui;
 
 public class Scout extends Thread{

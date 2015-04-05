@@ -35,12 +35,15 @@ public class BackupOrder extends WorkOrder{
 
 			boolean allChunkDelivered;
 
-			do {
+			while(nrOfRepeats < 6) {
+				
+				allChunkDelivered = true;
 				
 				chunksToSend = file.getChunks();
-				allChunkDelivered = true;
+			
 				for (SendChunk sendChunk : chunksToSend) {
 
+					
 					if (sendChunk.desiredReplicationDegreeMet())
 						continue;
 
@@ -55,11 +58,16 @@ public class BackupOrder extends WorkOrder{
 
 				}
 				
+				if(allChunkDelivered)break;
+				
 				nrOfRepeats++;
 				Thread.sleep(time);
 				time = time*2;
 				
-			} while (allChunkDelivered || nrOfRepeats > 5);
+
+			}
+			
+
 
 		} catch (Exception e) {
 

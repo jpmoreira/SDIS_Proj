@@ -383,11 +383,11 @@ public class DatabaseTests {
 		}
 
 		
-		S_File r = new FileToRestore(b.getFileID());
+		new FileToRestore(b.getFileID());
 		
 
 		
-		//r.resconstructFile();
+		
 		
 		
 		

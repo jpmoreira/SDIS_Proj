@@ -7,10 +7,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.net.UnknownHostException;
-import java.sql.SQLException;
 
-import org.eclipse.swt.internal.cocoa.Protocol;
 import org.junit.Test;
 
 import Chunk.RecieveChunk;
@@ -21,6 +18,7 @@ import Main.Database;
 import Messages.Message;
 import Messages.PutChunkMsg;
 import Workers.BackupOrder;
+import Workers.DeleteOrder;
 import Workers.Scout;
 import Workers.Worker;
 
@@ -73,7 +71,7 @@ public class WorkerTests {
 		
 		
 		
-		Thread d = new Thread(new Worker(bytes));
+		Thread d = new Worker(bytes);
 		d.start();
 		
 		d.join();
@@ -104,18 +102,22 @@ public class WorkerTests {
 	}
 	
 	@Test
-	public void backupSubprotocol_senderSide_checkWaitTillReplicationMet() throws SQLException, InterruptedException{
+	public void backupSubprotocol_senderSide_checkWaitTillReplicationMet() throws Exception{
 		
 		
 		ProtocolTests.changeToDB1();
 		new Database(true);
 		
 		
-		Thread putChunkSendThread = new Thread(new BackupOrder("testFiles/RIGP.pdf", 2, Message.MDB_PORT, Message.MDB_ADDRESS));
+		Thread putChunkSendThread = new BackupOrder("testFiles/RIGP.pdf", 2);
+		
+		FileToBackup b = new FileToBackup("testFiles/RIGP.pdf");
 		
 		MulticastSocket mdb_recieverSocket = initializeMDBReadingSocket();
 		byte[] rbuf = new byte[Scout.BUFFERSIZE];
 		DatagramPacket packet = new DatagramPacket(rbuf, Scout.BUFFERSIZE);
+		
+		
 		
 		Thread mdb_reader = new Thread(new Runnable() {
 			
@@ -142,12 +144,153 @@ public class WorkerTests {
 			assertTrue(putChunkSendThread.isAlive());
 			
 		}
-		catch(Exception e){
+		catch(Exception e){}
+		
+		
+		for (SendChunk s : b.getChunks()) {
 			
-			e.printStackTrace();
+			Thread w = new Worker(("STORED"  + " " + "1.0" + " " + s.fileID + " " + s.nr + " ").getBytes());
+			w.start();
+			w.join();
+			
+			
 		}
+		
+		Thread.sleep(1000);
+		
+		try{
+			
+			assertTrue(putChunkSendThread.isAlive());
+			
+		}
+		catch(Exception e){}
+		
+		
+		
+		for (SendChunk s : b.getChunks()) {
+			
+			Thread w = new Worker(("STORED"  + " " + "1.0" + " " + s.fileID + " " + s.nr + " ").getBytes());
+			w.start();
+			w.join();
+			w = new Worker(("STORED"  + " " + "1.0" + " " + s.fileID + " " + s.nr + " ").getBytes());
+			w.start();
+			w.join();
+			
+			
+		}
+		
+		Thread.sleep(2000);
+		
+		try{
+			
+			assertFalse(putChunkSendThread.isAlive());
+			
+		}
+		catch(Exception e){}
+		
+		
+		
+		
+		
+		
+		
+		
+		putChunkSendThread.join();
+		
+	}
 
-		//Thread putChunkReceiveThread = new Thread(new Worker(packet.getData()));
+	
+	//TODO backup subproto. check that only sends chunks that are still missing
+	//TODO assert that nothing is done if no space available
+	@Test
+	public void deleteSubprotocol_senderSide() throws Exception{
+		
+		S_File.cleanFolder(new File("backups/"));
+		S_File.cleanFolder(new File("backups_2/"));
+		
+		ProtocolTests.changeToDB1();
+		Database db_backed = new Database(true);
+		
+		
+		//SIMULATE backup done previously on sender
+		FileToBackup b = new FileToBackup("testFiles/RIGP.pdf",1);
+		
+		SendChunk[] chunks = b.getChunks();
+		
+		for (SendChunk sendChunk : chunks) {
+			
+			sendChunk.incrementReplicationCount();
+			
+			assertEquals(sendChunk.getReplicaCount(),1);
+		}
+		
+		
+		assertEquals(db_backed.nrChunksStored(),chunks.length);
+		
+		ProtocolTests.changeToDB2();
+		Database db_backer = new Database(true);
+		
+		//simulate reception of backup
+		for (SendChunk sendChunk : chunks) {
+			
+			RecieveChunk rc = new RecieveChunk(sendChunk.fileID, sendChunk.nr, sendChunk.getContent(),1);
+			assertEquals(rc.getReplicaCount(),1);
+		}
+		
+		assertEquals(db_backer.nrChunksStored(),chunks.length);
+			
+		
+		ProtocolTests.changeToDB1();
+		
+		Thread deleteWorker = new DeleteOrder("testFiles/RIGP.pdf");
+		
+		MulticastSocket mcSocket = this.initializeMCReadingSocket();
+		byte[] rbuf = new byte[Scout.BUFFERSIZE];
+		DatagramPacket packet = new DatagramPacket(rbuf, Scout.BUFFERSIZE);
+		
+		Thread mcReader = new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					mcSocket.receive(packet);
+				} catch (IOException e) {}
+				
+			}
+		});
+		
+		mcReader.start();
+		
+		
+		
+		deleteWorker.start();
+		
+		mcReader.join();
+		deleteWorker.join();
+		
+		assertEquals(db_backed.nrChunksStored(),0);//all have been deleted
+		assertEquals(db_backed.backedFilePaths().length,0);
+		
+		ProtocolTests.changeToDB2();
+		assertEquals(db_backer.nrChunksStored(),chunks.length);//all haven't been deleted yet
+		
+		Thread deleter = new Worker(packet.getData());
+		
+		deleter.start();
+		
+		deleter.join();
+		
+		
+		assertEquals(db_backer.nrChunksStored(),0);//all have been deleted
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		
 		
@@ -171,7 +314,6 @@ public class WorkerTests {
 		
 	}
 	
-	
 	public MulticastSocket initializeMDBReadingSocket(){
 		
 		
@@ -189,4 +331,5 @@ public class WorkerTests {
 		
 	}
 
+	
 }

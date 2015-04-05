@@ -177,5 +177,28 @@ public abstract class Chunk implements Comparable<Chunk>{
 		
 	}
 	
+	public boolean desiredReplicationDegreeExceeded(){
+		
+		
+		
+		try{
+			
+			Database d = new Database();
+			
+			int desired = d.getDesiredReplicationDegreeForChunk(this);
+			
+			int actual = d.replicaCountOfChunk(this.fileID, this.nr);
+			
+			if(desired < actual )return true;
+			
+			return false;
+		}
+		catch(Exception e){return false;}
+		
+		
+		
+		
+	}
+	
 
 }

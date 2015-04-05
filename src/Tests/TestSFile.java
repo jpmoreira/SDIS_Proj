@@ -47,6 +47,10 @@ public class TestSFile {
 	@Test
 	public void testReadExistingChunk() throws Exception{
 		
+		S_File.availableSpace = 2560000;
+		
+		S_File.cleanFolder(new File("backups/"));
+		
 		FileToBackup file = new FileToBackup("testFiles/oneChunkFile",10);
 		
 		String s = new String(file.getChunk(0).getContent());

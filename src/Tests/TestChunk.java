@@ -330,6 +330,14 @@ public class TestChunk {
 		
 		assertFalse(new File("backups/"+bestToRemove.fileID+"_"+bestToRemove.nr+".chunk").exists());
 		
+		try{
+			new RecieveChunk(chunks[7].fileID, chunks[7].nr);
+			fail("Should have thrown an exception");
+		}
+		catch(Exception e){
+			assertTrue(true);
+		}
+		
 		
 	}
 	

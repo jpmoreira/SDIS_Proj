@@ -73,7 +73,7 @@ public class PutChunkMsg extends Message {
 		
 		//TODO Simulate desiredReplicationDegreeMet
 		try {
-			if(chunk.desiredReplicationDegreeMet()) {
+			if(chunk.desiredReplicationDegreeExceeded()) {
 				((RecieveChunk) chunk).cleanup();
 			}
 		} catch (Exception e) {

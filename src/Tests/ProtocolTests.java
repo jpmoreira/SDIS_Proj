@@ -15,6 +15,7 @@ import Chunk.RecieveChunk;
 import Chunk.SendChunk;
 import Files.FileToBackup;
 import Files.FileToRestore;
+import Files.S_File;
 import Main.Database;
 import Messages.ChunkMsg;
 import Messages.DeleteMsg;
@@ -31,6 +32,14 @@ public class ProtocolTests {
 	public void a_backupSubProtocol() {
 		
 		try {
+			
+			S_File.availableSpace = 2560000;
+			
+			S_File.cleanFolder(new File("backups/"));
+			
+			S_File.cleanFolder(new File("backups_2/"));
+			
+			
 			Database.databaseToUse = "supportingFiles/supportingDB.db";
 			Database.defaultBackupDir = "backups/";
 			Database dbSource = new Database(true);

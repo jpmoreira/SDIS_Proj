@@ -4,6 +4,9 @@
 package Messages;
 
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 
 import Chunk.*;
 import Files.FileToRestore;
@@ -87,5 +90,30 @@ public class ChunkMsg extends Message {
 	}
 	
 	
+	@Override
+	public void send() {
+		
+		DatagramSocket socket = null;
+		try {
+
+			socket = new DatagramSocket();
+
+			byte[] msg = new byte[this.toBytes().length];
+
+			msg = this.toBytes();
+
+			DatagramPacket packet = new DatagramPacket(msg, msg.length, new InetSocketAddress(MDR_ADDRESS, MDR_PORT) );
+
+			socket.send(packet);
+
+
+		} catch (IOException e) {
+
+		} finally {
+			socket.close();
+		}
+		
+		
+	}
 
 }

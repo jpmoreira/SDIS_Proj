@@ -4,6 +4,9 @@
 package Messages;
 
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 
 import Chunk.*;
 
@@ -119,5 +122,31 @@ public class PutChunkMsg extends Message {
 		return (MSGCOD + " " + getVersion() + " " + chunk.fileID + " " + chunk.nr + " " + chunk.desiredReplicationDegree() + " ").getBytes();
 	}
 	
+	
+	@Override
+	public void send() {
+		
+		DatagramSocket socket = null;
+		try {
+
+			socket = new DatagramSocket();
+
+			byte[] msg = new byte[this.toBytes().length];
+
+			msg = this.toBytes();
+
+			DatagramPacket packet = new DatagramPacket(msg, msg.length, new InetSocketAddress(MDB_ADDRESS, MDB_PORT) );
+
+			socket.send(packet);
+
+
+		} catch (IOException e) {
+
+		} finally {
+			socket.close();
+		}
+		
+		
+	}
 
 }

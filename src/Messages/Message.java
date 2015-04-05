@@ -55,6 +55,7 @@ public abstract class Message {
 		this.version = version;
 	}
 	
+
 	public void send() {
 		
 		DatagramSocket socket = null;
@@ -72,8 +73,7 @@ public abstract class Message {
 
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
 		} finally {
 			socket.close();
 		}

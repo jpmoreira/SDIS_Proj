@@ -3,6 +3,11 @@
  */
 package Messages;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
+
 import Chunk.*;
 
 
@@ -68,5 +73,6 @@ public class StoredMsg extends Message {
 	public byte[] buildHeader() {
 		return  (MSGCOD  + " " + getVersion() + " " + chunk.fileID + " " + chunk.nr + " ").getBytes();
 	}
+
 
 }

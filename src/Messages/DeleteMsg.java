@@ -71,5 +71,7 @@ public class DeleteMsg extends Message {
 	public String getFileID() {
 		return fileID;
 	}
+	
+	
 
 }

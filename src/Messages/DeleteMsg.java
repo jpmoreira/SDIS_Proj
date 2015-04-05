@@ -16,7 +16,7 @@ public class DeleteMsg extends Message {
 	
 
 	/**
-	 * Instantiates a new delete msg.
+	 * Instantiates a new delete msg that is going to be sent or to be recieved.
 	 *
 	 * @param version the version
 	 * @param fileId the file id

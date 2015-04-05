@@ -78,6 +78,9 @@ public class DatabaseTests {
 	@Test
 	public void testDBClearMethod() throws Exception{
 		
+		S_File.availableSpace = 2560000;
+		
+		S_File.cleanFolder(new File("backups/"));
 		
 		Database d = new Database(true);
 		assertEquals(d.nrChunksStored(),0);
@@ -120,7 +123,9 @@ public class DatabaseTests {
 	@Test
 	public void attemptToAddChunksWithSameNumberButDifferentFile() throws Exception{
 		
+		S_File.availableSpace = 2560000;
 		
+		S_File.cleanFolder(new File("backups/"));
 		
 		
 		Database d = new Database(true);
@@ -137,7 +142,9 @@ public class DatabaseTests {
 		
 		
 		
+		S_File.availableSpace = 2560000;
 		
+		S_File.cleanFolder(new File("backups/"));
 		
 		Database d = new Database(true);
 		String path1 = "testFiles/testChunk4.chunk";
@@ -297,19 +304,23 @@ public class DatabaseTests {
 	@Test
 	public void addReplicaCount() throws Exception{
 		
+		
+		S_File.availableSpace = 2560000;
+		
+		S_File.cleanFolder(new File("backups/"));
+		
 		Database d = new Database(true);
 		
 		new RecieveChunk("blabla",0,new String("content").getBytes(),"testFiles/replicaTest.chunk",1);
 		
-		assertEquals(d.replicaCountOfChunk("blabla", 0),0);
+		assertEquals(d.replicaCountOfChunk("blabla", 0),1);
 		
 		d.addReplicaCountToChunk("blabla", 0);
 		
-		assertEquals(d.replicaCountOfChunk("blabla", 0),1);
+		assertEquals(d.replicaCountOfChunk("blabla", 0),2);
 		
 		
 	}
-
 
 	@Test
 	public void addFileToBackupRecord() throws Exception{
@@ -341,7 +352,6 @@ public class DatabaseTests {
 		
 		assertTrue(isOurOwn);
 	}
-
 
 	@Test
 	public void testRemovalOfPaths() throws Exception {
@@ -397,6 +407,7 @@ public class DatabaseTests {
 	
 		
 	}
+
 }
 
 

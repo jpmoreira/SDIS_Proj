@@ -15,6 +15,7 @@ import Chunk.RecieveChunk;
 import Chunk.SendChunk;
 import Files.FileToBackup;
 import Files.FileToRestore;
+import Files.S_File;
 import Main.Database;
 import Messages.ChunkMsg;
 import Messages.DeleteMsg;
@@ -31,6 +32,14 @@ public class ProtocolTests {
 	public void a_backupSubProtocol() {
 		
 		try {
+			
+			S_File.availableSpace = 2560000;
+			
+			S_File.cleanFolder(new File("backups/"));
+			
+			S_File.cleanFolder(new File("backups_2/"));
+			
+			
 			Database.databaseToUse = "supportingFiles/supportingDB.db";
 			Database.defaultBackupDir = "backups/";
 			Database dbSource = new Database(true);
@@ -69,6 +78,19 @@ public class ProtocolTests {
 				assertTrue(rtrnMsg instanceof StoredMsg);
 				
 				returnMsgs.add(rtrnMsg.toBytes());
+				
+				
+				//we already backed it up ! therefore the result should be noting
+				
+				int nrChunksBefore = dbDest.nrChunksStored();
+				
+				Message msg2 = MessageFactory.processMessage(bs);
+				Message rtrnMsg2 = msg2.process();
+				
+				assertEquals(nrChunksBefore,dbDest.nrChunksStored());//no change should be made 
+				assertNull(rtrnMsg2);
+				
+				
 							
 			}
 			
@@ -291,6 +313,54 @@ public class ProtocolTests {
 		
 	}
 	
+	
+	
+	@Test
+	public void z_recievingOwnPutChunk() throws Exception{
+		
+		
+		Database d = new Database(true);
+		
+		SendChunk[] chunks = new FileToBackup("testFiles/RIGP.pdf",10).getChunks();
+		
+		PutChunkMsg msg = new PutChunkMsg(chunks[0], "1.0");
+
+		
+		Message msgRecieved = MessageFactory.processMessage(msg.toBytes());
+		
+		assertTrue(msgRecieved instanceof PutChunkMsg);
+		
+		Message reply = msgRecieved.process();
+		
+		assertNull(reply);
+		
+		assertNull(d.getPathForChunk(chunks[0]));
+		
+	}
+	
+	@Test
+	public void y_revertBeingMadeCauseDegreeIsMet(){
+		
+		
+		
+		
+	}
+
+
+
+	public void changeToDB1(){
+		
+		Database.databaseToUse = "supportingFiles/supportingDB.db";
+		Database.defaultBackupDir = "backups/";
+		
+	}
+	
+	public void changeToDB2(){
+		
+		Database.databaseToUse = "supportingFiles/supportingDB.db";
+		Database.defaultBackupDir = "backups/";
+		
+	}
 	
 	
 }

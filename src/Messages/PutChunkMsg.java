@@ -19,7 +19,7 @@ public class PutChunkMsg extends Message {
 	
 
 	/**
-	 * Instantiates a new put chunk msg.
+	 * Instantiates a new put chunk msg that is to be sent.
 	 *
 	 * @param chunk the chunk
 	 */
@@ -33,7 +33,7 @@ public class PutChunkMsg extends Message {
 	
 
 	/**
-	 * Instantiates a new put chunk msg.
+	 * Instantiates a new put chunk msg that was recieved.
 	 *
 	 * @param version the version
 	 * @param fileId the file id
@@ -41,17 +41,19 @@ public class PutChunkMsg extends Message {
 	 * @param repDeg the rep deg
 	 * @param body the body
 	 */
+	
 	public PutChunkMsg(String version, String fileId, String chunkNo,
 			String repDeg, byte[] body) {
 		
 		super(version);
 		try {
-			this.chunk = new RecieveChunk(fileId, Integer.parseInt(chunkNo));
-			this.chunk = null;
-		} catch (Exception e) {
+			this.chunk = new RecieveChunk(fileId, Integer.parseInt(chunkNo));//attempt to load the chunk
+			this.chunk = null;// put it to null
+		} catch (Exception e) {//in case we were not able to load the chunk
 			try {
-				this.chunk = new RecieveChunk(fileId, Integer.parseInt(chunkNo),body,Integer.parseInt(repDeg));
+				this.chunk = new RecieveChunk(fileId, Integer.parseInt(chunkNo),body,Integer.parseInt(repDeg));//create a new one and store it
 			} catch (Exception e1) {
+				//In case the file to whom this chunk belongs is ours.
 				e1.printStackTrace();
 			}
 		}
@@ -69,9 +71,9 @@ public class PutChunkMsg extends Message {
 		if (chunk == null) return null;
 	
 		
-		//TODO Testar
+		//TODO Simulate desiredReplicationDegreeMet
 		try {
-			if(chunk.desiredReplicationDegreeMet()) {
+			if(chunk.desiredReplicationDegreeExceeded()) {
 				((RecieveChunk) chunk).cleanup();
 			}
 		} catch (Exception e) {

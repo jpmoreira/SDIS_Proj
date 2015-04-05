@@ -20,7 +20,7 @@ public class ChunkMsg extends Message {
 	
 
 	/**
-	 * Instantiates a new chunk msg.
+	 * Used to create a Chunk Message to be sent
 	 *
 	 * @param chunk the chunk
 	 */
@@ -30,7 +30,7 @@ public class ChunkMsg extends Message {
 	}
 
 	/**
-	 * Instantiates a new chunk message.
+	 * Used to create a Chunk Message that was recieved.
 	 *
 	 * @param version the version of the protocol
 	 * @param fileId the file id
@@ -41,10 +41,11 @@ public class ChunkMsg extends Message {
 		super(version);
 		
 		try {
-			new FileToRestore(fileId);
-			this.chunk = new RecieveChunk(fileId,Integer.parseInt(chunkNo),body);
+			//new FileToRestore(fileId);
+			this.chunk = new RecieveChunk(fileId,Integer.parseInt(chunkNo),body); 
 		} catch (Exception e1) {
 			
+			//If fileID isn't from us.
 		}
 	}
 
@@ -53,11 +54,7 @@ public class ChunkMsg extends Message {
 	 */
 	public Message process() {
 		
-//		try {
-//			new FileToRestore(chunk.fileID).addChunk((RecieveChunk) chunk);
-//		} catch (Exception e1) {
-//
-//		}
+
 		//TODO Enhancement
 		return null;
 	}

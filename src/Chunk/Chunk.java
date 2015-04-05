@@ -4,6 +4,7 @@ import java.sql.SQLException;
 
 import Main.Database;
 
+//TODO implement reclaim space
 
 public abstract class Chunk implements Comparable<Chunk>{
 	

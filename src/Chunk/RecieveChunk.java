@@ -156,6 +156,8 @@ public class RecieveChunk extends Chunk {
 		if(this.isOwn())throw new Exception("Tried to force replication degree on file thats ours");
 		else d.addChunk(this);
 		
+		this.incrementReplicationCount();//we start at one
+		
 	
 	}
 	
@@ -282,14 +284,25 @@ public class RecieveChunk extends Chunk {
 	}
 	
 
-
 	@Override
 	public int desiredReplicationDegree() {
 		
 		return this.desiredRepDegree;
 	}
 
-	
+	public static RecieveChunk chunkToRemove(){
+		
+		RecieveChunk r = null;
+		try{
+			
+			Database d = new Database();
+			
+			r = d.getChunkInBetterConditionToBeDeleted();
+			
+		}catch(Exception e){}
+		
+		return r;
+	}
 	
 
 }

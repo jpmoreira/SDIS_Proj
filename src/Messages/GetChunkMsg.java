@@ -19,7 +19,7 @@ public class GetChunkMsg extends Message {
 	
 	
 	/**
-	 * Instantiates a new gets the chunk msg.
+	 * Instantiates a new get chunk msg to be 
 	 *
 	 * @param version the version
 	 * @param fileId the file id

@@ -1,5 +1,6 @@
 package Tests;
 
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -15,6 +16,7 @@ import Chunk.Chunk;
 import Chunk.RecieveChunk;
 import Chunk.SendChunk;
 import Files.FileToBackup;
+import Files.S_File;
 import Main.Database;
 
 public class TestChunk {
@@ -237,23 +239,26 @@ public class TestChunk {
 	@Test
 	public void testReplicaCountMetOrNot() throws Exception{
 		
+		S_File.availableSpace = 2560000;
+		
+		S_File.cleanFolder(new File("backups/"));
+		
 		
 		Database d = new Database(true);
 		RecieveChunk r = new RecieveChunk("ola", 1, new String("aasdasd").getBytes(),10);
 		
 		assertFalse(r.desiredReplicationDegreeMet());
 		
-		assertEquals(r.getReplicaCount(),0);
-		assertEquals(d.replicaCountOfChunk(r.fileID, r.nr),0);
-		
-		r.incrementReplicationCount();
-		
 		assertEquals(r.getReplicaCount(),1);
 		assertEquals(d.replicaCountOfChunk(r.fileID, r.nr),1);
 		
+		r.incrementReplicationCount();
+		
+		assertEquals(r.getReplicaCount(),2);
+		assertEquals(d.replicaCountOfChunk(r.fileID, r.nr),2);
+		
 		assertFalse(r.desiredReplicationDegreeMet());
 		
-		r.incrementReplicationCount();
 		r.incrementReplicationCount();
 		r.incrementReplicationCount();
 		r.incrementReplicationCount();
@@ -285,4 +290,51 @@ public class TestChunk {
 		
 		
 	}
+	
+	@Test 
+	public void testChunkSpaceRemoval() throws Exception{
+		
+		
+		
+		S_File.availableSpace = 2560000;
+		
+		S_File.cleanFolder(new File("backups/"));
+		
+		new Database(true);
+		
+		FileToBackup b = new FileToBackup("testFiles/RIGP.pdf",1);
+		
+		SendChunk[] chunks = b.getChunks();
+		
+		new Database(true);
+		
+		for (SendChunk sendChunk : chunks) {
+			
+			new RecieveChunk(sendChunk.fileID, sendChunk.nr, sendChunk.getContent(),1);
+		}
+		
+		RecieveChunk bestToRemove = new RecieveChunk(chunks[7].fileID, chunks[7].nr);
+		
+		assertEquals(bestToRemove.getReplicaCount(),1);
+		
+		bestToRemove.incrementReplicationCount();
+		
+		RecieveChunk bestToRemoveCalculated = RecieveChunk.chunkToRemove();
+		
+		assertEquals(bestToRemoveCalculated.fileID,bestToRemove.fileID);
+		assertEquals(bestToRemove.nr,bestToRemoveCalculated.nr);
+		
+		assertTrue(new File("backups/"+bestToRemove.fileID+"_"+bestToRemove.nr+".chunk").exists());
+		
+		bestToRemoveCalculated.cleanup();
+		
+		assertFalse(new File("backups/"+bestToRemove.fileID+"_"+bestToRemove.nr+".chunk").exists());
+		
+		
+	}
+	
+
+
+
+	
 }

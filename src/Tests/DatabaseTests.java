@@ -310,7 +310,6 @@ public class DatabaseTests {
 		
 	}
 
-
 	@Test
 	public void addFileToBackupRecord() throws Exception{
 		
@@ -341,7 +340,6 @@ public class DatabaseTests {
 		
 		assertTrue(isOurOwn);
 	}
-
 
 	@Test
 	public void testRemovalOfPaths() throws Exception {
@@ -397,6 +395,7 @@ public class DatabaseTests {
 	
 		
 	}
+
 }
 
 

@@ -651,18 +651,26 @@ public class Database {
 
 
 	public RecieveChunk getChunkInBetterConditionToBeDeleted() {
+		
+		
+		Statement stmt = null;
+		RecieveChunk chunk = null;
+		try{
+			stmt = con.createStatement();
+			
+			ResultSet set = stmt.executeQuery("SELECT fileID,nr,CAST(replicas AS FLOAT)/desiredReplicas AS ratio from Chunk WHERE (SELECT Count(*) FROM BackedFiles WHERE BackedFiles.fileID = Chunk.fileID) = 0 ORDER BY ratio DESC LIMIT 1");
+			
+			if(set.next()) chunk = new RecieveChunk(set.getString("fileID"), set.getInt("nr"));
+			
+		}catch(Exception e){}
+		finally{
+			closeSTMT(stmt);
+		}
 	
-		/*
+		return chunk;
+
 		
-		Statement stmt = con.createStatement();
-		
-		
-		stmt.executeQuery("SELECT * from Chunk WHERE (SELECT Count(*) FROM BackedFiles WHERE BackedFiles.fileID = Chunk.fileID) = 0");
-		
-		*/
-		
-		return null;
-		
+		//FIXME implement and test
 		
 	}
 

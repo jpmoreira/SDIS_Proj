@@ -26,7 +26,7 @@ public class ReclaimSpaceOrder extends WorkOrder{
 		try {
 			db = new Database();
 		} catch (SQLException e) {
-			cancel();
+			
 		}
 		boolean enough = false;
 		
@@ -37,6 +37,7 @@ public class ReclaimSpaceOrder extends WorkOrder{
 			Message msgToBeSend = new RemovedMsg(chunk);
 			
 			msgToBeSend.send();
+			
 			
 			
 		}

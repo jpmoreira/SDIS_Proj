@@ -53,8 +53,8 @@ public class Scout extends Thread{
 
 				msg = packet.getData();
 
-				Thread t = new Thread(new Worker(msg));
-				t.start();
+				Worker w = new Worker(msg);
+				w.start();
 				
 			}
 			

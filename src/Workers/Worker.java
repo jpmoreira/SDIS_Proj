@@ -3,7 +3,7 @@ package Workers;
 import Messages.*;
 
 
-public class Worker implements Runnable {
+public class Worker extends Thread {
 
 	
 	private byte[] msg;

@@ -614,7 +614,7 @@ public class Gui extends Dialog {
 
 	protected void startBackup(String path, int replications) {
 			
-		new Timer().schedule(new BackupOrder(path, replications,mdbPort.getSelection(),mdbIP.getText()), 2000, 2000);
+		new Timer().schedule(new BackupOrder(path, replications), 10, 500);
 	
 	}
 
@@ -626,7 +626,7 @@ public class Gui extends Dialog {
 		
 		if (!mdrScout.isAlive()) mdrScout.start();	
 		
-		new Timer().schedule(new RestoreOrder(path, mdrPort.getSelection(),mdrIP.getText()), 2000, 2000);
+		new Timer().schedule(new RestoreOrder(path), 10, 500);
 		
 	}
 	
@@ -638,7 +638,7 @@ public class Gui extends Dialog {
 	 */
 	protected void startDelete(String path) {
 		
-		new Timer().schedule(new DeleteOrder(path, mcPort.getSelection(),mcIP.getText()), 10);
+		new Timer().schedule(new DeleteOrder(path), 10);
 		
 	}
 
@@ -650,7 +650,7 @@ public class Gui extends Dialog {
 	 */
 	protected void startReclaiming(int size) {
 		backupSpace.setSelection(backupSpace.getSelection()-size);
-		new Timer().schedule(new ReclaimSpaceOrder(kbToFree.getSelection()*1000, mcPort.getSelection(),mcIP.getText()), 10);
+		new Timer().schedule(new ReclaimSpaceOrder(kbToFree.getSelection()*1000), 10);
 	}
 	
 	

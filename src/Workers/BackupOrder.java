@@ -56,7 +56,7 @@ public class BackupOrder extends WorkOrder{
 				}
 				
 				nrOfRepeats++;
-				Thread.sleep(time);
+				currentThread().sleep(time);
 				time = time*2;
 				
 			} while (allChunkDelivered || nrOfRepeats > 5);

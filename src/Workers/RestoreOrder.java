@@ -12,19 +12,13 @@ import Messages.Message;
 
 public class RestoreOrder extends WorkOrder {
 
-	private int port;
-	private DatagramSocket socket;
-	private InetAddress address;
 	private FileToRestore file;
 
-	public RestoreOrder(String path, int port, String channel) {
+	public RestoreOrder(String path) {
 
 		try {
 
 			this.file = new FileToRestore(FileToRestore.fileIDForBackedFile("path"));
-			this.address = InetAddress.getByName(channel);
-			this.socket = new DatagramSocket();
-			this.port = port;
 
 		} catch (Exception e) {
 
@@ -39,22 +33,15 @@ public class RestoreOrder extends WorkOrder {
 		
 		if (missingChunks.length == 0) cancel();
 		
-		try {
-			for (Integer chunkNo : missingChunks) {
+		for (Integer chunkNo : missingChunks) {
 
-				Message msgToSend = new GetChunkMsg(Message.getVersion(), file.getFileID(), chunkNo.toString());
-				byte[] msg = msgToSend.toBytes();
+			Message msgToSend = new GetChunkMsg(Message.getVersion(), file.getFileID(), chunkNo.toString());
 
+			msgToSend.send();
 
-				socket = new DatagramSocket();
-
-				DatagramPacket packet = new DatagramPacket(msg, msg.length, new InetSocketAddress(address, port) );
-
-				socket.send(packet);
-
-			}
-		} catch (IOException e) {
 		}
+		
+		//TODO Enhancement
 		
 	}
 

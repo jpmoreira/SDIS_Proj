@@ -1,10 +1,5 @@
 package Workers;
 
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-
 import Chunk.SendChunk;
 import Files.FileToBackup;
 import Messages.Message;
@@ -13,18 +8,15 @@ import Messages.PutChunkMsg;
 public class BackupOrder extends WorkOrder{ 
 
 	FileToBackup file;
-	private InetAddress address;
-	private DatagramSocket socket;
-	private int port;
 
-	public BackupOrder(String filePath, int repDegree, int port, String channel) {
+	
+	private int nrOfRepeats = 1;
+
+	public BackupOrder(String filePath, int repDegree) {
 		try {
 
 			this.file = new FileToBackup(filePath, repDegree);
-			this.address = InetAddress.getByName(channel);
-			this.socket = new DatagramSocket();
-			this.port = port;
-
+	
 		} catch (Exception e) {
 
 		}
@@ -52,16 +44,14 @@ public class BackupOrder extends WorkOrder{
 				sendChunk.resetReplicationCount();
 
 				Message msgToSend = new PutChunkMsg(sendChunk, Message.getVersion());
-				byte[] msg = msgToSend.toBytes();
-
-				socket = new DatagramSocket();
-				DatagramPacket packet = new DatagramPacket(msg, msg.length, new InetSocketAddress(address, port) );
-
-				socket.send(packet);
-
+				
+				msgToSend.send();
+				
 			}
+			
+			nrOfRepeats++;
 
-			if (allChunkDelivered) cancel();
+			if (allChunkDelivered || nrOfRepeats > 5) cancel();
 
 		} catch (Exception e) {
 

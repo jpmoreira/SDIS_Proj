@@ -11,7 +11,7 @@ import Main.Gui;
 public class Scout extends Thread{
 
 
-	private static final int BUFFERSIZE = 70000;
+	public static final int BUFFERSIZE = 70000;
 	private InetAddress address;
 	private MulticastSocket socket;
 

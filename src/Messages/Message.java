@@ -74,6 +74,7 @@ public abstract class Message {
 
 		} catch (IOException e) {
 
+			e.printStackTrace();
 		} finally {
 			socket.close();
 		}

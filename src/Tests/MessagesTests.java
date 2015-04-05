@@ -1,5 +1,8 @@
 package Tests;
 
+//TODO Observer para o getChunk (para n mandar o chunk se alguém já mandou)
+//TODO Observer para o reclaim subprotocol (para verificar se alguém fez putchunk antes)
+
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;

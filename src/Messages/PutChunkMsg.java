@@ -84,7 +84,6 @@ public class PutChunkMsg extends Message {
 			return null;
 		}
 		
-		chunk.incrementReplicationCount();
 		return new StoredMsg(getVersion(), chunk.fileID, "" + chunk.nr);
 		
 	}

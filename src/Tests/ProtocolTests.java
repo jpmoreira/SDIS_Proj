@@ -483,17 +483,17 @@ public class ProtocolTests {
 		
 	}
 	
-	public void changeToDB1(){
+	public static void changeToDB1(){
 		
 		Database.databaseToUse = "supportingFiles/supportingDB.db";
 		Database.defaultBackupDir = "backups/";
 		
 	}
 	
-	public void changeToDB2(){
+	public static void changeToDB2(){
 		
-		Database.databaseToUse = "supportingFiles/supportingDB.db";
-		Database.defaultBackupDir = "backups/";
+		Database.databaseToUse = "supportingFiles/supportingDB_2.db";
+		Database.defaultBackupDir = "backups_2/";
 		
 	}
 	

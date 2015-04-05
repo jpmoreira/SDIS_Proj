@@ -39,21 +39,21 @@ public class RestoreOrder extends WorkOrder {
 		
 		if (missingChunks.length == 0) cancel();
 		
-		for (Integer chunkNo : missingChunks) {
+		try {
+			for (Integer chunkNo : missingChunks) {
 
-			Message msgToSend = new GetChunkMsg(Message.getVersion(), file.getFileID(), chunkNo.toString());
-			byte[] msg = msgToSend.toBytes();
+				Message msgToSend = new GetChunkMsg(Message.getVersion(), file.getFileID(), chunkNo.toString());
+				byte[] msg = msgToSend.toBytes();
 
-			try {
+
 				socket = new DatagramSocket();
 
 				DatagramPacket packet = new DatagramPacket(msg, msg.length, new InetSocketAddress(address, port) );
 
 				socket.send(packet);
 
-			} catch (IOException e) {
 			}
-
+		} catch (IOException e) {
 		}
 		
 	}

@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
+import Files.FileToRestore;
 import Main.Gui;
 
 public class Scout extends Thread{
@@ -23,10 +24,11 @@ public class Scout extends Thread{
 
 			address = InetAddress.getByName(ip);
 			socket = new MulticastSocket(port);
+			socket.joinGroup(address);
 
 		}
 		catch (IOException e) {
-			System.out.println("Adress/ Socket Error");
+			System.out.println("Adress/ Socket Error " + e.getMessage());
 		} 
 
 	}
@@ -38,9 +40,6 @@ public class Scout extends Thread{
 	public void run() {
 		
 		try {
-			
-			socket.joinGroup(address);
-
 
 			while (Gui.RUNNING) {
 
@@ -49,9 +48,6 @@ public class Scout extends Thread{
 				DatagramPacket packet = new DatagramPacket(rbuf, BUFFERSIZE);
 
 				socket.receive(packet);
-
-				//TODO Checks this call
-				if(Thread.interrupted()) return;
 				
 				byte[] msg = new byte[packet.getLength()];
 
@@ -62,14 +58,19 @@ public class Scout extends Thread{
 				
 			}
 			
-			socket.close();
+			
 			
 		} catch (IOException e) {
-			
+			System.out.println(e.getMessage());
 		}
 
 	}
-	
-	
+
+
+
+
+	public void closeSocket() {
+		socket.close();	
+	}	
 
 }

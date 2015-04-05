@@ -15,12 +15,11 @@ public class Worker implements Runnable {
 	@Override
 	public void run() {
 		
-		Message returnMsg = MessageFactory.processMessage(msg).process();
+		Message returnMsg = (MessageFactory.processMessage(msg)).process();
 		
 		if (returnMsg == null) return;
 		
-		// TODO give to MARTA
-		
+		returnMsg.send();
 		
 	}
 

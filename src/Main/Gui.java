@@ -7,6 +7,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Dialog;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
@@ -16,6 +17,7 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 
 import Files.FileToBackup;
+import Files.S_File;
 import Messages.Message;
 import Workers.BackupOrder;
 import Workers.DeleteOrder;
@@ -28,7 +30,6 @@ public class Gui extends Dialog {
 	private static final String VERSION = Message.getVersion();
 	
 	public static boolean RUNNING = false;
-	
 	
 	// TODO Organize variables
 	protected boolean result;
@@ -45,10 +46,7 @@ public class Gui extends Dialog {
 	private Button btnRestoreFile;
 	private Button btnSelectRestoreFile;
 	private Button btnRestore;
-	private Label lblBackupPath;
-	private Label lblReplicationDegree;
-	private Label lblKb;
-	private Label lblRestorePath;
+
 	private Button btnDeleteFile;
 	private Button btnSelectDeleteFile;
 	private Label lblDeletePath;
@@ -57,22 +55,16 @@ public class Gui extends Dialog {
 	private Spinner kbToFree;
 	private Button btnFreeSpace;
 	
-	
-	
-	private String pathToFile = "";
+
+	private String pathToFile;
 
 	private Text mdbIP;
 	private Text mdrIP;
 	private Text mcIP;
-	private Label lblPort;
-	private Label lblIp;
 
 	private Button btnStart;
-
 	private Spinner mdbPort;
-
 	private Spinner mdrPort;
-
 	private Spinner mcPort;
 	
 	
@@ -80,11 +72,7 @@ public class Gui extends Dialog {
 	private Scout mdrScout;
 	private Scout mcScout;
 	private Spinner backupSpace;
-	private Label lblKb_1;
-	private Label lblBackupSpace;
-	private Text backupFolder;
-	private Button btnBrowseFolder;
-	private Label lblBackupFolder;
+
 	
 	
 
@@ -134,62 +122,9 @@ public class Gui extends Dialog {
 		grpComunicationSettings.setText("Comunication Settings");
 		grpComunicationSettings.setBounds(10, 10, 430, 145);
 		
-		mdbPort = new Spinner(grpComunicationSettings, SWT.BORDER);
-		mdbPort.setMaximum(9999);
-		mdbPort.setSelection(8888);
-		mdbPort.setBounds(250, 45, 60, 22);
-		
-		mdrPort = new Spinner(grpComunicationSettings, SWT.BORDER);
-		mdrPort.setMaximum(9999);
-		mdrPort.setSelection(8887);
-		mdrPort.setBounds(250, 70, 60, 22);
-		
-		mcPort = new Spinner(grpComunicationSettings, SWT.BORDER);
-		mcPort.setMaximum(9999);
-		mcPort.setSelection(8886);
-		mcPort.setBounds(250, 95, 60, 22);
-		
-		mdbIP = new Text(grpComunicationSettings, SWT.BORDER);
-		mdbIP.setText("227.0.0.1");
-		mdbIP.setBounds(315, 45, 105, 21);
-		
-		Label label = new Label(grpComunicationSettings, SWT.SEPARATOR | SWT.VERTICAL);
-		label.setBounds(205, 5, 2, 115);
-		
-		Label lblChannels = new Label(grpComunicationSettings, SWT.NONE);
-		lblChannels.setBounds(270, 8, 70, 14);
-		lblChannels.setText("Channels");
-		
-		mdrIP = new Text(grpComunicationSettings, SWT.BORDER);
-		mdrIP.setText("227.0.0.2");
-		mdrIP.setBounds(315, 70, 105, 21);
-		
-		mcIP = new Text(grpComunicationSettings, SWT.BORDER);
-		mcIP.setText("227.0.0.3");
-		mcIP.setBounds(315, 95, 105, 21);
-		
-		Label lblMdb = new Label(grpComunicationSettings, SWT.NONE);
-		lblMdb.setBounds(210, 48, 40, 14);
-		lblMdb.setText("MDB");
-		
-		Label lblMdr = new Label(grpComunicationSettings, SWT.NONE);
-		lblMdr.setBounds(210, 73, 40, 14);
-		lblMdr.setText("MDR");
-		
-		Label lblMc = new Label(grpComunicationSettings, SWT.NONE);
-		lblMc.setBounds(210, 98, 40, 14);
-		lblMc.setText("MC");
-		
-		lblPort = new Label(grpComunicationSettings, SWT.NONE);
-		lblPort.setBounds(250, 27, 50, 14);
-		lblPort.setText("Port");
-		
-		lblIp = new Label(grpComunicationSettings, SWT.NONE);
-		lblIp.setBounds(315, 27, 60, 14);
-		lblIp.setText("IP");
-		
+	
 		btnStart = new Button(grpComunicationSettings, SWT.TOGGLE);
-		btnStart.setBounds(60, 5, 95, 28);
+		btnStart.setBounds(55, 25, 95, 28);
 		btnStart.setText("Start");
 		btnStart.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -210,34 +145,81 @@ public class Gui extends Dialog {
 			}
 		});
 		
-		
-		
-		
 		backupSpace = new Spinner(grpComunicationSettings, SWT.BORDER);
 		backupSpace.setPageIncrement(1000);
-		backupSpace.setIncrement(100);
+		backupSpace.setIncrement(10);
 		backupSpace.setMaximum(9999999);
-		backupSpace.setSelection(256);
-		backupSpace.setBounds(10, 95, 70, 22);
+		backupSpace.setSelection((int) S_File.availableSpace/1000);
+		backupSpace.setBounds(60, 75, 70, 22);
 		
-		lblKb_1 = new Label(grpComunicationSettings, SWT.NONE);
-		lblKb_1.setBounds(80, 98, 20, 14);
+		Label lblKb_1 = new Label(grpComunicationSettings, SWT.NONE);
+		lblKb_1.setBounds(130, 78, 20, 14);
 		lblKb_1.setText("KB");
 		
-		lblBackupSpace = new Label(grpComunicationSettings, SWT.NONE);
-		lblBackupSpace.setBounds(10, 78, 90, 16);
+		Label lblBackupSpace = new Label(grpComunicationSettings, SWT.NONE);
+		lblBackupSpace.setBounds(64, 58, 90, 16);
 		lblBackupSpace.setText("Backup Space");
+
 		
-		backupFolder = new Text(grpComunicationSettings, SWT.BORDER);
-		backupFolder.setBounds(10, 50, 120, 19);
 		
-		btnBrowseFolder = new Button(grpComunicationSettings, SWT.NONE);
-		btnBrowseFolder.setBounds(130, 47, 75, 28);
-		btnBrowseFolder.setText("Browse");
+		// CHANNEL SETTINGS =================================================
 		
-		lblBackupFolder = new Label(grpComunicationSettings, SWT.NONE);
-		lblBackupFolder.setBounds(10, 35, 100, 16);
-		lblBackupFolder.setText("Backup Folder");
+		
+		Label label = new Label(grpComunicationSettings, SWT.SEPARATOR | SWT.VERTICAL);
+		label.setBounds(205, 5, 2, 115);
+		
+		Label lblChannels = new Label(grpComunicationSettings, SWT.NONE);
+		lblChannels.setBounds(270, 8, 70, 14);
+		lblChannels.setText("Channels");
+		
+		Label lblPort = new Label(grpComunicationSettings, SWT.NONE);
+		lblPort.setBounds(250, 27, 50, 14);
+		lblPort.setText("Port");
+		
+		Label lblIp = new Label(grpComunicationSettings, SWT.NONE);
+		lblIp.setBounds(315, 27, 60, 14);
+		lblIp.setText("IP");
+		
+		Label lblMdb = new Label(grpComunicationSettings, SWT.NONE);
+		lblMdb.setBounds(210, 48, 40, 14);
+		lblMdb.setText("MDB");
+		
+		Label lblMdr = new Label(grpComunicationSettings, SWT.NONE);
+		lblMdr.setBounds(210, 73, 40, 14);
+		lblMdr.setText("MDR");
+		
+		Label lblMc = new Label(grpComunicationSettings, SWT.NONE);
+		lblMc.setBounds(210, 98, 40, 14);
+		lblMc.setText("MC");
+		
+		mdbPort = new Spinner(grpComunicationSettings, SWT.BORDER);
+		mdbPort.setMaximum(9999);
+		mdbPort.setSelection(Message.MDB_PORT);
+		mdbPort.setBounds(250, 45, 60, 22);
+		
+		mdrPort = new Spinner(grpComunicationSettings, SWT.BORDER);
+		mdrPort.setMaximum(9999);
+		mdrPort.setSelection(Message.MDR_PORT);
+		mdrPort.setBounds(250, 70, 60, 22);
+		
+		mcPort = new Spinner(grpComunicationSettings, SWT.BORDER);
+		mcPort.setMaximum(9999);
+		mcPort.setSelection(Message.MC_PORT);
+		mcPort.setBounds(250, 95, 60, 22);
+		
+		mdbIP = new Text(grpComunicationSettings, SWT.BORDER);
+		mdbIP.setText(Message.MDB_ADDRESS);
+		mdbIP.setBounds(315, 45, 105, 21);
+			
+		mdrIP = new Text(grpComunicationSettings, SWT.BORDER);
+		mdrIP.setText(Message.MDR_ADDRESS);
+		mdrIP.setBounds(315, 70, 105, 21);
+		
+		mcIP = new Text(grpComunicationSettings, SWT.BORDER);
+		mcIP.setText(Message.MC_ADDRESS);
+		mcIP.setBounds(315, 95, 105, 21);
+		
+		
 		
 		
 		
@@ -293,7 +275,7 @@ public class Gui extends Dialog {
 		});
 		
 		
-		lblBackupPath = new Label(grpStandardActions, SWT.NONE);
+		Label lblBackupPath = new Label(grpStandardActions, SWT.NONE);
 		lblBackupPath.setBounds(120, 33, 30, 20);
 		lblBackupPath.setText("Path");
 		lblBackupPath.setEnabled(false);
@@ -303,7 +285,7 @@ public class Gui extends Dialog {
 		fileToBackup.setEditable(false);
 		fileToBackup.setEnabled(false);
 		
-		lblReplicationDegree = new Label(grpStandardActions, SWT.NONE);
+		Label lblReplicationDegree = new Label(grpStandardActions, SWT.NONE);
 		lblReplicationDegree.setBounds(120, 55, 115, 18);
 		lblReplicationDegree.setText("Replication Degree:");
 		lblReplicationDegree.setEnabled(false);
@@ -363,7 +345,7 @@ public class Gui extends Dialog {
 			}
 		});
 		
-		lblRestorePath = new Label(grpStandardActions, SWT.NONE);
+		Label lblRestorePath = new Label(grpStandardActions, SWT.NONE);
 		lblRestorePath.setText("Path");
 		lblRestorePath.setBounds(120, 103, 30, 21);
 		lblRestorePath.setEnabled(false);
@@ -476,7 +458,7 @@ public class Gui extends Dialog {
 		kbToFree.setBounds(25, 240, 92, 22);
 		kbToFree.setEnabled(false);
 		
-		lblKb = new Label(grpStandardActions, SWT.NONE);
+		Label lblKb = new Label(grpStandardActions, SWT.NONE);
 		lblKb.setBounds(120, 243, 30, 14);
 		lblKb.setText("KB");
 		lblKb.setEnabled(false);
@@ -490,6 +472,7 @@ public class Gui extends Dialog {
 			public void widgetSelected(SelectionEvent e) {
 				String path = fileToDelete.getText();
 				if (path.equals("")) {
+					
 					//MessageDialog.openError(null, "Printer Error Message", "Error getting print reply file.");
 				} else {
 					startReclaiming(kbToFree.getSelection());
@@ -581,16 +564,8 @@ public class Gui extends Dialog {
 		
 		mdrIP.setEditable(b);
 		mdrIP.setEnabled(b);
-		mdrPort.setEnabled(b);
-		
-		backupFolder.setEditable(b);
-		backupFolder.setEnabled(b);
-		btnBrowseFolder.setEnabled(b);
-		lblBackupFolder.setEnabled(b);
-		
+
 		backupSpace.setEnabled(b);
-		lblKb_1.setEnabled(b);
-		lblBackupSpace.setEnabled(b);
 		
 	}
 
@@ -598,9 +573,9 @@ public class Gui extends Dialog {
 	
 	protected void setBackupFileEnable(boolean b) {	
 		btnBrowseBackUp.setEnabled(b);
-		lblBackupPath.setEnabled(b);
+
 		fileToBackup.setEnabled(b);
-		lblReplicationDegree.setEnabled(b);
+
 		repDeg.setEnabled(b);
 		btnBackup.setEnabled(b);		
 	}
@@ -608,7 +583,7 @@ public class Gui extends Dialog {
 	
 	protected void setRestoreFileEnable(boolean b) {
 		btnSelectRestoreFile.setEnabled(b);
-		lblRestorePath.setEnabled(b);
+
 		fileToRestore.setEnabled(b);
 		btnRestore.setEnabled(b);		
 	}
@@ -624,7 +599,7 @@ public class Gui extends Dialog {
 	
 	protected void setReclaimSpaceEnable(boolean b) {
 		kbToFree.setEnabled(b);
-		lblKb.setEnabled(b);
+
 		btnFreeSpace.setEnabled(b);	
 	}
 	
@@ -648,61 +623,97 @@ public class Gui extends Dialog {
 	protected void startRestore(String path) {
 		
 		//TODO Check this call and see what is the condition to sleep
-		if (!mcScout.isAlive()) mcScout.start();
 		
+		if (!mdrScout.isAlive()) mdrScout.start();	
 		
 		new Timer().schedule(new RestoreOrder(path, mdrPort.getSelection(),mdrIP.getText()), 2000, 2000);
 		
 	}
 	
 	
-	
+	/**
+	 * Delete the registers of a file that was previous backup.
+	 * 
+	 * @param path
+	 */
 	protected void startDelete(String path) {
 		
-		new Timer().schedule(new DeleteOrder(path, mcPort.getSelection(),mcIP.getText()), 1);
+		new Timer().schedule(new DeleteOrder(path, mcPort.getSelection(),mcIP.getText()), 10);
 		
 	}
 
 	
-	
+	/**
+	 * Free space in the backup folder.
+	 * 
+	 * @param size the amount of space in KB to free.
+	 */
 	protected void startReclaiming(int size) {
-		new Timer().schedule(new ReclaimSpaceOrder(kbToFree.getSelection(), mcPort.getSelection(),mcIP.getText()), 1);
+		backupSpace.setSelection(backupSpace.getSelection()-size);
+		new Timer().schedule(new ReclaimSpaceOrder(kbToFree.getSelection()*1000, mcPort.getSelection(),mcIP.getText()), 10);
 	}
 	
 	
+	/*
+	 * 
+	 * SERVER
+	 * 
+	 */
 	
 	
 	
-	
+	/**
+	 * Initialize the server.
+	 * 
+	 */
 	protected void startServer() {
+		
+		S_File.availableSpace = backupSpace.getSelection()*1000;
 		
 		kbToFree.setMaximum(backupSpace.getSelection());
 		kbToFree.setSelection(backupSpace.getSelection()/2);
+		
+		Message.MDB_ADDRESS =  mdbIP.getText();
+		Message.MDR_ADDRESS = mdrIP.getText();
+		Message.MC_ADDRESS = mcIP.getText();
+		
+		Message.MDB_PORT = mdbPort.getSelection();
+		Message.MDR_PORT = mdrPort.getSelection();
+		Message.MC_PORT = mcPort.getSelection();
 		
 		btnStart.setText("Stop");
 		setActionsEnable(true);
 		RUNNING = true;
 		
-		mdbScout = new Scout(mdbPort.getSelection(), mdbIP.getText());
-		mdrScout = new Scout(mdrPort.getSelection(), mdrIP.getText());
-		mcScout = new Scout(mcPort.getSelection(), mcIP.getText());
+		mdbScout = new Scout(mdbPort.getSelection(), Message.MDB_ADDRESS);
+		mdrScout = new Scout(mdrPort.getSelection(), Message.MDR_ADDRESS);
+		mcScout = new Scout(mcPort.getSelection(), Message.MC_ADDRESS);
+		
 		
 		if (!mdbScout.isAlive()) mdbScout.start();
+		if (!mcScout.isAlive()) mcScout.start();
 		if (!mdrScout.isAlive()) mdrScout.start();
 		
 	}
 
+	/**
+	 * Stops the server and interrupts the scout threads. 
+	 * 
+	 * 
+	 */
 	protected void stopServer() {
 		btnStart.setText("Start");
 		setActionsEnable(false);
 		RUNNING = false;
 		
-		mdbScout.interrupt();
-		mdrScout.interrupt();
-		mcScout.interrupt();
+		mdbScout.closeSocket();
+		mdrScout.closeSocket();
+		mcScout.closeSocket();
 		
 	}
 
+	
+	
 	public static void main(String[] args) {
 		
 		Display display = Display.getDefault();

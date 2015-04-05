@@ -71,7 +71,7 @@ public class PutChunkMsg extends Message {
 		if (chunk == null) return null;
 	
 		
-		//TODO Simulate desiredReplicationDegreeMet
+		
 		try {
 			if(chunk.desiredReplicationDegreeExceeded()) {
 				((RecieveChunk) chunk).cleanup();
@@ -99,11 +99,9 @@ public class PutChunkMsg extends Message {
 		byte[] header = buildHeader();
 		
 		byte[] body = new byte[0];
-		try {
-			body = chunk.getContent();
-		} catch (IOException e) {
-
-		}
+		
+		body = chunk.getContent();
+		
 		
 		byte[] msgToSend = new byte[header.length + HEADEREND.length + body.length];
 		

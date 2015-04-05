@@ -42,14 +42,11 @@ public class GetChunkMsg extends Message {
 	 * @see Messages.Message#process()
 	 */
 	public Message process() {
+		
 		if  (chunk == null) return null;
 		
-		try {
-			return new ChunkMsg(new SendChunk(chunk.fileID, chunk.nr),getVersion());
-		} catch (Exception e) {
-			
-		}
-		return null;
+		return new ChunkMsg((SendChunk)chunk,getVersion());
+
 	}
 
 	

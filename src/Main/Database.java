@@ -669,8 +669,7 @@ public class Database {
 	
 		return chunk;
 
-		
-		//FIXME implement and test
+
 		
 	}
 

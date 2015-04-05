@@ -34,9 +34,8 @@ public abstract class Chunk implements Comparable<Chunk>{
 	 * 
 	 * Returns the content of the Chunk object
 	 * @return the content of the chunk
-	 * @throws IOException an exception is thrown if an attempt to read the chunk from a file was made but it didn't succeed 
 	 */
-	public byte[] getContent() throws IOException{
+	public byte[] getContent() {
 
 		
 		return content;	

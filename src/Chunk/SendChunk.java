@@ -2,6 +2,7 @@ package Chunk;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -68,21 +69,31 @@ public class SendChunk extends Chunk{
 	}
 	
 	@Override
-	public byte[] getContent() throws IOException {
+	public byte[] getContent() {
 		
 		
 		if(f != null){
-			return f.contentForChunk(this.nr);
+			
+			try{
+				return f.contentForChunk(this.nr);
+				
+			}
+			catch(IOException e){return new byte[0];}
+			
 		}
 		else{
 			
 			if(this.path == null)return null;
 			
 			File file = new File(this.getPath());
-			FileInputStream is = new FileInputStream(this.getPath());
-			byte[] buffer = new byte[(int)file.length()];
-			is.read(buffer);
-			is.close();
+			byte[] buffer = new byte[0];
+			try {
+				FileInputStream is = new FileInputStream(this.getPath());
+				buffer = new byte[(int)file.length()];
+				is.read(buffer);
+				is.close();
+			} catch (IOException e) {}
+			
 			return buffer;
 		}
 		

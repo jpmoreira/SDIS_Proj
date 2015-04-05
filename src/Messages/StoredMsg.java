@@ -27,7 +27,7 @@ public class StoredMsg extends Message {
 		super(version);
 	
 		try {
-			this.chunk = new SendChunk(fileId, Integer.parseInt(chunkNo));
+			this.chunk = new SendChunk(fileId, Integer.parseInt(chunkNo));//because using a RecieveChunk would require that the chunk has a path
 		} catch (Exception e) {
 			this.chunk = null;
 		}

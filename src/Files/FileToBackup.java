@@ -1,6 +1,5 @@
 package Files;
 
-//FIXME what if we want to backup a file that has already been backed and is now changed, what is supposed to happen???? Ask Souto
 
 import java.io.File;
 import java.io.IOException;

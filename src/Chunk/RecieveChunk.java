@@ -43,10 +43,7 @@ public class RecieveChunk extends Chunk {
 		
 		
 	}
-	
-	//TODO: get chunk with most degree
-	
-	//TODO: verify when creating receive chunk that space is available
+
 	
 	/**
 	 * 
@@ -185,15 +182,20 @@ public class RecieveChunk extends Chunk {
 	}
 	
 	@Override
-	public byte[] getContent() throws IOException {
+	public byte[] getContent() {
 		
 		if(this.content == null){
 	
 			byte[] bFile = new byte[(int) f.length()];
 		    //convert file into array of bytes
-			FileInputStream fileInputStream = new FileInputStream(f);
-			fileInputStream.read(bFile);
-			fileInputStream.close();
+			
+			try{
+				FileInputStream fileInputStream = new FileInputStream(f);
+				fileInputStream.read(bFile);
+				fileInputStream.close();
+			}
+			catch(IOException e){}
+			
 			return bFile;
 
 			

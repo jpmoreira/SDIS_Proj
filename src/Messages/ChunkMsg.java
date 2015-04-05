@@ -68,11 +68,8 @@ public class ChunkMsg extends Message {
 		byte[] header = buildHeader();
 		
 		byte[] body = new byte[0];
-		try {
-			body = chunk.getContent();
-		} catch (IOException e) {
+		body = chunk.getContent();
 
-		}
 		
 		byte[] msgToSend = new byte[header.length + HEADEREND.length + body.length];
 		

@@ -315,6 +315,7 @@ public class ProtocolTests {
 	
 	
 	
+	
 	@Test
 	public void z_recievingOwnPutChunk() throws Exception{
 		
@@ -339,15 +340,149 @@ public class ProtocolTests {
 	}
 	
 	@Test
-	public void y_revertBeingMadeCauseDegreeIsMet(){
+	public void y_revertBeingMadeCauseDegreeIsMet() throws Exception{
+		
+		
+		S_File.availableSpace = 2560000;
+		S_File.cleanFolder(new File("backups/"));
+		S_File.cleanFolder(new File("backups_2/"));
+		
+		changeToDB1();
+		new Database(true);
+		
+		FileToBackup b = new FileToBackup("testFiles/RIGP.pdf",1);
+		
+		SendChunk[] chunksOnOrigin = b.getChunks();
+		
+		PutChunkMsg putChunkMsg_sender = new PutChunkMsg(chunksOnOrigin[0], "1.0");
+		
+		byte[] putChunkMsg_bytes = putChunkMsg_sender.toBytes();
+		
+		changeToDB2();
+		Database dest = new Database(true);
+		
+		Message putChunkMsg_dest = MessageFactory.processMessage(putChunkMsg_bytes);
+		
+		assertTrue(putChunkMsg_dest instanceof PutChunkMsg);
+		
+
+		StoredMsg recieved_store_msg = new StoredMsg("1.0", b.fileID, "0");
+		
+		assertEquals(dest.nrChunksStored(),1);
+		
+		RecieveChunk c = dest.chunksForFile(b.fileID)[0];
+		
+		assertEquals(c.getReplicaCount(), 1);
+		
+		recieved_store_msg.process();
+		
+		assertEquals(c.getReplicaCount(),2);
+		
+		putChunkMsg_dest.process();
+		
+		assertEquals(dest.nrChunksStored(),0);
+		
+		
+
+		
+		
+		
+		
+		
 		
 		
 		
 		
 	}
 
+	@Test
+	public void w_recieveGetChunkMessageWeCannotFulfill() throws Exception{
+		
+		S_File.availableSpace = 2560000;
+		S_File.cleanFolder(new File("backups/"));
+		S_File.cleanFolder(new File("backups_2/"));
+		
+		changeToDB1();
+		new Database(true);
+		
+		FileToBackup b = new FileToBackup("testFiles/RIGP.pdf",1);
+		
+		SendChunk[] chunksOnOrigin = b.getChunks(); // register the chunks
+		
+		GetChunkMsg getChunkMessage_origin = new GetChunkMsg("1.0", b.fileID, "0");
+		
+		byte[] getChunkMsgBytes = getChunkMessage_origin.toBytes();
+		
+		changeToDB2();
+		Database db = new Database(true);
+		
+		
+		Message getChunksMsg_dest = MessageFactory.processMessage(getChunkMsgBytes);
+		
+		assertTrue(getChunksMsg_dest instanceof GetChunkMsg);
+		
+		assertEquals(db.nrChunksStored(),0);
+		
+		getChunksMsg_dest.process();
+		
+		assertEquals(db.nrChunksStored(),0);
+		
+		
+		
+	}
 
+	@Test
+	public void x_simulateStoreProcessingByPutChunkOrig() throws Exception{
+		
+		S_File.availableSpace = 2560000;
+		S_File.cleanFolder(new File("backups/"));
+		S_File.cleanFolder(new File("backups_2/"));
+		
+		changeToDB1();
+		new Database(true);
+		
+		FileToBackup b = new FileToBackup("testFiles/RIGP.pdf",1);
+		
+		SendChunk[] chunksOnOrigin = b.getChunks(); //register the chunks
 
+		assertEquals(chunksOnOrigin[0].getReplicaCount(),0);
+		
+		StoredMsg recieved_store_msg = new StoredMsg("1.0", b.fileID, "0");
+		
+		recieved_store_msg.process();
+		
+		assertEquals(chunksOnOrigin[0].getReplicaCount(),1);//check if replica count was actually incremented
+		
+		assertTrue(chunksOnOrigin[0].desiredReplicationDegreeMet());
+		
+		assertFalse(chunksOnOrigin[0].desiredReplicationDegreeExceeded());
+		
+		
+	}
+
+	@Test
+	public void v_simulateRecievingStoredWeAreNotInterestedIn() throws Exception{
+		
+		S_File.availableSpace = 2560000;
+		S_File.cleanFolder(new File("backups/"));
+		S_File.cleanFolder(new File("backups_2/"));
+		
+		changeToDB1();
+		Database db = new Database(true);
+		
+		assertEquals(db.nrChunksStored(),0);
+		
+		StoredMsg stored_recieved = new StoredMsg("1.0", "asdasdasd", "0");
+		
+		assertEquals(db.nrChunksStored(),0);
+		
+		stored_recieved.process();
+		
+		assertEquals(db.nrChunksStored(),0);
+		
+		
+	}
+	
 	public void changeToDB1(){
 		
 		Database.databaseToUse = "supportingFiles/supportingDB.db";

@@ -43,7 +43,7 @@ public class Database {
 		
 		synchronized (Database.class) {
 			if(con == null) con = DriverManager.getConnection("jdbc:sqlite:"+dbFile);
-			con.createStatement().execute("PRAGMA locking_mode = EXCLUSIVE");	
+			//con.createStatement().execute("PRAGMA locking_mode = EXCLUSIVE");	
 			
 		}
 		

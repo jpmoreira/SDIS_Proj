@@ -137,10 +137,9 @@ public class PutChunkMsg extends Message {
 		DatagramPacket packet = new DatagramPacket(msg, msg.length, new InetSocketAddress(MDB_ADDRESS, MDB_PORT) );
 		
 		Scout.sendSocket(packet);
-		
-		System.out.println("was "+chunk.getReplicaCount());
+
 		chunk.resetReplicationCount();
-		System.out.println("now is "+chunk.getReplicaCount());
+
 		
 		
 	}

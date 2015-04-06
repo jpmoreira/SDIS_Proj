@@ -5,6 +5,7 @@ package Messages;
 
 import Chunk.*;
 
+//TODO ao carregar no backup sem ter um path
 
 /**
  * The Class GetChunkMsg.
@@ -30,7 +31,6 @@ public class GetChunkMsg extends Message {
 		
 		try {
 			this.chunk = new SendChunk(fileId,Integer.parseInt(chunkNo));
-			if(chunk.isOwn())chunk = null;
 		} catch (Exception e) {
 			chunk = null;
 		}
@@ -44,7 +44,7 @@ public class GetChunkMsg extends Message {
 	 */
 	public Message process() {
 		
-		if  (chunk == null) return null;
+		if  (chunk == null || chunk.isOwn()) return null;
 		
 		return new ChunkMsg((SendChunk)chunk,getVersion());
 

@@ -24,7 +24,7 @@ public class Scout extends Thread{
 	private static Scout mcScout = null;
 	
 	
-	private static DatagramSocket sender = null;
+	public static DatagramSocket sender = null;
 
 	
 	int port;
@@ -64,6 +64,17 @@ public class Scout extends Thread{
 
 			
 			
+			synchronized (Scout.class) {
+				
+				if(sender == null){
+					try {
+						sender = new DatagramSocket();
+					} catch (SocketException e) {}
+				}
+				
+				
+			}
+			
 			while (true) {
 
 				
@@ -74,49 +85,12 @@ public class Scout extends Thread{
 
 				DatagramPacket packet = new DatagramPacket(rbuf, BUFFERSIZE);
 
-				
-			
 				socket.receive(packet);
 				
-				
-				synchronized (Scout.class) {
-					
-					if(sender == null){
-						try {
-							sender = new DatagramSocket();
-						} catch (SocketException e) {}
-					}
-					
-					
-				}
+				new Worker(packet).start();
 	
 				
-				if(packet.getPort() == sender.getLocalPort() && packet.getAddress().equals(InetAddress.getLocalHost())){
 				
-					
-					byte[] byteMsg = new byte[packet.getLength()];
-					System.arraycopy(packet.getData(),packet.getOffset(),byteMsg, 0, packet.getLength());
-					
-					Message msg = MessageFactory.processMessage(byteMsg);
-					System.out.println("Dropping "+msg.toString());
-					continue;
-					
-				}
-				
-				byte[] byteMsg = new byte[packet.getLength()];
-				System.arraycopy(packet.getData(),packet.getOffset(),byteMsg, 0, packet.getLength());
-				
-				Message msg = MessageFactory.processMessage(byteMsg);
-				
-				if (msg != null) {
-					System.out.println("Recieved Message: "+msg.toString());
-					
-					Worker w = new Worker(msg);
-					w.start();
-
-				} else {
-					System.out.println("Message not recognized...");		
-				}
 					
 				
 				

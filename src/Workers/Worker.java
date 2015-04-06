@@ -1,5 +1,8 @@
 package Workers;
 
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Random;
 
 import Messages.*;
@@ -12,12 +15,62 @@ public class Worker extends Thread {
 	
 	private boolean proceed = true;
 
+	private DatagramPacket packet;
+	
+	
+	public Worker(DatagramPacket packet) throws UnknownHostException{
+		
+		this.packet = packet;
+		
+		
+		
+	}
+	
+	
+	private void obtainMessage() {
+		
+		try {
+			if(packet.getPort() == Scout.sender.getLocalPort() && packet.getAddress().equals(InetAddress.getLocalHost())){
+				
+				
+				byte[] byteMsg = new byte[packet.getLength()];
+				System.arraycopy(packet.getData(),packet.getOffset(),byteMsg, 0, packet.getLength());
+				
+				Message msg = MessageFactory.processMessage(byteMsg);
+				
+				System.out.println("Dropping "+msg.toString());
+				return;
+				
+			}
+		} catch (UnknownHostException e) {
+			return;
+		}
+		
+		
+		
+		byte[] byteMsg = new byte[packet.getLength()];
+		System.arraycopy(packet.getData(),packet.getOffset(),byteMsg, 0, packet.getLength());
+		this.msg = MessageFactory.processMessage(byteMsg);
+		
+	}
+	
+	
 	public Worker(Message msg) {
 		this.msg = msg;
 	}
 	
 	@Override
 	public void run() {
+		
+		
+		obtainMessage();		
+		if(msg== null)return;
+		
+		
+		//work
+		
+		
+		
 		
 		Random rand = new Random();
 		

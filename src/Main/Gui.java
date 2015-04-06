@@ -1,5 +1,8 @@
 package Main;
 
+import java.io.File;
+import java.sql.SQLException;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -699,7 +702,13 @@ public class Gui extends Dialog {
 
 	
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SQLException {
+		
+
+		S_File.cleanFolder(new File(Database.defaultBackupDir));
+		S_File.cleanFolder(new File(Database.defaultRestoreDir));
+		new Database(true);
+		
 		
 		Display display = Display.getDefault();
 		Shell dialogShell = new Shell(display);

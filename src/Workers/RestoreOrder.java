@@ -61,9 +61,14 @@ public class RestoreOrder extends WorkOrder {
 	
 		}
 		
+	
 		
+		try {
+			file.reconstructFile();
+			file.cleanup();
+		} catch (Exception e1) {
 
-		System.out.println("finished");
+		}
 		
 		synchronized(RestoreOrder.class){
 			count --;

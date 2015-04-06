@@ -559,7 +559,8 @@ public class Gui extends Dialog {
 		
 		mdrIP.setEditable(b);
 		mdrIP.setEnabled(b);
-
+		mdrPort.setEnabled(b);
+		
 		backupSpace.setEnabled(b);
 		
 	}

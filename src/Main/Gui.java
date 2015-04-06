@@ -55,7 +55,7 @@ public class Gui extends Dialog {
 	private Button btnFreeSpace;
 	
 
-	private String pathToFile;
+	private String pathToFile = "";
 
 	private Text mdbIP;
 	private Text mdrIP;
@@ -698,6 +698,16 @@ public class Gui extends Dialog {
 		Scout.getMDBScout().closeSocket();
 		Scout.getMCScout().closeSocket();
 		Scout.getMDRScout().closeSocket();
+		
+		try {
+			Scout.getMDBScout().join();
+			Scout.getMCScout().join();
+			Scout.getMDRScout().join();
+			
+		} catch (InterruptedException e) {
+			System.out.println(e.getMessage());
+		}
+		
 		
 	}
 

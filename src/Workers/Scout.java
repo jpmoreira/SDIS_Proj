@@ -21,13 +21,19 @@ public class Scout extends Thread{
 	private static Scout mdrScout = null;
 	private static Scout mcScout = null;
 	
+	int port;
+	String ip;
+	
 
 	private Scout(int port, String ip) {
 
+		this.port = port;
+		this.ip = ip;
+		
 		try {
 
 			
-			System.out.println("LISTENING AT "+ip+":"+port);
+			
 			address = InetAddress.getByName(ip);
 			socket = new MulticastSocket(port);
 			socket.joinGroup(address);
@@ -45,10 +51,12 @@ public class Scout extends Thread{
 	@Override
 	public void run() {
 
+		System.out.println("LISTENING AT "+ip+":"+port);
 		try {
 
 			while (true) {
 
+				
 				
 				byte[] rbuf = new byte[BUFFERSIZE];
 
@@ -82,10 +90,7 @@ public class Scout extends Thread{
 	public void closeSocket() {
 		
 		socket.close();	
-		
-		System.out.println("OOOOOOOUUUUUUUTTTTTT");
-		
-		//Thread.currentThread().interrupt();
+
 	}
 
 
@@ -101,7 +106,10 @@ public class Scout extends Thread{
 	public static Scout getMDRScout() {
 		
 		
-		if (mdrScout == null || mdrScout.getState().equals(Thread.State.TERMINATED)) mdrScout = new Scout(Message.MDR_PORT, Message.MDR_ADDRESS);
+		if (mdrScout == null || mdrScout.getState().equals(Thread.State.TERMINATED)){
+			System.out.println("NEEWWW");
+			mdrScout = new Scout(Message.MDR_PORT, Message.MDR_ADDRESS);
+		}
 		return mdrScout;
 	}	
 

@@ -73,6 +73,7 @@ public class RestoreOrder extends WorkOrder {
 		synchronized(RestoreOrder.class){
 			count --;
 			
+			System.out.println("CLOSING SOCKET");
 			Scout mdr = Scout.getMDRScout();
 			if(count == 0){
 				mdr.closeSocket();

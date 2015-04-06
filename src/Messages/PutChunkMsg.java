@@ -51,7 +51,8 @@ public class PutChunkMsg extends Message {
 		super(version);
 		try {
 			this.chunk = new RecieveChunk(fileId, Integer.parseInt(chunkNo));//attempt to load the chunk
-			this.chunk = null;// put it to null
+			this.chunk.resetReplicationCount();
+			this.chunk.incrementReplicationCount();
 		} catch (Exception e) {//in case we were not able to load the chunk
 			try {
 				this.chunk = new RecieveChunk(fileId, Integer.parseInt(chunkNo),body,Integer.parseInt(repDeg));//create a new one and store it

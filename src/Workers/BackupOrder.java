@@ -12,7 +12,7 @@ public class BackupOrder extends WorkOrder{
 	
 	private int nrOfRepeats = 1;
 
-	private long time = 500;
+	private long time = 1000;
 
 	public BackupOrder(String filePath, int repDegree) {
 		try {

@@ -28,6 +28,7 @@ public class StoredMsg extends Message {
 	
 		try {
 			this.chunk = new SendChunk(fileId, Integer.parseInt(chunkNo));//because using a RecieveChunk would require that the chunk has a path
+			if(chunk != null) chunk.incrementReplicationCount();
 		} catch (Exception e) {
 			this.chunk = null;
 		}
@@ -38,10 +39,6 @@ public class StoredMsg extends Message {
 	 * @see Messages.Message#process()
 	 */
 	public Message process() {
-		
-		if (chunk == null) return null;
-		
-		chunk.incrementReplicationCount();
 		
 		return null;
 	}

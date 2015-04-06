@@ -36,7 +36,7 @@ public class RemovedMsg extends Message {
 	}
 
 	public RemovedMsg(Chunk chunk) {
-		super(Message.getVersion());
+		super(Message.localVersion);
 		this.chunk = chunk;
 	}
 
@@ -75,4 +75,20 @@ public class RemovedMsg extends Message {
 		return (MSGCOD + " " + getVersion() + " " + chunk.fileID + " "  + chunk.nr + " ").getBytes();
 	}
 
+	
+	@Override
+	public boolean ofInterest(Message msg) {
+		
+		if(!(msg instanceof PutChunkMsg))return false;
+		
+		
+		PutChunkMsg chunkMsg = (PutChunkMsg) msg;
+		
+		if (chunkMsg.chunk.nr != this.chunk.nr) return false;
+		
+		if(!chunkMsg.chunk.fileID.equals(this.chunk.fileID))return false;
+		
+		
+		return true;
+	}
 }

@@ -18,7 +18,7 @@ import Chunk.*;
 public class PutChunkMsg extends Message {
 	
 	private final String MSGCOD = "PUTCHUNK";
-	private Chunk chunk = null;
+	public Chunk chunk = null;
 	
 
 	/**

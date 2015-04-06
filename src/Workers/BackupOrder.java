@@ -52,7 +52,7 @@ public class BackupOrder extends WorkOrder{
 					sendChunk.resetReplicationCount();
 
 					Message msgToSend = new PutChunkMsg(sendChunk,
-							Message.getVersion());
+							Message.localVersion);
 
 					msgToSend.send();
 

@@ -35,7 +35,7 @@ public class RestoreOrder extends WorkOrder {
 
 				for (Integer chunkNo : missingChunks) {
 
-					Message msgToSend = new GetChunkMsg(Message.getVersion(),
+					Message msgToSend = new GetChunkMsg(Message.localVersion,
 							file.getFileID(), chunkNo.toString());
 
 					msgToSend.send();

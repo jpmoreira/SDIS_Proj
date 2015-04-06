@@ -22,7 +22,7 @@ public class DeleteOrder extends WorkOrder {
 	@Override
 	public void run() {
 		
-		Message msgToSend = new DeleteMsg(Message.getVersion(), file.getFileID());
+		Message msgToSend = new DeleteMsg(Message.localVersion, file.getFileID());
 		
 		msgToSend.send();
 		

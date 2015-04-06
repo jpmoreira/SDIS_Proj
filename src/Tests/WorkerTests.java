@@ -16,6 +16,7 @@ import Files.FileToBackup;
 import Files.S_File;
 import Main.Database;
 import Messages.Message;
+import Messages.MessageFactory;
 import Messages.PutChunkMsg;
 import Workers.BackupOrder;
 import Workers.DeleteOrder;
@@ -71,7 +72,9 @@ public class WorkerTests {
 		
 		
 		
-		Thread d = new Worker(bytes);
+		
+		
+		Thread d = new Worker(MessageFactory.processMessage(bytes));
 		d.start();
 		
 		d.join();
@@ -87,7 +90,7 @@ public class WorkerTests {
 		
 		assertEquals(chunksToSend[0].getReplicaCount(),0);
 		
-		Thread d2 = new Thread(new Worker(packet.getData()));
+		Thread d2 = new Thread(new Worker(MessageFactory.processMessage(packet.getData())));
 		
 		d2.start();
 		
@@ -149,7 +152,7 @@ public class WorkerTests {
 		
 		for (SendChunk s : b.getChunks()) {
 			
-			Thread w = new Worker(("STORED"  + " " + "1.0" + " " + s.fileID + " " + s.nr + " ").getBytes());
+			Thread w = new Worker(MessageFactory.processMessage(("STORED"  + " " + "1.0" + " " + s.fileID + " " + s.nr + " ").getBytes()));
 			w.start();
 			w.join();
 			
@@ -169,10 +172,10 @@ public class WorkerTests {
 		
 		for (SendChunk s : b.getChunks()) {
 			
-			Thread w = new Worker(("STORED"  + " " + "1.0" + " " + s.fileID + " " + s.nr + " ").getBytes());
+			Thread w = new Worker(MessageFactory.processMessage(("STORED"  + " " + "1.0" + " " + s.fileID + " " + s.nr + " ").getBytes()));
 			w.start();
 			w.join();
-			w = new Worker(("STORED"  + " " + "1.0" + " " + s.fileID + " " + s.nr + " ").getBytes());
+			w = new Worker(MessageFactory.processMessage(("STORED"  + " " + "1.0" + " " + s.fileID + " " + s.nr + " ").getBytes()));
 			w.start();
 			w.join();
 			
@@ -199,6 +202,65 @@ public class WorkerTests {
 		
 	}
 
+	
+	
+	
+	@Test
+	public void backupSubprotocol_senderSide_checkOnlyNonFullfiledChunksSent() throws Exception{
+		
+		
+		ProtocolTests.changeToDB1();
+		new Database(true);
+		
+		
+		Thread putChunkSendThread = new BackupOrder("testFiles/RIGP.pdf", 2);
+		
+		FileToBackup b = new FileToBackup("testFiles/RIGP.pdf");
+		
+		MulticastSocket mdb_recieverSocket = initializeMDBReadingSocket();
+		byte[] rbuf = new byte[Scout.BUFFERSIZE];
+		DatagramPacket packet = new DatagramPacket(rbuf, Scout.BUFFERSIZE);
+		
+		
+		
+		Thread mdb_reader = new Thread(new Runnable() {
+			
+			@Override
+			public void run() {	
+				try {
+					mdb_recieverSocket.receive(packet);
+				} catch (IOException e) {}
+				
+			}
+		});
+		
+		
+		mdb_reader.start();
+		putChunkSendThread.start();
+		
+		mdb_reader.join();
+		
+	
+		
+		
+		
+		for (SendChunk s : b.getChunks()) {
+			
+			Thread w = new Worker(MessageFactory.processMessage(("STORED"  + " " + "1.0" + " " + s.fileID + " " + s.nr + " ").getBytes()));
+			w.start();
+			w.join();
+			w = new Worker(MessageFactory.processMessage(("STORED"  + " " + "1.0" + " " + s.fileID + " " + s.nr + " ").getBytes()));
+			w.start();
+			w.join();
+			
+			
+		}
+
+		//TODO continue here
+		
+		putChunkSendThread.join();
+		
+	}
 	
 	//TODO backup subproto. check that only sends chunks that are still missing
 	//TODO assert that nothing is done if no space available
@@ -274,7 +336,7 @@ public class WorkerTests {
 		ProtocolTests.changeToDB2();
 		assertEquals(db_backer.nrChunksStored(),chunks.length);//all haven't been deleted yet
 		
-		Thread deleter = new Worker(packet.getData());
+		Thread deleter = new Worker(MessageFactory.processMessage(packet.getData()));
 		
 		deleter.start();
 		

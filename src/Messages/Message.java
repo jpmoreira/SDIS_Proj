@@ -16,7 +16,9 @@ public abstract class Message {
 
 	/** The HEADEREND. */
 	public final static byte[] HEADEREND = {(byte) 0xD, (byte) 0xA, (byte) 0xD, (byte) 0xA};
-	private static String version = "1.0";
+	private String version = "1.0";
+	
+	public static String localVersion = "1.0";
 	
 	public static String MDB_ADDRESS = "224.0.0.1";
 	public static int MDB_PORT = 8081;
@@ -46,7 +48,7 @@ public abstract class Message {
 
 	public abstract byte[] buildHeader();
 
-	public static String getVersion() {
+	public String getVersion() {
 		return version;
 	}
 
@@ -80,5 +82,16 @@ public abstract class Message {
 		
 		
 	}
-	
+
+	/**
+	 * 
+	 * States whether the passed message is of interest to this instance. (Used in the observer)
+	 * @param msg
+	 * @return
+	 */
+	public boolean ofInterest(Message msg){
+		
+		return false;
+		
+	}
 }

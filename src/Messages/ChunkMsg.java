@@ -18,7 +18,7 @@ public class ChunkMsg extends Message {
 
 
 	private final String MSGCOD = "CHUNK";
-	private Chunk chunk;
+	public Chunk chunk;
 	
 
 	/**

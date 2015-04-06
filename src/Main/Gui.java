@@ -24,7 +24,6 @@ import Workers.Scout;
 
 public class Gui extends Dialog {
 
-	private static final String VERSION = Message.getVersion();
 	
 	public static boolean RUNNING = false;
 	
@@ -487,7 +486,7 @@ public class Gui extends Dialog {
 		
 		Label lblVersion = new Label(shell, SWT.NONE);
 		lblVersion.setBounds(10, 460, 75, 14);
-		lblVersion.setText("Version " + VERSION);
+		lblVersion.setText("Version " + Message.localVersion);
 
 
 	}

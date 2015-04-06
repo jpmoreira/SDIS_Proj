@@ -78,6 +78,7 @@ public class PutChunkMsg extends Message {
 		try {
 			if(chunk.desiredReplicationDegreeExceeded()) {
 				((RecieveChunk) chunk).cleanup();
+				return null;
 			}
 		} catch (Exception e) {
 			System.out.println("Chunk already exists.");
@@ -143,6 +144,7 @@ public class PutChunkMsg extends Message {
 			System.out.println("SENDING TO "+MDB_ADDRESS+":"+MDB_PORT+"size = "+msg.length);
 			
 			socket.send(packet);
+			chunk.resetReplicationCount();
 
 
 		} catch (IOException e) {

@@ -49,11 +49,13 @@ public class BackupOrder extends WorkOrder{
 
 					allChunkDelivered = false;
 
-					sendChunk.resetReplicationCount();
+					
 
 					Message msgToSend = new PutChunkMsg(sendChunk,
 							Message.localVersion);
 
+					sendChunk.resetReplicationCount();
+					
 					msgToSend.send();
 
 				}

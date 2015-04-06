@@ -64,7 +64,7 @@ public class Database {
 	 */
 	public void addChunk(Chunk chunk) throws SQLException{
 		
-		
+		synchronized(Database.class){
 		
 		Statement stmt = null;
 		
@@ -93,13 +93,14 @@ public class Database {
 			closeSTMT(stmt);
 		}
 
-		
+		}
 		
 	}
 
 	public void setPathForChunk(RecieveChunk chunk) throws Exception{
 		
 		
+		synchronized(Database.class){
 		if(!chunk.isOwn())throw new Exception("Impossible to set path of a chunk backed up by us");
 		
 		Statement stmt = null;
@@ -119,12 +120,14 @@ public class Database {
 		}
 		
 		
+		}
 
 		
 	}
 	
 	public boolean chunkExists(Chunk c) {
 		
+		synchronized(Database.class){
 		Statement stmt = null;
 		boolean result =false;
 		try {
@@ -147,7 +150,7 @@ public class Database {
 			closeSTMT(stmt);
 		}
 		return result;
-		
+		}
 	}
 	
 	/**
@@ -159,6 +162,7 @@ public class Database {
 	 */
 	public String getPathForChunk(Chunk chunk) throws SQLException{
 		
+		synchronized(Database.class){
 		Statement stmt = null;
 		String path = null;
 		try{
@@ -188,7 +192,7 @@ public class Database {
 
 		return path;
 		
-	
+		}
 		
 	}
 	
@@ -201,6 +205,7 @@ public class Database {
 	 */
 	public boolean getRestoreFlagForChunk(Chunk chunk) {
 		
+		synchronized(Database.class){
 		Statement stmt = null;
 		
 		boolean value = false;
@@ -228,6 +233,7 @@ public class Database {
 			closeSTMT(stmt);
 		}
 		return value;
+		}
 		
 	}
 	/**
@@ -238,6 +244,8 @@ public class Database {
 	 * @throws SQLException an exception is thrown if an error occurs
 	 */
 	public void removeChunk(Chunk chunk) {
+		
+		synchronized(Database.class){
 		
 		Statement stmt = null;
 				
@@ -251,7 +259,7 @@ public class Database {
 		finally{
 			closeSTMT(stmt);
 		}
-	
+		}
 		
 	}
 
@@ -264,6 +272,8 @@ public class Database {
 	 */
 	public int nrChunksStored(){
 		
+		
+		synchronized(Database.class){
 		int nrChunks = -1;
 		Statement stmt = null;
 		try {
@@ -285,7 +295,7 @@ public class Database {
 
 		return nrChunks;
 		
-		
+		}
 		
 	}
 		
@@ -297,7 +307,7 @@ public class Database {
 	 */
 	public void clearData() {
 		
-		
+		synchronized(Database.class){
 		Statement stmt = null;
 		try {
 			stmt = con.createStatement();
@@ -310,7 +320,7 @@ public class Database {
 			closeSTMT(stmt);
 		}
 		
-		
+		}
 		
 	}
 
@@ -324,6 +334,7 @@ public class Database {
 	 */
 	public RecieveChunk[] chunksForFile(String fileID) {
 	
+		synchronized(Database.class){
 		Statement stmt = null;
 		RecieveChunk[] array = null;
 		try {
@@ -362,13 +373,15 @@ public class Database {
 		
 		return array;
 		
-		
+		}
 		
 		
 	}
 
 	public void addReplicaCountToChunk(String fileID,int nr) {
 		
+		
+		synchronized(Database.class){
 		Statement stmt = null;
 		try {
 			stmt = con.createStatement();
@@ -381,12 +394,13 @@ public class Database {
 			closeSTMT(stmt);
 		}
 		
-		
+		}
 		
 	}
 	
 	public void subtractReplicaCountToChunk(String fileID,int nr) {
 		
+		synchronized(Database.class){
 		Statement stmt = null;
 		try {
 			stmt = con.createStatement();
@@ -399,12 +413,14 @@ public class Database {
 			closeSTMT(stmt);
 		}
 		
-		
+		}
 		
 	}
 	
 	public void resetReplicaCountToChunk(String fileID,int nr) {
 		
+		
+		synchronized(Database.class){
 		Statement stmt = null;
 		try {
 			stmt = con.createStatement();
@@ -416,12 +432,14 @@ public class Database {
 		finally{
 			closeSTMT(stmt);
 		}
-		
+		}
 		
 	}
 	
 	public int replicaCountOfChunk(String fileID,int nr) {
 		
+		
+		synchronized(Database.class){
 		Statement stmt = null;
 		int count = -1;
 		try {
@@ -441,12 +459,14 @@ public class Database {
 			closeSTMT(stmt);
 		}
 		return count;
-		
+		}
 		
 	}
 	
 	public void addBackedUpFile(FileToBackup f) {
 		
+		
+		synchronized(Database.class){
 		Statement stmt = null;
 		try {
 			stmt = con.createStatement();
@@ -459,12 +479,12 @@ public class Database {
 			closeSTMT(stmt);
 		}
 
-		
+		}
 	}
 	
 	public int getNrChunks(S_File f) {
 		
-		
+		synchronized(Database.class){
 		Statement stmt = null;
 		int nr = -1;
 		try {
@@ -487,11 +507,13 @@ public class Database {
 		}
 		
 		return nr;
+		}
 		
 	}
 
 	public String getPathForRestoreFile(S_File f) throws SQLException{
-			
+		
+		synchronized(Database.class){
 		Statement stmt = null;
 		String result = null;
 		try {
@@ -511,12 +533,13 @@ public class Database {
 		}
 
 		return result;
-		
+		}
 		
 	}
 	
 	public void removePathsForChunksOfFile(String fileID){
 		
+		synchronized(Database.class){
 		Statement stmt = null;
 		try {
 			stmt = con.createStatement();
@@ -527,11 +550,13 @@ public class Database {
 			closeSTMT(stmt);
 		}
 
+		}
 	}
 
 	public boolean isOurFile(String fileID){
 		
 		
+		synchronized(Database.class){
 		boolean returnValue = false;
 		Statement stmt = null;
 		try{
@@ -547,12 +572,14 @@ public class Database {
 		}
 		return returnValue;
 		
-		
+		}
 	}
 
 	public String[] backedFilePaths(){
 		
 
+		synchronized(Database.class){
+		
 		String[] pathsArray = new String[0];
 		Statement stmt = null;
 		try {
@@ -575,14 +602,14 @@ public class Database {
 		}
 		return pathsArray;
 		
-		
+		}
 		
 		
 	}
 	
 	public void removeBackedFile(String path){
 		
-		
+		synchronized(Database.class){
 		Statement stmt = null;
 		try {
 			stmt = con.createStatement();
@@ -604,12 +631,14 @@ public class Database {
 			closeSTMT(stmt);
 		}
 		
-		
+		}
 		
 	}
 
 
 	public String fileIDForBackedFile(String path){
+		
+		synchronized(Database.class){
 		Statement stmt = null;
 		String toRet = null;
 		try {
@@ -624,12 +653,14 @@ public class Database {
 		}
 		
 		return toRet;
+		}
 		
 	}
 
 
 	public int getDesiredReplicationDegreeForChunk(Chunk rc){
 		
+		synchronized(Database.class){
 		Statement stmt = null;
 		int toRet = 0;
 		try {
@@ -644,11 +675,14 @@ public class Database {
 		
 		return toRet;
 		
+		}
+		
 	}
 
 
 	public int getDesiredReplicationDegreeForFile(String fileID){
 		
+		synchronized(Database.class){
 		
 		Statement stmt = null;
 		int toRet = 0;
@@ -663,13 +697,14 @@ public class Database {
 		}
 		return toRet;
 		
-		
+
+		}
 	}
 
 
 	public RecieveChunk getChunkInBetterConditionToBeDeleted() {
 		
-		
+		synchronized(Database.class){
 		Statement stmt = null;
 		RecieveChunk chunk = null;
 		try{
@@ -685,6 +720,8 @@ public class Database {
 		}
 	
 		return chunk;
+		
+		}
 
 
 		

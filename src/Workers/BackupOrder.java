@@ -54,7 +54,6 @@ public class BackupOrder extends WorkOrder{
 					Message msgToSend = new PutChunkMsg(sendChunk,
 							Message.localVersion);
 
-					//sendChunk.resetReplicationCount();
 					
 					msgToSend.send();
 

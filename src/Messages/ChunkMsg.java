@@ -100,8 +100,6 @@ public class ChunkMsg extends Message {
 		byte[] msg = new byte[this.toBytes().length];
 
 		msg = this.toBytes();
-
-		System.out.println("SENDING TO "+MDR_ADDRESS+":"+MDR_PORT+"size = "+msg.length);
 		
 		DatagramPacket packet = new DatagramPacket(msg, msg.length, new InetSocketAddress(MDR_ADDRESS, MDR_PORT) );
 

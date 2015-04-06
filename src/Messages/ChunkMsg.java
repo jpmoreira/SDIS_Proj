@@ -95,7 +95,6 @@ public class ChunkMsg extends Message {
 		
 		System.out.println("SENDING : "+this.toString());
 		
-		DatagramSocket socket = null;
 		byte[] msg = new byte[this.toBytes().length];
 
 		msg = this.toBytes();

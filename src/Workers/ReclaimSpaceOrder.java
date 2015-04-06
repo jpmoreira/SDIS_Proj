@@ -38,6 +38,12 @@ public class ReclaimSpaceOrder extends WorkOrder{
 			Message msgToBeSend = new RemovedMsg(chunk);
 			msgToBeSend.send();
 			
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+
+			}
+			
 			
 		}
 	}

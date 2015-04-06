@@ -41,6 +41,8 @@ public class RestoreOrder extends WorkOrder {
 							file.getFileID(), chunkNo.toString());
 
 					msgToSend.send();
+					
+					Thread.sleep(500);
 
 				}
 				

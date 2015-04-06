@@ -30,6 +30,7 @@ public class RemovedMsg extends Message {
 		super(version);
 		try {
 			this.chunk = new SendChunk(fileId, Integer.parseInt(chunkNo));
+			if(this.chunk != null) chunk.decrementReplicationCount();
 		} catch (Exception e) {
 			
 		}

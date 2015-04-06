@@ -30,6 +30,8 @@ public class GetChunkMsg extends Message {
 		
 		try {
 			this.chunk = new SendChunk(fileId,Integer.parseInt(chunkNo));
+			
+			if(chunk.isOwn())chunk = null;
 		} catch (Exception e) {
 			chunk = null;
 		}

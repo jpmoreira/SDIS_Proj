@@ -46,7 +46,6 @@ public class ChunkMsg extends Message {
 			//new FileToRestore(fileId);
 			this.chunk = new RecieveChunk(fileId,Integer.parseInt(chunkNo),body); 
 		} catch (Exception e1) {
-			
 			//If fileID isn't from us.
 		}
 	}

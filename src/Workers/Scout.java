@@ -71,11 +71,18 @@ public class Scout extends Thread{
 				
 				Message msg = MessageFactory.processMessage(byteMsg);
 				
-				System.out.println("Recieved Message: "+msg.toString());
-				
-				Worker w = new Worker(msg);
-				w.start();
+				if (msg != null) {
+					System.out.println("Recieved Message: "+msg.toString());
+					
+					Worker w = new Worker(msg);
+					w.start();
 
+				} else {
+					System.out.println("Message not recognized...");		
+				}
+					
+				
+				
 			}
 
 

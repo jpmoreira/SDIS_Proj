@@ -106,14 +106,20 @@ public class MessageFactory {
 				return getChunkMsg;
 				
 			case "CHUNK":
-				
+				System.out.println("Chunk message");
 				if (header.length != 4) throw new Exception("CHUNK header ERROR!");
 				
 				body = new byte[msg.length-index];
 				System.arraycopy(msg, index, body, 0, body.length);
 				
+				System.out.println("B");
+				
 				ChunkMsg chunkMsg = new ChunkMsg(header[1],header[2],header[3], body);
+				System.out.println("Bxxxxx");
+				
 				notifyList(chunkMsg);
+				
+				System.out.println("tttt");
 				
 				return chunkMsg;
 				

@@ -56,13 +56,17 @@ public class BackupOrder extends WorkOrder{
 
 					
 					msgToSend.send();
+					
+				
+					Thread.sleep(500);
 
 				}
 				
 				if(allChunkDelivered)break;
 				
 				nrOfRepeats++;
-				currentThread().sleep(time);
+				
+				Thread.sleep(time);
 				time = time*2;
 				
 

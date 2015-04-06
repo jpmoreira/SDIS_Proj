@@ -32,7 +32,6 @@ public class RestoreOrder extends WorkOrder {
 			while(missingChunks.length > 0) {
 
 				
-				System.out.println("looping");
 
 				for (Integer chunkNo : missingChunks) {
 
@@ -43,16 +42,16 @@ public class RestoreOrder extends WorkOrder {
 
 				}
 				
-				System.out.println("looping2");
+				
 
 
 				Thread.sleep(time);
 				time = time*2;
-				System.out.println("ola");
+				
 				
 				missingChunks = file.missingChunkNrs();
 				
-				System.out.println(missingChunks.length);
+				
 
 			}
 

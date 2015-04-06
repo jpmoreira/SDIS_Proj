@@ -46,7 +46,11 @@ public class StoredMsg extends Message {
 		return null;
 	}
 	
-	
+	@Override
+	public void send() {
+		if(chunk != null)chunk.decrementReplicationCount(); // we know we are going to get our own message
+		super.send();
+	}
 
 	/* (non-Javadoc)
 	 * @see Messages.Message#toBytes()

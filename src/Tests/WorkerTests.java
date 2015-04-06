@@ -20,6 +20,7 @@ import Main.Gui;
 import Messages.Message;
 import Messages.MessageFactory;
 import Messages.PutChunkMsg;
+import Messages.StoredMsg;
 import Workers.BackupOrder;
 import Workers.DeleteOrder;
 import Workers.RestoreOrder;
@@ -87,6 +88,12 @@ public class WorkerTests {
 		
 		RecieveChunk c = new RecieveChunk(chunksToSend[0].fileID, chunksToSend[0].nr);
 
+		Thread ownStoreReciever = new Worker(MessageFactory.processMessage(new StoredMsg("1.0",chunksToSend[0].fileID , "0").toBytes()));
+		
+		ownStoreReciever.start();
+		
+		ownStoreReciever.join();
+		
 		assertEquals(c.getReplicaCount(),1);
 		
 		ProtocolTests.changeToDB1();
@@ -189,7 +196,7 @@ public class WorkerTests {
 		
 		try{
 			
-			assertFalse(putChunkSendThread.isAlive());
+			assertNotEquals(putChunkSendThread.getState(),Thread.State.TERMINATED);
 			
 		}
 		catch(Exception e){}
@@ -257,6 +264,8 @@ public class WorkerTests {
 			
 		}
 		
+		System.out.println("blasdasdasdasdasdas");
+		
 		mdb_reader.start();
 		mdb_reader.join();
 		
@@ -271,7 +280,11 @@ public class WorkerTests {
 		
 		PutChunkMsg putChunkMsg = (PutChunkMsg) msg;
 		
-		assertEquals(putChunkMsg.chunk.nr,chunks[chunks.length-1].nr);//assert that the put chunk message that was sent was from the chunk that was missing indeed
+		if(putChunkMsg.chunk == null) System.out.println("NULLL");
+		int x = putChunkMsg.chunk.nr;
+		int y = chunks[chunks.length-1].nr;
+		
+		assertEquals(x,y);//assert that the put chunk message that was sent was from the chunk that was missing indeed
 		
 		//Check replication rates on both sides
 		

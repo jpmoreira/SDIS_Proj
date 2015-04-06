@@ -113,6 +113,26 @@ public abstract class Chunk implements Comparable<Chunk>{
 	}
 	
 	/**
+	 * Increments the replica count of this chunk
+	 * 
+	 */
+	public void decrementReplicationCount(){
+		
+		try{	
+			Database d = new Database();
+			
+			d.subtractReplicaCountToChunk(fileID, nr);
+		}
+		catch(Exception e){
+			
+		}
+
+		
+		
+		
+	}
+	
+	/**
 	 * 
 	 * Decrements the replica count for this chunk
 	 * 

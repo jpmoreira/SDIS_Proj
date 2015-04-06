@@ -385,6 +385,24 @@ public class Database {
 		
 	}
 	
+	public void subtractReplicaCountToChunk(String fileID,int nr) {
+		
+		Statement stmt = null;
+		try {
+			stmt = con.createStatement();
+			
+			String sql = "UPDATE Chunk SET replicas = replicas-1 WHERE fileID = '"+fileID+"' AND nr = "+nr+";";
+			
+			stmt.execute(sql);
+		} catch (Exception e) {}
+		finally{
+			closeSTMT(stmt);
+		}
+		
+		
+		
+	}
+	
 	public void resetReplicaCountToChunk(String fileID,int nr) {
 		
 		Statement stmt = null;

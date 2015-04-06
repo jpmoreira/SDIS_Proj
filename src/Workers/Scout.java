@@ -58,8 +58,10 @@ public class Scout extends Thread{
 			
 				socket.receive(packet);
 				
+				byte[] byteMsg = new byte[packet.getLength()];
+				System.arraycopy(packet.getData(),packet.getOffset(),byteMsg, 0, packet.getLength());
 				
-				Message msg = MessageFactory.processMessage(packet.getData());
+				Message msg = MessageFactory.processMessage(byteMsg);
 				
 				System.out.println("Recieved Message: "+msg.toString());
 				

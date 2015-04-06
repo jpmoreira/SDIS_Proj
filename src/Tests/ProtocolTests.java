@@ -1,5 +1,4 @@
 package Tests;
-//TODO add random
 import static org.junit.Assert.*;
 
 import java.io.File;

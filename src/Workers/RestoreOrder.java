@@ -8,6 +8,7 @@ import Messages.Message;
 
 public class RestoreOrder extends WorkOrder {
 
+	private static int count = 0;
 	private FileToRestore file;
 	private long time = 500;
 
@@ -15,10 +16,10 @@ public class RestoreOrder extends WorkOrder {
 
 		try {
 
-			this.file = new FileToRestore(FileToRestore.fileIDForBackedFile("path"));
+			this.file = new FileToRestore(FileToRestore.fileIDForBackedFile(path));
 
 		} catch (Exception e) {
-
+			e.printStackTrace();
 		}
 
 	}
@@ -26,12 +27,12 @@ public class RestoreOrder extends WorkOrder {
 	@Override
 	public void run() {
 
-		Integer[] missingChunks;
+		Integer[] missingChunks = file.missingChunkNrs();
 		try {
-			do {
+			while(missingChunks.length > 0) {
 
-				missingChunks = file.missingChunkNrs();
-
+				
+				System.out.println("looping");
 
 				for (Integer chunkNo : missingChunks) {
 
@@ -41,18 +42,56 @@ public class RestoreOrder extends WorkOrder {
 					msgToSend.send();
 
 				}
+				
+				System.out.println("looping2");
 
 
 				Thread.sleep(time);
 				time = time*2;
+				System.out.println("ola");
+				
+				missingChunks = file.missingChunkNrs();
+				
+				System.out.println(missingChunks.length);
 
-			} while (missingChunks.length != 0);
+			}
 
 		} catch (InterruptedException e) {
+			
+			System.out.println(e.getMessage());
 	
 		}
-		//TODO Enhancement
+		
+		
 
+		System.out.println("finished");
+		
+		synchronized(RestoreOrder.class){
+			count --;
+			
+			Scout mdr = Scout.getMDRScout();
+			if(count == 0){
+				mdr.closeSocket();
+				try {
+					mdr.join();
+				} catch (InterruptedException e) {}
+			} 
+			
+			
+		}
+		
+		
 	}
 
+	
+	@Override
+	public synchronized void start() {
+		
+		synchronized(RestoreOrder.class){
+			count ++;
+		}
+	
+		
+		super.start();
+	}
 }

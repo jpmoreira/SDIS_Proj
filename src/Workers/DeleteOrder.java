@@ -26,7 +26,7 @@ public class DeleteOrder extends WorkOrder {
 		
 		msgToSend.send();
 		
-		//TODO Enhancement (Sugestão: com intervalo de tempo exponencial reenviar isto... utilizar um nr máximo de tentativas)
+		//TODO Enhancement (Sugestão: nova mensagem com feedback)
 		file.remove();
 		
 	}

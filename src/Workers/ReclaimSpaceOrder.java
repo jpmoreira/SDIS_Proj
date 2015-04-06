@@ -3,6 +3,7 @@ package Workers;
 import java.sql.SQLException;
 
 import Chunk.Chunk;
+import Chunk.RecieveChunk;
 import Files.S_File;
 import Main.Database;
 import Messages.*;
@@ -20,24 +21,22 @@ public class ReclaimSpaceOrder extends WorkOrder{
 
 	@Override
 	public void run() {
-		//TODO complete method
 		
 		Database db = null;
 		try {
 			db = new Database();
-		} catch (SQLException e) {
-			
-		}
-		boolean enough = false;
+		} catch (SQLException e) {}
 		
 		while (S_File.spaceLeft() < 0) {
 			
-			Chunk chunk = db.getChunkInBetterConditionToBeDeleted();
+			RecieveChunk chunk = db.getChunkInBetterConditionToBeDeleted();
+			
+			try {
+				chunk.cleanup();
+			} catch (Exception e) {}
 			
 			Message msgToBeSend = new RemovedMsg(chunk);
-			
 			msgToBeSend.send();
-			
 			
 			
 		}

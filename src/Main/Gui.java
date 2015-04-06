@@ -614,7 +614,7 @@ public class Gui extends Dialog {
 	
 	protected void startRestore(String path) {
 		
-		//TODO Check this call and see what is the condition to sleep	
+		if(!Scout.getMDRScout().isAlive())Scout.getMDRScout().start();
 		
 		new RestoreOrder(path).start();
 		
@@ -677,7 +677,7 @@ public class Gui extends Dialog {
 		
 		Scout.getMDBScout().start();
 		Scout.getMCScout().start();
-		Scout.getMDRScout().start();
+		
 		
 	}
 

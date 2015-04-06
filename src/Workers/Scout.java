@@ -54,13 +54,18 @@ public class Scout extends Thread{
 
 		try {
 
-			while (Gui.RUNNING) {
+			while (true) {
 
+				System.out.println("a");
 				byte[] rbuf = new byte[BUFFERSIZE];
 
 				DatagramPacket packet = new DatagramPacket(rbuf, BUFFERSIZE);
 
+				
+				System.out.println("b");
 				socket.receive(packet);
+				
+				
 
 				Message msg = MessageFactory.processMessage(packet.getData());
 
@@ -75,27 +80,36 @@ public class Scout extends Thread{
 			System.out.println(e.getMessage());
 		}
 
+		return;
 	}
 
 	public void closeSocket() {
+		
 		socket.close();	
+		
+		//Thread.currentThread().interrupt();
 	}
 
 
 	public static Scout getMDBScout() {
-		if (mdbScout == null) return new Scout(Message.MDB_PORT, Message.MDB_ADDRESS);
+		
+		
+		if (mdbScout == null ) mdbScout = new Scout(Message.MDB_PORT, Message.MDB_ADDRESS);
+		
 		return mdbScout;
 	}
 
 
 	public static Scout getMDRScout() {
-		if (mdrScout == null) return new Scout(Message.MDR_PORT, Message.MDR_ADDRESS);
+		
+		
+		if (mdrScout == null || mdrScout.getState().equals(Thread.State.TERMINATED)) mdrScout = new Scout(Message.MDR_PORT, Message.MDR_ADDRESS);
 		return mdrScout;
 	}	
 
 
 	public static Scout getMCScout() {
-		if (mcScout == null) return new Scout(Message.MC_PORT, Message.MC_ADDRESS);
+		if (mcScout == null) mcScout = new Scout(Message.MC_PORT, Message.MC_ADDRESS);
 		return mcScout;
 	}	
 

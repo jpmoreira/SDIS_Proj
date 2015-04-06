@@ -13,13 +13,16 @@ import org.junit.Test;
 import Chunk.RecieveChunk;
 import Chunk.SendChunk;
 import Files.FileToBackup;
+import Files.FileToRestore;
 import Files.S_File;
 import Main.Database;
+import Main.Gui;
 import Messages.Message;
 import Messages.MessageFactory;
 import Messages.PutChunkMsg;
 import Workers.BackupOrder;
 import Workers.DeleteOrder;
+import Workers.RestoreOrder;
 import Workers.Scout;
 import Workers.Worker;
 
@@ -201,9 +204,6 @@ public class WorkerTests {
 		putChunkSendThread.join();
 		
 	}
-
-	
-	
 	
 	@Test
 	public void backupSubprotocol_senderSide_checkOnlyNonFullfiledChunksSent() throws Exception{
@@ -216,6 +216,9 @@ public class WorkerTests {
 		Thread putChunkSendThread = new BackupOrder("testFiles/RIGP.pdf", 2);
 		
 		FileToBackup b = new FileToBackup("testFiles/RIGP.pdf");
+		
+		
+		SendChunk[] chunks = b.getChunks();
 		
 		MulticastSocket mdb_recieverSocket = initializeMDBReadingSocket();
 		byte[] rbuf = new byte[Scout.BUFFERSIZE];
@@ -235,16 +238,15 @@ public class WorkerTests {
 		});
 		
 		
-		mdb_reader.start();
+		
 		putChunkSendThread.start();
 		
-		mdb_reader.join();
+		
 		
 	
-		
-		
-		
-		for (SendChunk s : b.getChunks()) {
+		for(int i = 0 ; i < chunks.length -1; i++){//dont do that for the last one
+			
+			SendChunk s = chunks[i];
 			
 			Thread w = new Worker(MessageFactory.processMessage(("STORED"  + " " + "1.0" + " " + s.fileID + " " + s.nr + " ").getBytes()));
 			w.start();
@@ -253,22 +255,45 @@ public class WorkerTests {
 			w.start();
 			w.join();
 			
-			
 		}
-
-		//TODO continue here
+		
+		mdb_reader.start();
+		mdb_reader.join();
 		
 		putChunkSendThread.join();
 		
+		
+		ProtocolTests.changeToDB2();
+		
+		Message msg = MessageFactory.processMessage(packet.getData());
+		
+		assertTrue(msg instanceof PutChunkMsg);
+		
+		PutChunkMsg putChunkMsg = (PutChunkMsg) msg;
+		
+		assertEquals(putChunkMsg.chunk.nr,chunks[chunks.length-1].nr);//assert that the put chunk message that was sent was from the chunk that was missing indeed
+		
+		//Check replication rates on both sides
+		
+		ProtocolTests.changeToDB1();
+		
+		for (SendChunk s : chunks) {
+			
+			if(putChunkMsg.chunk.nr == s.nr) assertEquals(s.getReplicaCount(),0);
+			else assertEquals(s.getReplicaCount(),2);
+		}
+		
+
+		
 	}
 	
-	//TODO backup subproto. check that only sends chunks that are still missing
 	//TODO assert that nothing is done if no space available
 	@Test
 	public void deleteSubprotocol_senderSide() throws Exception{
 		
 		S_File.cleanFolder(new File("backups/"));
 		S_File.cleanFolder(new File("backups_2/"));
+		S_File.availableSpace = 2560000;
 		
 		ProtocolTests.changeToDB1();
 		Database db_backed = new Database(true);
@@ -356,6 +381,80 @@ public class WorkerTests {
 		
 		
 		
+		
+	}
+	
+	@Test
+	public void restoreSubprotocol_senderSide() throws Exception {
+		
+		S_File.cleanFolder(new File("backups/"));
+		S_File.cleanFolder(new File("backups_2/"));
+		
+		ProtocolTests.changeToDB1();
+		Database d1 = new Database(true);
+		
+		FileToBackup b1 = new FileToBackup("testFiles/oneChunkFile",2);
+		
+		FileToBackup b2 = new FileToBackup("testFiles/RIGP.pdf",1);
+		
+		SendChunk[] b1_chunks = b1.getChunks();
+		SendChunk[] b2_chunks = b2.getChunks();
+		
+		
+		//simulate backup being done
+		for (SendChunk c : b1_chunks) {
+			
+			c.incrementReplicationCount();
+			c.incrementReplicationCount();
+		}
+		
+		
+		for (SendChunk c : b2_chunks) {
+			
+			c.incrementReplicationCount();
+		}
+		
+		
+		assertEquals(d1.nrChunksStored(),b1_chunks.length+b2_chunks.length);
+		
+		
+		Thread restoreThread_b1 = new RestoreOrder("testFiles/oneChunkFile");
+		Thread restoreThread_b2 = new RestoreOrder("testFiles/RIGP.pdf");
+		
+		
+		Scout mdr = Scout.getMDRScout();
+		
+		mdr.start();
+		restoreThread_b1.start();
+		restoreThread_b2.start();
+		
+		Thread.sleep(2000);
+		assertNotEquals(mdr.getState(),Thread.State.TERMINATED);
+		assertNotEquals(restoreThread_b1.getState(),Thread.State.TERMINATED);
+		assertNotEquals(restoreThread_b2.getState(),Thread.State.TERMINATED);
+		
+		
+		new RecieveChunk(b1_chunks[0].fileID, b1_chunks[0].nr, b1_chunks[0].getContent());
+		
+		restoreThread_b1.join();
+		
+		assertEquals(restoreThread_b1.getState(),Thread.State.TERMINATED);
+		assertNotEquals(restoreThread_b2.getState(),Thread.State.TERMINATED);
+		assertNotEquals(mdr.getState(),Thread.State.TERMINATED);
+		
+		
+		for (SendChunk sendChunk : b2_chunks) {
+			
+			new RecieveChunk(sendChunk.fileID,sendChunk.nr,sendChunk.getContent());
+		}
+		
+		restoreThread_b2.join();
+		
+		
+		assertEquals(restoreThread_b2.getState(),Thread.State.TERMINATED);
+		assertEquals(Scout.getMDRScout().getState(),Thread.State.NEW);
+		
+
 		
 	}
 	

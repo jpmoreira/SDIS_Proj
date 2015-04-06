@@ -56,8 +56,7 @@ public class PutChunkMsg extends Message {
 			try {
 				this.chunk = new RecieveChunk(fileId, Integer.parseInt(chunkNo),body,Integer.parseInt(repDeg));//create a new one and store it
 			} catch (Exception e1) {
-				//In case the file to whom this chunk belongs is ours.
-				e1.printStackTrace();
+				
 			}
 		}
 		

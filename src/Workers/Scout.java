@@ -36,7 +36,9 @@ public class Scout extends Thread{
 			
 			address = InetAddress.getByName(ip);
 			socket = new MulticastSocket(port);
+			socket.setTimeToLive(0);
 			socket.joinGroup(address);
+			socket.setLoopbackMode(true);
 
 		}
 		catch (IOException e) {

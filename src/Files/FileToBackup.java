@@ -157,7 +157,7 @@ public class FileToBackup extends S_File {
 		
 		if(readSize<64000){//if we don't have 64K to read shorten array before creating chunk
 			return Arrays.copyOfRange(b, 0, readSize);	
-			//TODO change the id here
+
 		}
 		
 		return b;

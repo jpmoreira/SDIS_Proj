@@ -1,10 +1,9 @@
 package Tests;
-
+//TODO add random
 import static org.junit.Assert.*;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.junit.FixMethodOrder;
@@ -56,7 +55,7 @@ public class ProtocolTests {
 			// BACKUP REQUEST
 			for (SendChunk sendChunk : chunksToSend) {
 				
-				Message msgToSend = new PutChunkMsg(sendChunk, Message.getVersion());
+				Message msgToSend = new PutChunkMsg(sendChunk, Message.localVersion);
 				
 				msgsRecieved.add(msgToSend.toBytes());
 				
@@ -151,7 +150,7 @@ public class ProtocolTests {
 			ArrayList<byte[]> msgsToSend = new ArrayList<byte[]>();
 			for (int i = 0; i < file.getNrChunks(); i++){
 				
-				Message msg = new GetChunkMsg(Message.getVersion(), file.fileID, Integer.toString(i));
+				Message msg = new GetChunkMsg(Message.localVersion, file.fileID, Integer.toString(i));
 				msgsToSend.add(msg.toBytes());
 				
 			}
@@ -265,7 +264,7 @@ public class ProtocolTests {
 			// DELETE REQUEST
 			ArrayList<byte[]> msgsToSend = new ArrayList<byte[]>();
 			
-			Message msg = new DeleteMsg(Message.getVersion(), file.getFileID());
+			Message msg = new DeleteMsg(Message.localVersion, file.getFileID());
 			msgsToSend.add(msg.toBytes());
 			
 			
@@ -407,7 +406,7 @@ public class ProtocolTests {
 		
 		FileToBackup b = new FileToBackup("testFiles/RIGP.pdf",1);
 		
-		SendChunk[] chunksOnOrigin = b.getChunks(); // register the chunks
+		b.getChunks(); // register the chunks
 		
 		GetChunkMsg getChunkMessage_origin = new GetChunkMsg("1.0", b.fileID, "0");
 		

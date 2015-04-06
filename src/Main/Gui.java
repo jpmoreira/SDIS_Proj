@@ -1,13 +1,10 @@
 package Main;
 
-import java.util.Timer;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Dialog;
-import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
@@ -27,7 +24,6 @@ import Workers.Scout;
 
 public class Gui extends Dialog {
 
-	private static final String VERSION = Message.getVersion();
 	
 	public static boolean RUNNING = false;
 	
@@ -490,7 +486,7 @@ public class Gui extends Dialog {
 		
 		Label lblVersion = new Label(shell, SWT.NONE);
 		lblVersion.setBounds(10, 460, 75, 14);
-		lblVersion.setText("Version " + VERSION);
+		lblVersion.setText("Version " + Message.localVersion);
 
 
 	}

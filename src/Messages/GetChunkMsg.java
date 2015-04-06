@@ -75,4 +75,22 @@ public class GetChunkMsg extends Message {
 		return (MSGCOD + " " + getVersion() + " " + chunk.fileID + " "  + chunk.nr + " ").getBytes();
 	}
 
+	
+	public boolean ofInterest(Message msg){
+		
+		
+		if(!(msg instanceof ChunkMsg))return false;
+		
+		
+		ChunkMsg chunkMsg = (ChunkMsg) msg;
+		
+		if (chunkMsg.chunk.nr != this.chunk.nr) return false;
+		
+		if(!chunkMsg.chunk.fileID.equals(this.chunk.fileID))return false;
+		
+		
+		return true;
+		
+	}
+	
 }

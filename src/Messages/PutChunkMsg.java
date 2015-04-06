@@ -18,7 +18,7 @@ import Chunk.*;
 public class PutChunkMsg extends Message {
 	
 	private final String MSGCOD = "PUTCHUNK";
-	private Chunk chunk = null;
+	public Chunk chunk = null;
 	
 
 	/**
@@ -141,6 +141,7 @@ public class PutChunkMsg extends Message {
 
 		} catch (IOException e) {
 
+			e.printStackTrace();
 		} finally {
 			socket.close();
 		}

@@ -1,5 +1,4 @@
 package Chunk;
-import java.io.IOException;
 import java.sql.SQLException;
 
 import Main.Database;

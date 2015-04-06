@@ -9,7 +9,6 @@ import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 
 import Chunk.*;
-import Files.FileToRestore;
 
 
 /**
@@ -19,7 +18,7 @@ public class ChunkMsg extends Message {
 
 
 	private final String MSGCOD = "CHUNK";
-	private Chunk chunk;
+	public Chunk chunk;
 	
 
 	/**

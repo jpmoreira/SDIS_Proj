@@ -6,7 +6,6 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.ArrayList;
 
-import Files.FileToRestore;
 import Main.Gui;
 import Messages.*;
 

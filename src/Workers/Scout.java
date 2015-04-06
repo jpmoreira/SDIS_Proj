@@ -157,7 +157,7 @@ public class Scout extends Thread{
 	}
 
 
-	private void notifyPutChunkList(Message msg) {
+	private void notifyList(PutChunkMsg msg) {
 		
 		for (Worker worker : putChunkList) {
 			worker.update(msg);
@@ -165,29 +165,8 @@ public class Scout extends Thread{
 
 	}
 
-	private void notifyStoredList(Message msg) {
-		for (Worker worker : storedList) {
-			worker.update(msg);
-		}
-	}
-
-	private void notifyGetChunkList(Message msg) {
-		for (Worker worker : getChunkList) {
-			worker.update(msg);
-		}
-	}
-	private void notifyChunkList(Message msg) {
+	private void notifyList(ChunkMsg msg) {
 		for (Worker worker : chunkList) {
-			worker.update(msg);
-		}
-	}
-	private void notifyDeleteList(Message msg) {
-		for (Worker worker : deleteList) {
-			worker.update(msg);
-		}
-	}
-	private void notifyRemoveList(Message msg) {
-		for (Worker worker : removeList) {
 			worker.update(msg);
 		}
 	}

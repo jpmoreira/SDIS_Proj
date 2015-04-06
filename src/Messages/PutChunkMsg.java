@@ -8,6 +8,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 
+import Workers.Scout;
 import Chunk.*;
 
 
@@ -118,8 +119,6 @@ public class PutChunkMsg extends Message {
 	}
 
 
-
-
 	public byte[] buildHeader() {
 		return (MSGCOD + " " + getVersion() + " " + chunk.fileID + " " + chunk.nr + " " + chunk.desiredReplicationDegree() + " ").getBytes();
 	}
@@ -131,30 +130,20 @@ public class PutChunkMsg extends Message {
 		
 		System.out.println("SENDING : "+this.toString());
 		
-		DatagramSocket socket = null;
-		try {
+		byte[] msg = new byte[this.toBytes().length];
 
-			socket = new DatagramSocket();
+		msg = this.toBytes();
 
-			byte[] msg = new byte[this.toBytes().length];
+		DatagramPacket packet = new DatagramPacket(msg, msg.length, new InetSocketAddress(MDB_ADDRESS, MDB_PORT) );
 
-			msg = this.toBytes();
-
-			DatagramPacket packet = new DatagramPacket(msg, msg.length, new InetSocketAddress(MDB_ADDRESS, MDB_PORT) );
-
-			
-			System.out.println("SENDING TO "+MDB_ADDRESS+":"+MDB_PORT+"size = "+msg.length);
-			
-			socket.send(packet);
-			chunk.resetReplicationCount();
-
-
-		} catch (IOException e) {
-
-			e.printStackTrace();
-		} finally {
-			socket.close();
-		}
+		
+		System.out.println("SENDING TO "+MDB_ADDRESS+":"+MDB_PORT+"size = "+msg.length);
+		
+		Scout.sendSocket(packet);
+		
+		System.out.println("was "+chunk.getReplicaCount());
+		chunk.resetReplicationCount();
+		System.out.println("now is "+chunk.getReplicaCount());
 		
 		
 	}
@@ -166,4 +155,6 @@ public class PutChunkMsg extends Message {
 		if(chunk != null) return MSGCOD+": nr = "+chunk.nr+" fileID = "+chunk.fileID;
 		else return MSGCOD+" (not interested)";
 	}
+
+
 }

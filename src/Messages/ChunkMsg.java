@@ -8,6 +8,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 
+import Workers.Scout;
 import Chunk.*;
 
 
@@ -96,29 +97,15 @@ public class ChunkMsg extends Message {
 		System.out.println("SENDING : "+this.toString());
 		
 		DatagramSocket socket = null;
-		try {
+		byte[] msg = new byte[this.toBytes().length];
 
-			socket = new DatagramSocket();
+		msg = this.toBytes();
 
-			byte[] msg = new byte[this.toBytes().length];
+		System.out.println("SENDING TO "+MDR_ADDRESS+":"+MDR_PORT+"size = "+msg.length);
+		
+		DatagramPacket packet = new DatagramPacket(msg, msg.length, new InetSocketAddress(MDR_ADDRESS, MDR_PORT) );
 
-			msg = this.toBytes();
-			
-			
-
-			System.out.println("SENDING TO "+MDR_ADDRESS+":"+MDR_PORT+"size = "+msg.length);
-			
-			DatagramPacket packet = new DatagramPacket(msg, msg.length, new InetSocketAddress(MDR_ADDRESS, MDR_PORT) );
-
-			socket.send(packet);
-
-
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-		} finally {
-			socket.close();
-		}
+		Scout.sendSocket(packet);
 		
 		
 	}

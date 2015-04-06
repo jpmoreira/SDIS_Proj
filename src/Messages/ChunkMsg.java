@@ -103,8 +103,10 @@ public class ChunkMsg extends Message {
 			byte[] msg = new byte[this.toBytes().length];
 
 			msg = this.toBytes();
+			
+			
 
-			System.out.println("SENDING TO "+MDR_ADDRESS+":"+MDR_PORT);
+			System.out.println("SENDING TO "+MDR_ADDRESS+":"+MDR_PORT+"size = "+msg.length);
 			
 			DatagramPacket packet = new DatagramPacket(msg, msg.length, new InetSocketAddress(MDR_ADDRESS, MDR_PORT) );
 
@@ -112,7 +114,8 @@ public class ChunkMsg extends Message {
 
 
 		} catch (IOException e) {
-
+			System.out.println(e.getMessage());
+			e.printStackTrace();
 		} finally {
 			socket.close();
 		}

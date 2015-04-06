@@ -59,7 +59,6 @@ public class Scout extends Thread{
 				socket.receive(packet);
 				
 				
-
 				Message msg = MessageFactory.processMessage(packet.getData());
 				
 				System.out.println("Recieved Message: "+msg.toString());
@@ -81,6 +80,8 @@ public class Scout extends Thread{
 	public void closeSocket() {
 		
 		socket.close();	
+		
+		System.out.println("OOOOOOOUUUUUUUTTTTTT");
 		
 		//Thread.currentThread().interrupt();
 	}

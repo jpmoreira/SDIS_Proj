@@ -93,4 +93,14 @@ public class GetChunkMsg extends Message {
 		
 	}
 	
+	
+	@Override
+	public String toString() {
+		
+		if(chunk != null) return MSGCOD+": nr = "+chunk.nr+" fileID = "+chunk.fileID;
+		
+		else return MSGCOD+" (not interested)";
+		
+		
+	}
 }

@@ -59,6 +59,8 @@ public abstract class Message {
 
 	public void send() {
 		
+		System.out.println("SENDING : "+this.toString());
+		
 		DatagramSocket socket = null;
 		try {
 
@@ -93,5 +95,12 @@ public abstract class Message {
 		
 		return false;
 		
+	}
+
+
+
+	@Override
+	public String toString() {
+		return "Generic Message";
 	}
 }

@@ -70,4 +70,11 @@ public class StoredMsg extends Message {
 	}
 
 
+
+	@Override
+	public String toString() {
+		
+		if(chunk != null)return MSGCOD+": nr = "+chunk.nr+" fileID = "+chunk.fileID;
+		return MSGCOD+" (not interested)";
+	}
 }

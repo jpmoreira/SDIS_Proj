@@ -92,6 +92,9 @@ public class ChunkMsg extends Message {
 	@Override
 	public void send() {
 		
+		
+		System.out.println("SENDING : "+this.toString());
+		
 		DatagramSocket socket = null;
 		try {
 
@@ -115,4 +118,12 @@ public class ChunkMsg extends Message {
 		
 	}
 
+	
+	@Override
+	public String toString() {
+		
+		return MSGCOD+": nr = "+chunk.nr+" fileID = "+chunk.fileID;
+		
+	
+	}
 }

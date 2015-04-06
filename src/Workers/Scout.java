@@ -60,6 +60,8 @@ public class Scout extends Thread{
 
 				Message msg = MessageFactory.processMessage(packet.getData());
 				
+				System.out.println("Recieved Message: "+msg.toString());
+				
 				Worker w = new Worker(msg);
 				w.start();
 

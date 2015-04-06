@@ -125,6 +125,9 @@ public class PutChunkMsg extends Message {
 	@Override
 	public void send() {
 		
+		
+		System.out.println("SENDING : "+this.toString());
+		
 		DatagramSocket socket = null;
 		try {
 
@@ -149,4 +152,11 @@ public class PutChunkMsg extends Message {
 		
 	}
 
+	
+	@Override
+	public String toString() {
+		
+		if(chunk != null) return MSGCOD+": nr = "+chunk.nr+" fileID = "+chunk.fileID;
+		else return MSGCOD+" (not interested)";
+	}
 }

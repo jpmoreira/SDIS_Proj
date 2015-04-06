@@ -73,5 +73,10 @@ public class DeleteMsg extends Message {
 	}
 	
 	
+	@Override
+	public String toString() {
+		
+		return MSGCOD+": fileID = "+fileID;
+	}
 
 }

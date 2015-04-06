@@ -127,7 +127,10 @@ public class MessageFactory {
 				
 				if (header.length != 3) throw new Exception("DELETE header ERROR!");
 				
-				return new DeleteMsg(header[1],header[2]);
+				DeleteMsg deleteMsg = new DeleteMsg(header[1],header[2]);
+				notifyList(deleteMsg);
+				
+				return deleteMsg;
 				
 			case "REMOVED":
 				
@@ -290,6 +293,33 @@ public class MessageFactory {
 
 	
 	/**
+	 * Notify all workers on StoredMsg list
+	 * 
+	 * @param msg
+	 */
+	private static void notifyList(StoredMsg msg) {
+		for (Worker worker : storedList) {
+			worker.update(msg);
+		}
+		
+	}
+
+	
+	
+	/**
+	 * Notify all workers on GetChunkMsg list
+	 * 
+	 * @param msg
+	 */
+	private static void notifyList(GetChunkMsg msg) {
+		for (Worker worker : getChunkList) {
+			worker.update(msg);
+		}
+		
+	}
+	
+	
+	/**
 	 * Notify all workers on ChunkMsg list
 	 * 
 	 * @param msg
@@ -307,37 +337,23 @@ public class MessageFactory {
 	 * @param msg
 	 */
 	private static void notifyList(RemovedMsg msg) {
-		for (Worker worker : chunkList) {
+		for (Worker worker : removeList) {
 			worker.update(msg);
 		}
 		
 	}
 
-	
 	/**
-	 * Notify all workers on GetChunkMsg list
+	 * Notify all workers on RemovedMsg list
 	 * 
 	 * @param msg
 	 */
-	private static void notifyList(GetChunkMsg msg) {
-		for (Worker worker : getChunkList) {
+	private static void notifyList(DeleteMsg msg) {
+		for (Worker worker : deleteList) {
 			worker.update(msg);
 		}
 		
 	}
-
 	
-	/**
-	 * Notify all workers on StoredMsg list
-	 * 
-	 * @param msg
-	 */
-	private static void notifyList(StoredMsg msg) {
-		for (Worker worker : storedList) {
-			worker.update(msg);
-		}
-		
-	}
-
 
 }

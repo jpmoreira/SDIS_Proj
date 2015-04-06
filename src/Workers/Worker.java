@@ -24,7 +24,7 @@ public class Worker extends Thread {
 		registerAsObserver();
 
 		try {
-			this.sleep(rand.nextInt(400));
+			Thread.sleep(rand.nextInt(400));
 			
 		} catch (InterruptedException e) {
 			
@@ -96,6 +96,14 @@ public class Worker extends Thread {
 	}
 
 	public void update(StoredMsg msg) {
+		if (this.msg.ofInterest(msg)) {
+			proceed = false;
+			unRegisterAsObserver();
+		};
+		
+	}
+
+	public void update(DeleteMsg msg) {
 		if (this.msg.ofInterest(msg)) {
 			proceed = false;
 			unRegisterAsObserver();

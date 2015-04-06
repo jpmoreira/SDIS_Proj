@@ -644,7 +644,7 @@ public class Gui extends Dialog {
 	 */
 	protected void startReclaiming(int size) {
 		backupSpace.setSelection(backupSpace.getSelection()-size);
-		new ReclaimSpaceOrder(kbToFree.getSelection()*1000).start();
+		new ReclaimSpaceOrder(size*1000).start();
 	}
 	
 	

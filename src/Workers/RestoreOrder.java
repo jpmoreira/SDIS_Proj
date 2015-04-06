@@ -12,6 +12,8 @@ public class RestoreOrder extends WorkOrder {
 	private FileToRestore file;
 	private long time = 500;
 
+	private int nrOfRepeats = 1;
+	
 	public RestoreOrder(String path) {
 
 		try {
@@ -29,7 +31,7 @@ public class RestoreOrder extends WorkOrder {
 
 		Integer[] missingChunks = file.missingChunkNrs();
 		try {
-			while(missingChunks.length > 0) {
+			while(missingChunks.length > 0 || nrOfRepeats < 6) {
 
 				
 
@@ -44,7 +46,7 @@ public class RestoreOrder extends WorkOrder {
 				
 				
 
-
+				nrOfRepeats++;
 				Thread.sleep(time);
 				time = time*2;
 				

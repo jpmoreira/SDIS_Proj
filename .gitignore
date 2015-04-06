@@ -6,3 +6,5 @@ RIGP_Recovery.pdf
 testFiles/testChunk*
 /bin/
 *.chunk
+*.log
+*.log

@@ -138,6 +138,9 @@ public class PutChunkMsg extends Message {
 
 			DatagramPacket packet = new DatagramPacket(msg, msg.length, new InetSocketAddress(MDB_ADDRESS, MDB_PORT) );
 
+			
+			System.out.println("SENDING TO "+MDB_ADDRESS+":"+MDB_PORT+"size = "+msg.length);
+			
 			socket.send(packet);
 
 

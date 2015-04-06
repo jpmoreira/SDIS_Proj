@@ -104,6 +104,8 @@ public class ChunkMsg extends Message {
 
 			msg = this.toBytes();
 
+			System.out.println("SENDING TO "+MDR_ADDRESS+":"+MDR_PORT);
+			
 			DatagramPacket packet = new DatagramPacket(msg, msg.length, new InetSocketAddress(MDR_ADDRESS, MDR_PORT) );
 
 			socket.send(packet);

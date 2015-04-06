@@ -26,6 +26,8 @@ public class Scout extends Thread{
 
 		try {
 
+			
+			System.out.println("LISTENING AT "+ip+":"+port);
 			address = InetAddress.getByName(ip);
 			socket = new MulticastSocket(port);
 			socket.joinGroup(address);

@@ -44,7 +44,7 @@ public class GetChunkMsg extends Message {
 	 */
 	public Message process() {
 		
-		if  (chunk == null || chunk.isOwn()) return null;
+		if  (chunk == null || chunk.isOwn()) return null;//WE dont process getChunkMessages that are either our own or of files we dont have
 		
 		return new ChunkMsg((SendChunk)chunk,getVersion());
 

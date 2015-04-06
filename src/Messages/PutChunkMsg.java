@@ -135,9 +135,6 @@ public class PutChunkMsg extends Message {
 		msg = this.toBytes();
 
 		DatagramPacket packet = new DatagramPacket(msg, msg.length, new InetSocketAddress(MDB_ADDRESS, MDB_PORT) );
-
-		
-		System.out.println("SENDING TO "+MDB_ADDRESS+":"+MDB_PORT+"size = "+msg.length);
 		
 		Scout.sendSocket(packet);
 		

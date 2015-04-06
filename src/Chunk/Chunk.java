@@ -85,7 +85,7 @@ public abstract class Chunk implements Comparable<Chunk>{
 		}
 		catch(SQLException e){
 			
-			return 0;
+			return -1;
 		}
 
 		

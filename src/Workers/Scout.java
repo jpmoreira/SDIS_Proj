@@ -75,24 +75,17 @@ public class Scout extends Thread{
 				
 			}
 			
+			byte[] rbuf = new byte[BUFFERSIZE];
+			
 			while (true) {
 
 				
-				System.out.println("Scouting");
-				
-				
-				byte[] rbuf = new byte[BUFFERSIZE];
-
 				DatagramPacket packet = new DatagramPacket(rbuf, BUFFERSIZE);
 
 				socket.receive(packet);
 				
 				new Worker(packet).start();
-	
-				
-				
-					
-				
+
 				
 			}
 

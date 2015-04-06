@@ -31,7 +31,7 @@ public class RestoreOrder extends WorkOrder {
 
 		Integer[] missingChunks = file.missingChunkNrs();
 		try {
-			while(missingChunks.length > 0 || nrOfRepeats < 6) {
+			while(missingChunks.length > 0 && nrOfRepeats < 6) {
 
 				
 

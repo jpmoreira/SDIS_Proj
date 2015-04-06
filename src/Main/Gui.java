@@ -707,6 +707,7 @@ public class Gui extends Dialog {
 
 		S_File.cleanFolder(new File(Database.defaultBackupDir));
 		S_File.cleanFolder(new File(Database.defaultRestoreDir));
+		Database.databaseToUse= Database.defaultDeploymentDB;
 		new Database(true);
 		
 		

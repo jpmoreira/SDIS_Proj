@@ -19,7 +19,7 @@ public class Database {
 	Connection con;
 	
 	public static String databaseToUse = null;
-	private static String defaultDeploymentDB = "supportingFiles/supportingDB.db";
+	public static String defaultDeploymentDB = "supportingFiles/supportingDB.db";
 	
 	public static String defaultBackupDir = "backups/";
 	public static String defaultRestoreDir = "restores/";

@@ -618,7 +618,7 @@ public class Gui extends Dialog {
 	
 	protected void startRestore(String path) {
 		
-		if(!Scout.getMDRScout().isAlive())Scout.getMDRScout().start();
+		if(Scout.getMDRScout().getState().equals(Thread.State.NEW)) Scout.getMDRScout().start();
 		
 		new RestoreOrder(path).start();
 		

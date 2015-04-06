@@ -9,6 +9,8 @@ public class Worker extends Thread {
 
 	
 	private Message msg;
+	
+	private boolean proceed = true;
 
 	public Worker(Message msg) {
 		this.msg = msg;
@@ -23,9 +25,12 @@ public class Worker extends Thread {
 
 		try {
 			this.sleep(rand.nextInt(400));
+			
 		} catch (InterruptedException e) {
 			
 		}
+		
+		if (!proceed) return;
 		
 		Message returnMsg = msg.process();
 		
@@ -33,26 +38,68 @@ public class Worker extends Thread {
 		
 		returnMsg.send();
 		
+		unRegisterAsObserver();
+		
 	}
 
 	
 	private void registerAsObserver() {
 
 		if (msg instanceof GetChunkMsg) {
-			Scout.getMDRScout().attachObserverToChunkMsg(this);
+			MessageFactory.attachObserverToChunkMsg(this);
 		} else if (msg instanceof RemovedMsg) {
-			Scout.getMDBScout().attachObserverToPutChunkMsg(this);
+			MessageFactory.attachObserverToPutChunkMsg(this);
+		}
+	}
+	
+	private void unRegisterAsObserver() {
+
+		if (msg instanceof GetChunkMsg) {
+			MessageFactory.detachObserverFromChunkMsg(this);
+		} else if (msg instanceof RemovedMsg) {
+			MessageFactory.detachObserverFromPutChunkMsg(this);
 		}
 	}
 
+	
 	public void update(PutChunkMsg msg) {
-		// TODO Auto-generated method stub
-
+		
+		if (this.msg.ofInterest(msg)) {
+			proceed = false;
+			unRegisterAsObserver();
+		};
 		
 	}
 	
 	public void update(ChunkMsg msg) {
-		// TODO Auto-generated method stub
+		if (this.msg.ofInterest(msg)) {
+			proceed = false;
+			unRegisterAsObserver();
+		};
+		
+	}
+
+	public void update(RemovedMsg msg) {
+		if (this.msg.ofInterest(msg)) {
+			proceed = false;
+			unRegisterAsObserver();
+		};
+		
+	}
+
+	public void update(GetChunkMsg msg) {
+		if (this.msg.ofInterest(msg)) {
+			proceed = false;
+			unRegisterAsObserver();
+		};
+		
+	}
+
+	public void update(StoredMsg msg) {
+		if (this.msg.ofInterest(msg)) {
+			proceed = false;
+			unRegisterAsObserver();
+		};
 		
 	}
 

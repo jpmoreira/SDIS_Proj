@@ -20,16 +20,7 @@ public class Scout extends Thread{
 	private static Scout mdbScout = null;
 	private static Scout mdrScout = null;
 	private static Scout mcScout = null;
-
-
-	private ArrayList<Worker> putChunkList = new ArrayList<Worker>();
-	private ArrayList<Worker> storedList = new ArrayList<Worker>();
-	private ArrayList<Worker> getChunkList = new ArrayList<Worker>();
-	private ArrayList<Worker> chunkList = new ArrayList<Worker>();
-	private ArrayList<Worker> deleteList = new ArrayList<Worker>();
-	private ArrayList<Worker> removeList = new ArrayList<Worker>();
-
-
+	
 
 	private Scout(int port, String ip) {
 
@@ -63,7 +54,7 @@ public class Scout extends Thread{
 				socket.receive(packet);
 
 				Message msg = MessageFactory.processMessage(packet.getData());
-
+				
 				Worker w = new Worker(msg);
 				w.start();
 
@@ -99,75 +90,5 @@ public class Scout extends Thread{
 		return mcScout;
 	}	
 
-
-	public void attachObserverToPutChunkMsg(Worker w) {
-		putChunkList.add(w);
-	}
-
-
-	public void detachObserverFromPutChunkMsg(Worker w) {
-		putChunkList.remove(w);
-	}
-
-	public void attachObserverToStoredMsg(Worker w) {
-		storedList.add(w);
-	}
-
-
-	public void detachObserverFromStoredMsg(Worker w) {
-		storedList.remove(w);
-	}
-
-
-	public void attachObserverToGetChunkMsg(Worker w) {
-		getChunkList.add(w);
-	}
-
-
-	public void detachObserverFromGetChunkMsg(Worker w) {
-		getChunkList.remove(w);
-	}
-
-	public void attachObserverToChunkMsg(Worker w) {
-		chunkList.add(w);
-	}
-
-
-	public void detachObserverFromChunkMsg(Worker w) {
-		chunkList.remove(w);
-	}
-
-	public void attachObserverToDeleteMsg(Worker w) {
-		deleteList.add(w);
-	}
-
-
-	public void detachObserverFromDeleteMsg(Worker w) {
-		deleteList.remove(w);
-	}
-
-	public void attachObserverToRemoveMsg(Worker w) {
-		removeList.add(w);
-	}
-
-
-	public void detachObserverFromRemoveMsg(Worker w) {
-		removeList.remove(w);
-	}
-
-
-	private void notifyList(PutChunkMsg msg) {
-		
-		for (Worker worker : putChunkList) {
-			worker.update(msg);
-		}
-
-	}
-
-	private void notifyList(ChunkMsg msg) {
-		for (Worker worker : chunkList) {
-			worker.update(msg);
-		}
-	}
 	
 }

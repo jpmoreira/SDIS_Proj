@@ -80,7 +80,7 @@ public class Database {
 				
 			}
 			else{
-				System.out.println(chunk.isOwn());
+				
 				sql = "INSERT INTO Chunk (path,fileID,nr,isOwn,desiredReplicas) VALUES('"+path+"','"+chunk.fileID+"',"+chunk.nr+",'"+Boolean.toString(chunk.isOwn()).toUpperCase()+"',"+chunk.desiredReplicationDegree()+");";
 				
 			}

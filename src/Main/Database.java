@@ -664,6 +664,27 @@ public class Database {
 		
 		
 	}
+	
+	public String filePathForBackedFile(String fileID){
+		
+		
+		Statement stmt = null;
+		String toRet = null;
+		try {
+			stmt = con.createStatement();
+			
+			ResultSet set = stmt.executeQuery("SELECT path from BackedFiles WHERE fileID = '"+fileID+"';");
+			
+			if(set.next())toRet = set.getString("path");
+		} catch (SQLException e) {}
+		finally{
+			closeSTMT(stmt);
+		}
+		
+		return toRet;
+		
+		
+	}
 
 
 	public int getDesiredReplicationDegreeForChunk(Chunk rc){

@@ -25,6 +25,8 @@ public class SendChunk extends Chunk{
 			
 			//if(path == null)throw new Exception();
 			
+			if(path == null)f = new FileToBackup(d.filePathForBackedFile(fileID));
+			
 		}
 		catch(Exception e){
 			

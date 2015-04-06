@@ -8,6 +8,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 
+import Workers.Scout;
+
 
 /**
  * The Interface Message.
@@ -61,26 +63,13 @@ public abstract class Message {
 		
 		System.out.println("SENDING : "+this.toString());
 		
-		DatagramSocket socket = null;
-		try {
+		byte[] msg = new byte[this.toBytes().length];
 
-			socket = new DatagramSocket();
+		msg = this.toBytes();
 
-			byte[] msg = new byte[this.toBytes().length];
+		DatagramPacket packet = new DatagramPacket(msg, msg.length, new InetSocketAddress(MC_ADDRESS, MC_PORT) );
 
-			msg = this.toBytes();
-
-			DatagramPacket packet = new DatagramPacket(msg, msg.length, new InetSocketAddress(MC_ADDRESS, MC_PORT) );
-
-			socket.send(packet);
-
-
-		} catch (IOException e) {
-
-			e.printStackTrace();
-		} finally {
-			socket.close();
-		}
+		Scout.sendSocket(packet);
 		
 		
 	}

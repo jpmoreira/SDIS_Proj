@@ -105,6 +105,8 @@ public abstract class Chunk implements Comparable<Chunk>{
 		}
 		catch(Exception e){
 			
+			System.out.println("Database ERRORRRRRRRR");
+			
 		}
 
 		

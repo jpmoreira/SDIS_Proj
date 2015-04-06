@@ -29,6 +29,7 @@ public class Worker extends Thread {
 	
 	private void obtainMessage() {
 		
+		/*
 		try {
 			if(packet.getPort() == Scout.sender.getLocalPort() && packet.getAddress().equals(InetAddress.getLocalHost())){
 				
@@ -46,7 +47,7 @@ public class Worker extends Thread {
 			return;
 		}
 		
-		
+		*/
 		
 		byte[] byteMsg = new byte[packet.getLength()];
 		System.arraycopy(packet.getData(),packet.getOffset(),byteMsg, 0, packet.getLength());
